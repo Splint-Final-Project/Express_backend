@@ -8,20 +8,20 @@ export const getPickles = async (req, res) => {
     
     const skip = (page - 1) * limit;
 
-    const pickles = await Pickle.find({}, '_id')
+    const pickles = await Pickle.find({})
       .skip(skip)
       .limit(limit);
 
     const total = await Pickle.countDocuments();
 
     res.status(200).json({
-      success: true,
       count: pickles.length,
       total,
       page,
       pages: Math.ceil(total / limit),
       data: pickles
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
