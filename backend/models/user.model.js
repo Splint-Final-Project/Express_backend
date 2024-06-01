@@ -2,11 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
 	{
-		fullName: {
-			type: String,
-			required: true,
-		},
-		username: {
+		email: {
 			type: String,
 			required: true,
 			unique: true,
@@ -16,11 +12,11 @@ const userSchema = new mongoose.Schema(
 			required: true,
 			minlength: 6,
 		},
-		gender: {
-			type: String,
-			required: true,
-			enum: ["male", "female"],
-		},
+		// gender: {
+		// 	type: String,
+		// 	required: true,
+		// 	enum: ["male", "female"],
+		// },
 		profilePic: {
 			type: String,
 			default: "",

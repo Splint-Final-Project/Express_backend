@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from  "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 import connectToMongoDB from "./db/connectToMongoDB.js";
 
@@ -12,15 +13,19 @@ import { app, server } from "./socket/socket.js";
 // const app = express();
 
 dotenv.config();
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 8080;
 
+app.use(cors({
+  origin: "http://localhost:4000",
+  credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
 
 // middleware -> "api/auth/${authRoutes의 경로가 추가: signup, login, logout}"
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/v1/user", authRoutes);
+app.use("/api/v1/messages", messageRoutes);
+app.use("/api/v1/users", userRoutes);
 
 server.listen(PORT, () => {
   connectToMongoDB();
