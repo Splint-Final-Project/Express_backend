@@ -23,7 +23,6 @@ export const signup = async (req, res) => {
     // https://avatar-placeholder.iran.liara.run/
 
 		const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${email}`;
-		// const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
 
 		const newUser = new User({
 			email,
@@ -62,12 +61,13 @@ export const login = async (req, res) => {
 			return res.status(400).json({ error: "Invalid email or password" });
 		}
 
-		generateTokenAndSetCookie(user._id, res);
+		const token = generateTokenAndSetCookie(user._id, res);
 
 		res.status(200).json({
 			_id: user._id,
 			email: user.email,
 			profilePic: user.profilePic,
+			token: token,
 		});
 	} catch (error) {
 		console.log("Error in login controller", error.message);
