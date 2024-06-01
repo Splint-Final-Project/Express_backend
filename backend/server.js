@@ -8,6 +8,8 @@ import connectToMongoDB from "./db/connectToMongoDB.js";
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import pickleRoutes from "./routes/pickle.routes.js";
+
 import { app, server } from "./socket/socket.js";
 
 // const app = express();
@@ -26,6 +28,7 @@ app.use(cookieParser());
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/messages", messageRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/pickle", pickleRoutes);
 
 server.listen(PORT, () => {
   connectToMongoDB();

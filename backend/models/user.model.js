@@ -16,6 +16,13 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
+
+		myPickles: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Pickle",
+			}
+		],
 		// createdAt, updatedAt => Member since <createdAt>
 	},
 	{ timestamps: true }
