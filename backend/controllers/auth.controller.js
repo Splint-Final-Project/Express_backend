@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 
 import User from "../models/user.model.js";
-import generateTokenAndSetCookie from "../utils/generateToken.js";
 import generateToken from "../utils/generateToken.js";
 
 export const signup = async (req, res) => {
@@ -39,9 +38,10 @@ export const signup = async (req, res) => {
 
       res.status(201).json({
         message: "회원가입 성공, 추가정보 입력 페이지로 리다이렉트합니다.",
-        token: generateToken(newUser._id),
+        // token: generateToken(newUser._id),
         _id: newUser._id,
         email: newUser.email,
+        status: newUser.status,
         profilePic: newUser.profilePic,
       });
     } else {
@@ -50,6 +50,25 @@ export const signup = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
     console.log("Error in signup controller", err.message);
+  }
+};
+
+export const signup2 = async (req, res) => {
+  try {
+    const { nickname, profilePic, occupation } = req.body;
+    if (!nickname)
+      return res.status(400).json({ error: "닉네임을 입력해주세요." });
+    await User.findByIdAndUpdate(req.user._id, {
+      nickname,
+      profilePic,
+      occupation,
+    });
+    res
+      .status(201)
+      .json({ message: "필수 회원 정보가 입력되어 회원가입이 완료됐습니다." });
+  } catch (err) {
+    res.status(500).json({ error: "Internal Server Error" });
+    console.log("Error in signup2 controller", err.message);
   }
 };
 
@@ -65,13 +84,17 @@ export const login = async (req, res) => {
     if (!user || !isPasswordCorrect) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
-
     res.status(200).json({
       message: "로그인 성공",
-      token: generateToken(newUser._id),
-      _id: newUser._id,
-      email: newUser.email,
-      profilePic: newUser.profilePic,
+      token: generateToken(user._id, res),
+      user: {
+        _id: user._id,
+        email: user.email,
+        status: user.status,
+        profilePic: user.profilePic,
+        nickname: user.nickname,
+        occupation: user.occupation,
+      },
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -81,7 +104,7 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.cookie("jwt", "", { maxAge: 15 * 24 * 60 * 60 * 1000 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
