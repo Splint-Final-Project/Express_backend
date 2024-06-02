@@ -37,13 +37,15 @@ export const signup = async (req, res) => {
       // generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
 
+      generateToken(newUser._id, res);
       res.status(201).json({
         message: "회원가입 성공, 추가정보 입력 페이지로 리다이렉트합니다.",
-        // token: generateToken(newUser._id),
-        _id: newUser._id,
-        email: newUser.email,
-        status: newUser.status,
-        profilePic: newUser.profilePic,
+        user: {
+          _id: newUser._id,
+          email: newUser.email,
+          status: newUser.status,
+          profilePic: newUser.profilePic,
+        },
       });
     } else {
       res.status(400).json({ error: "Invalid user data" });
@@ -127,6 +129,39 @@ export const login = async (req, res) => {
       });
   } catch (error) {
     console.log("Error in login controller", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized - No Token Provided" });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(401).json({ error: "Unauthorized - Invalid Token" });
+    }
+    const user = await User.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json({
+      message: "유저 정보를 성공적으로 가져왔습니다.",
+      user: {
+        _id: user._id,
+        email: user.email,
+        status: user.status,
+        profilePic: user.profilePic,
+        nickname: user.nickname,
+        occupation: user.occupation,
+      },
+    });
+  } catch (error) {
+    console.log("Error in getMe controller", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
