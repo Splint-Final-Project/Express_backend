@@ -1,12 +1,11 @@
 import express from "express";
 
-import { getPickles, createPickle, getNearbyPickles } from "../controllers/pickle.controller.js";
+import { getPickles, createPickle } from "../controllers/pickle.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
 router.get("/", protectRoute, getPickles);
-router.get("/nearby", protectRoute, getNearbyPickles);
 router.post("/create", protectRoute, createPickle);
 // router.get("/:pickleType", protectRoute, getPicklesOfType);
 

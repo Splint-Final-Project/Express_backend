@@ -42,7 +42,7 @@ const pickleSchema = new mongoose.Schema(
     capacity: {
       type: Number,
       required: true,
-    },
+    }
   }
 );
 
