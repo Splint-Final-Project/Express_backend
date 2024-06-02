@@ -86,15 +86,17 @@ export const signup2 = async (req, res) => {
       status: "active",
     });
 
+    const updated = await User.findById(user._id).select("-password");
+
     res.status(200).json({
       message: "필수 회원 정보가 입력되어 회원가입이 완료됐습니다.",
       user: {
-        _id: user._id,
-        email: user.email,
-        status: user.status,
-        profilePic: user.profilePic,
-        nickname: user.nickname,
-        occupation: user.occupation,
+        _id: updated._id,
+        email: updated.email,
+        status: updated.status,
+        profilePic: updated.profilePic,
+        nickname: updated.nickname,
+        occupation: updated.occupation,
       },
     });
   } catch (err) {
@@ -168,7 +170,7 @@ export const getMe = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 15 * 24 * 60 * 60 * 1000 });
+    res.clearCookie("jwt");
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);

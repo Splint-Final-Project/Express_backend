@@ -4,8 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
-      unique: true,
+      // unique: true,
     },
     status: {
       type: String,
@@ -19,7 +18,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
     },
     profilePic: {
@@ -30,7 +28,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-
+    oauthType: {
+      type: String || null,
+      enum: ["github", "kakao"],
+      required: false,
+      default: null,
+    },
+    oauthId: {
+      type: String || null,
+      required: false,
+      default: null,
+    },
     myPickles: [
       {
         type: mongoose.Schema.Types.ObjectId,
