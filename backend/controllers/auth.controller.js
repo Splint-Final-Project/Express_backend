@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
 import generateToken from "../utils/generateToken.js";
@@ -55,17 +56,45 @@ export const signup = async (req, res) => {
 
 export const signup2 = async (req, res) => {
   try {
+    const token = req.cookies.jwt;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized - No Token Provided" });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(401).json({ error: "Unauthorized - Invalid Token" });
+    }
+    const user = await User.findById(decoded.userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const { nickname, profilePic, occupation } = req.body;
+
     if (!nickname)
       return res.status(400).json({ error: "닉네임을 입력해주세요." });
-    await User.findByIdAndUpdate(req.user._id, {
+
+    await User.findByIdAndUpdate(user._id, {
       nickname,
       profilePic,
       occupation,
+      status: "active",
     });
-    res
-      .status(201)
-      .json({ message: "필수 회원 정보가 입력되어 회원가입이 완료됐습니다." });
+
+    res.status(200).json({
+      message: "필수 회원 정보가 입력되어 회원가입이 완료됐습니다.",
+      user: {
+        _id: user._id,
+        email: user.email,
+        status: user.status,
+        profilePic: user.profilePic,
+        nickname: user.nickname,
+        occupation: user.occupation,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
     console.log("Error in signup2 controller", err.message);
@@ -84,18 +113,18 @@ export const login = async (req, res) => {
     if (!user || !isPasswordCorrect) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
-    res.status(200).json({
-      message: "로그인 성공",
-      token: generateToken(user._id, res),
-      user: {
-        _id: user._id,
-        email: user.email,
-        status: user.status,
-        profilePic: user.profilePic,
-        nickname: user.nickname,
-        occupation: user.occupation,
-      },
-    });
+    generateToken(user._id, res),
+      res.status(200).json({
+        message: "로그인 성공",
+        user: {
+          _id: user._id,
+          email: user.email,
+          status: user.status,
+          profilePic: user.profilePic,
+          nickname: user.nickname,
+          occupation: user.occupation,
+        },
+      });
   } catch (error) {
     console.log("Error in login controller", error.message);
     res.status(500).json({ error: "Internal Server Error" });

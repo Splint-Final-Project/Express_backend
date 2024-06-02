@@ -5,13 +5,13 @@ import {
   signup,
   signup2,
 } from "../controllers/auth.controller.js";
-import protectRoute from "../middleware/protectRoute.js";
+// import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
 router.post("/join", signup);
 
-router.put("/join2", protectRoute, signup2);
+router.put("/join2", signup2);
 
 router.post("/login", login);
 
