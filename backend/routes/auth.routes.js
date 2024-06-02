@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getMe,
   login,
   logout,
   signup,
@@ -9,9 +10,11 @@ import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
+router.get("/me", protectRoute, getMe);
+
 router.post("/join", signup);
 
-router.put("/join2", protectRoute, signup2);
+router.put("/join2", signup2);
 
 router.post("/login", login);
 
