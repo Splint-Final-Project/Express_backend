@@ -92,11 +92,11 @@ pickleSchema.virtual('status').get(function() {
   const lastTime = this.when.times[this.when.times.length - 1];
 
   if (this.participants.length === this.capacity && lastTime > now) {
-    return '진행 중';
+    return 'start';
   } else if (this.participants.length === this.capacity && lastTime < now) {
-    return '종료';
+    return 'end';
   } else {
-    return '모집 중';
+    return 'recruiting';
   }
 });
 

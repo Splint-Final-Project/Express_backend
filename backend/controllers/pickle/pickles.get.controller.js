@@ -70,8 +70,9 @@ export const getNearbyPickles = async (req, res) => {
   }
 }
 
+// 로그인 필수
 export const getPicklesByStatus = async (req, res) => {
-  const { status } = req.query;
+  const { status } = req.params;
   const user = req.user._id;
 
   const now = new Date();
@@ -95,9 +96,9 @@ export const getPicklesByStatus = async (req, res) => {
           todayPickles.push(pickle);
         }
       } else {
-        if (status === '진행 중' && isParticipant && pickle.participants.length === pickle.capacity && lastTime > now) {
+        if (status === 'start' && isParticipant && pickle.participants.length === pickle.capacity && lastTime > now) {
           filteredPickles.push(pickle);
-        } else if (status === '종료' && isParticipant && pickle.participants.length === pickle.capacity && lastTime < now) {
+        } else if (status === 'end' && isParticipant && pickle.participants.length === pickle.capacity && lastTime < now) {
           filteredPickles.push(pickle);
         }
       }
