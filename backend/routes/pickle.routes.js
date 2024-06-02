@@ -1,6 +1,7 @@
 import express from "express";
 
-import { getPickles, createPickle, getNearbyPickles } from "../controllers/pickle.controller.js";
+import { getPickles, getNearbyPickles } from "../controllers/pickle/pickle.controller.js";
+import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();

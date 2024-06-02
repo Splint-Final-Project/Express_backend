@@ -1,4 +1,4 @@
-import Pickle from "../models/Pickle.model.js";
+import Pickle from "../../models/Pickle.model.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -109,43 +109,5 @@ export const getPickleDetails = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-export const createPickle = async (req, res) => {
-  try {
-    const {
-      title,
-      content,
-      latitude,
-      longitude,
-      capacity
-    } = req.body;
-    // 현재 사용자가 생성 -> 리더가 됩니다.
-    const leader = req.user._id;
-
-    const newPickle = new Pickle({
-      leader,
-      title,
-      content,
-      viewCount: 0,
-      latitude,
-      longitude,
-      capacity
-    });
-
-    // 데이터베이스에 저장
-    const savedPickle = await newPickle.save();
-
-    res.status(201).json({
-      success: true,
-      data: savedPickle
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    });
   }
 };

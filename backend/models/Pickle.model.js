@@ -38,8 +38,16 @@ const pickleSchema = new mongoose.Schema(
     },
 
     when: {
-      type: Date,
-      required: true,
+      summary: {
+        type: String,
+      },
+      
+      times: [
+        {
+          type: Date,
+          required: true,
+        }
+      ],
     },
 
     // {id} url로 접근할 시, 추가로 제공되는 데이터
@@ -80,9 +88,12 @@ const pickleSchema = new mongoose.Schema(
 pickleSchema.virtual('status').get(function() {
   const now = new Date();
   
-  if (this.participants.length === this.capacity && this.when > now) {
+  // when.times 배열에서 가장 마지막 시간을 가져옵니다.
+  const lastTime = this.when.times[this.when.times.length - 1];
+
+  if (this.participants.length === this.capacity && lastTime > now) {
     return '진행 중';
-  } else if (this.participants.length === this.capacity && this.when < now) {
+  } else if (this.participants.length === this.capacity && lastTime < now) {
     return '종료';
   } else {
     return '모집 중';
