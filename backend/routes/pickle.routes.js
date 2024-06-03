@@ -1,7 +1,7 @@
 import express from "express";
 
-import { getPickles, getNearbyPickles } from "../controllers/pickle/pickle.controller.js";
-import { getPicklesByStatus } from "../controllers/pickle/pickles.get.controller.js";
+import { getNearbyPickles } from "../controllers/pickle/pickle.controller.js";
+import { getPickles, getPicklesByStatus } from "../controllers/pickle/pickles.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
 

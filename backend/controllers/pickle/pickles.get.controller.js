@@ -1,5 +1,6 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import { minimumFormatPickle } from "../dto/\bpickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -15,12 +16,14 @@ export const getPickles = async (req, res) => {
 
     const total = await Pickle.countDocuments();
 
+    const formattedPickles = pickles.map(minimumFormatPickle);
+
     res.status(200).json({
       count: pickles.length,
       total,
       page,
       pages: Math.ceil(total / limit),
-      data: pickles
+      data: formattedPickles
     });
 
   } catch (error) {
@@ -63,7 +66,9 @@ export const getNearbyPickles = async (req, res) => {
       }
     });
 
-    res.json(nearbyPickles);
+    const formattedPickles = nearbyPickles.map(minimumFormatPickle);
+
+    res.json({data: formattedPickles});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
