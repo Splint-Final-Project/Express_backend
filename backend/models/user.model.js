@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     oauthType: {
       type: String || null,
-      enum: ["github", "kakao"],
+      enum: ["naver", "kakao"],
       required: false,
       default: null,
     },
