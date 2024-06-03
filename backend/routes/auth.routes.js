@@ -1,4 +1,5 @@
 import express from "express";
+import axios from "axios";
 import {
   getMe,
   login,
@@ -7,7 +8,6 @@ import {
   signup2,
 } from "../controllers/auth.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
-import axios from "axios";
 import User from "../models/user.model.js";
 import generateToken from "../utils/generateToken.js";
 import qs from "qs";

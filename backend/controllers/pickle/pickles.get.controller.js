@@ -1,4 +1,5 @@
-import Pickle from "../models/Pickle.model.js";
+// 다양한 종류 피클에 대한 컨트롤러
+import Pickle from "../../models/Pickle.model.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -29,7 +30,6 @@ export const getPickles = async (req, res) => {
     });
   }
 };
-
 
 export const getNearbyPickles = async (req, res) => {
   const { latitude, longitude } = req.query;
@@ -70,82 +70,43 @@ export const getNearbyPickles = async (req, res) => {
   }
 }
 
+// 로그인 필수
 export const getPicklesByStatus = async (req, res) => {
-  const { status = '모집 중' } = req.query;
+  const { status } = req.params;
+  const user = req.user._id;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   try {
     const pickles = await Pickle.find().exec();
 
-    // 상태에 따라 필터링
-    const filteredPickles = pickles.filter(pickle => {
-      const now = new Date();
+    // 상태별로 필터링된 결과를 저장할 배열
+    let filteredPickles = [];
+    let todayPickles = [];
 
-      if (status === '모집 중') {
-        return pickle.deadLine > now && pickle.participants.length < pickle.capacity;
-      } else if (status === '진행 중') {
-        return pickle.participants.length === pickle.capacity && pickle.when > now;
-      } else if (status === '종료') {
-        return pickle.participants.length === pickle.capacity && pickle.when < now;
+    pickles.forEach(pickle => {
+      const isParticipant = pickle.participants.some(participant => participant.equals(user));
+      const lastTime = new Date(pickle.when.times[pickle.when.times.length - 1]);
+
+      // 오늘 날짜와 동일한 시간을 가지는 피클을 따로 저장
+      const isSameDayAsToday = lastTime >= today && lastTime < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      if (isSameDayAsToday) {
+        if (isParticipant) {
+          todayPickles.push(pickle);
+        }
+      } else {
+        if (status === 'start' && isParticipant && pickle.participants.length === pickle.capacity && lastTime > now) {
+          filteredPickles.push(pickle);
+        } else if (status === 'end' && isParticipant && pickle.participants.length === pickle.capacity && lastTime < now) {
+          filteredPickles.push(pickle);
+        }
       }
-      return false;
     });
 
-    res.json(filteredPickles);
+    res.json({ filteredPickles, todayPickles });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-export const getPickleDetails = async (req, res) => {
-  try {
-    const pickle = await Pickle.findById(req.params.id).exec();
-
-    if (!pickle) {
-      return res.status(404).json({ error: 'Pickle not found' });
-    }
-
-    res.json(pickle); // status 필드가 JSON 응답에 포함됩니다.
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-export const createPickle = async (req, res) => {
-  try {
-    const {
-      title,
-      content,
-      latitude,
-      longitude,
-      capacity
-    } = req.body;
-    // 현재 사용자가 생성 -> 리더가 됩니다.
-    const leader = req.user._id;
-
-    const newPickle = new Pickle({
-      leader,
-      title,
-      content,
-      viewCount: 0,
-      latitude,
-      longitude,
-      capacity
-    });
-
-    // 데이터베이스에 저장
-    const savedPickle = await newPickle.save();
-
-    res.status(201).json({
-      success: true,
-      data: savedPickle
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    });
   }
 };
