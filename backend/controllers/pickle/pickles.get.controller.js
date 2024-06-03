@@ -109,7 +109,10 @@ export const getPicklesByStatus = async (req, res) => {
       }
     });
 
-    res.json({ filteredPickles, todayPickles });
+    const formattedFilteredPickles = pickles.map(minimumFormatPickle);
+    const formattedTodayPickles = pickles.map(minimumFormatPickle);
+
+    res.json({ filteredPickles: formattedFilteredPickles, todayPickles: formattedTodayPickles });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
