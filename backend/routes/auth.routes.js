@@ -10,6 +10,7 @@ import protectRoute from "../middleware/protectRoute.js";
 import axios from "axios";
 import User from "../models/user.model.js";
 import generateToken from "../utils/generateToken.js";
+import qs from "qs";
 
 const router = express.Router();
 
@@ -23,33 +24,56 @@ router.post("/login", login);
 
 router.delete("/logout", logout);
 
-router.get("/oauth/github", async (req, res) => {
+//callbackes from oauth providers
+router.get("/oauth/:provider", async (req, res) => {
   try {
     const { code } = req.query;
-    const result = await axios({
-      url: "https://github.com/login/oauth/access_token",
-      method: "POST",
-      data: {
-        client_id: process.env.GIT_CLIENT_ID,
-        client_secret: process.env.GIT_CLIENT_SECRET,
-        code: code,
-      },
-    });
-    const accessToken = result.data.split("=")[1].split("&")[0];
-    const userInfo = await axios({
-      url: "https://api.github.com/user",
-      method: "get",
-      headers: {
-        Authorization: `token ${accessToken}`,
-      },
-    });
-    console.log("user info received from github");
+    const provider = req.params.provider;
+    let tokenUrl, userInfoUrl, oauthType;
 
-    // 깃허브id가 유저목록db 검색해서 나오면 바로 로그인 jwt 발급, fe 홈으로 리다이렉트
-    // 없으면 JSON으로 정보 넘기면서 fe의 회원가입 추가정보입력 페이지로 이동,
+    if (provider === "kakao") {
+      tokenUrl = "https://kauth.kakao.com/oauth/token";
+      userInfoUrl = "https://kapi.kakao.com/v2/user/me";
+      oauthType = "kakao";
+    } else if (provider === "naver") {
+      tokenUrl = "https://nid.naver.com/oauth2.0/token";
+      userInfoUrl = "https://openapi.naver.com/v1/nid/me";
+      oauthType = "naver";
+    } else {
+      throw new Error("Invalid provider");
+    }
+
+    const result = await axios.post(
+      tokenUrl,
+      qs.stringify({
+        grant_type: "authorization_code",
+        client_id:
+          provider === "kakao"
+            ? process.env.KAKAO_CLIENT_ID
+            : process.env.NAVER_CLIENT_ID,
+        client_secret:
+          provider === "kakao"
+            ? process.env.KAKAO_CLIENT_SECRET
+            : process.env.NAVER_CLIENT_SECRET,
+        redirectUri: `http://localhost:8080/api/v1/user/oauth/${provider}`,
+        code: code,
+      }),
+      { "content-type": "application/x-www-form-urlencoded" }
+    );
+
+    const token = result.data.access_token;
+    const userInfo = await axios.get(userInfoUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const oauthId =
+      provider === "kakao" ? userInfo.data.id : userInfo.data.response.id;
+
     const found = await User.findOne({
-      oauthType: "github",
-      oauthId: userInfo.data.id,
+      oauthType: oauthType,
+      oauthId: oauthId,
     });
     if (found) {
       generateToken(found._id, res);
@@ -60,8 +84,8 @@ router.get("/oauth/github", async (req, res) => {
     } else {
       // 회원가입
       const newUser = new User({
-        oauthType: "github",
-        oauthId: userInfo.data.id,
+        oauthType: oauthType,
+        oauthId: oauthId,
       });
       await newUser.save();
       console.log("회원가입 완료");
