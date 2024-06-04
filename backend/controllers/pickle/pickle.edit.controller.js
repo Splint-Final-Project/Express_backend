@@ -1,7 +1,6 @@
-// 세부 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
 
-export const getPickleDetails = async (req, res) => {
+export const editPickle = async (req, res) => {
   try {
     const pickle = await Pickle.findById(req.params.id).exec();
 
@@ -9,7 +8,13 @@ export const getPickleDetails = async (req, res) => {
       return res.status(404).json({ error: 'Pickle not found' });
     }
 
-    res.json(pickle); // status 필드가 JSON 응답에 포함됩니다.
+    const updates = req.body;
+    
+    Object.assign(pickle, updates);
+
+    const updatedPickle = await pickle.save();
+
+    res.json(updatedPickle);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
