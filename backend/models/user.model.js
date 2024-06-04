@@ -39,13 +39,13 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
-    myPickles: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Pickle",
-      },
-    ],
-    // createdAt, updatedAt => Member since <createdAt>
+    // Participation 테이블에 저장
+    // myPickles: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Pickle",
+    //   },
+    // ],
   },
   { timestamps: true }
 );

@@ -7,12 +7,13 @@ const removeExpiredPickles = async () => {
     const result = await Pickle.deleteMany({
       deadLine: { $gt: now },
       $expr: {
-        $lt: [{ $size: "$participants" }, "$capacity"]
-      }
+        $lt: [{ $size: "$participants" }, "$capacity"],
+      },
     });
+    //TODO: 환불 처리하기
     console.log(`${result.deletedCount} pickles removed.`);
   } catch (error) {
-    console.error('Error removing expired pickles:', error);
+    console.error("Error removing expired pickles:", error);
   }
 };
 
