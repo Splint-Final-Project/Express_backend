@@ -7,5 +7,17 @@ export const minimumFormatPickle = (pickle) => {
     deadLine: pickle.deadLine,
     where: pickle.where,
     when: pickle.when,
+    cost: pickle.cost,
+    latitude: pickle.latitude,
+    longtitude: pickle.longitude
   };
+}
+
+export const pickleEditFormat = (pickle) => {
+  return {
+    title: pickle.title,
+    capacity: pickle.capacity,
+    explanation: pickle.explanation,
+    deadLine: pickle.deadLine,
+  }
 }

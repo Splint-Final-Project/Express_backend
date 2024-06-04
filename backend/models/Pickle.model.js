@@ -66,18 +66,18 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 노출 시킬 필요 없는 것
-    viewCount: {
-      type: Number,
-      required: true,
-    },
-
     latitude: {
       type: Number,
       required: true,
     },
 
     longitude: {
+      type: Number,
+      required: true,
+    },
+
+    // 노출 시킬 필요 없는 것
+    viewCount: {
       type: Number,
       required: true,
     },
