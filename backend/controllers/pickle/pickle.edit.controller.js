@@ -1,5 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
-import { pickleEditFormat } from "../dto/\bpickle.dto.js";
+import { pickleEditFormat } from "../dto/pickle.dto.js";
 
 export const editPickle = async (req, res) => {
   try {

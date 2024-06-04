@@ -1,6 +1,6 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
-import { minimumFormatPickle } from "../dto/\bpickle.dto.js";
+import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
