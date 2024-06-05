@@ -139,3 +139,27 @@ export const getPopularPickles = async (req, res) => {
     res.status(500).json({ message: '서버 오류가 발생했습니다.', error });
   }
 };
+
+export const getHotTimePickles = async (req, res) => {
+  try {
+    const now = new Date();
+    const oneDayLater = new Date(now);
+    oneDayLater.setDate(now.getDate() + 1); // 현재 날짜에서 1일 후의 날짜를 설정
+
+    // 마감 기한이 하루 남은 피클을 찾습니다.
+    let hotTimePickles = await Pickle.find({
+      deadLine: { $gte: now, $lte: oneDayLater }
+    }).sort({ deadLine: 1 }) // deadLine 오름차순으로 정렬
+
+    // 결과가 10개를 초과할 경우 10개만 반환
+    if (hotTimePickles.length > 10) {
+      hotTimePickles = hotTimePickles.slice(0, 10);
+    }
+
+    const filteredPickles = hotTimePickles.map(minimumFormatPickle);
+
+    res.status(200).json({data: filteredPickles});
+  } catch (error) {
+    res.status(500).json({ message: '서버 오류가 발생했습니다.', error });
+  }
+}
