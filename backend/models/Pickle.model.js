@@ -49,11 +49,11 @@ const pickleSchema = new mongoose.Schema({
     ],
   },
 
-  // participation 테이블에 저장
-  // leader: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  // 	ref: "User",
-  // },
+  // participation 테이블에 저장 -> 1:1 채팅을 위해 필요.
+  leader: {
+    type: mongoose.Schema.Types.ObjectId,
+  	ref: "User",
+  },
 
   content: {
     type: String,
