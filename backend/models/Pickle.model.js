@@ -1,86 +1,89 @@
 import mongoose from "mongoose";
 
-const pickleSchema = new mongoose.Schema({
-  // participation 테이블에 저장
-  // participants: [
-  // 	{
-  // 		type: mongoose.Schema.Types.ObjectId,
-  // 		ref: "User",
-  // 	},
-  // ],
+const pickleSchema = new mongoose.Schema(
+  {
+    // participation 테이블에 저장
+    participants: [
+    	{
+    		type: mongoose.Schema.Types.ObjectId,
+    		ref: "User",
+    	},
+    ],
 
-  title: {
-    type: String,
-    required: true,
-  },
-
-  // 모집 중
-  capacity: {
-    type: Number,
-    required: true,
-  },
-
-  cost: {
-    type: Number,
-    required: true,
-  },
-
-  deadLine: {
-    type: Date,
-    required: true,
-  },
-
-  // 진행 중
-  where: {
-    type: String,
-    required: true,
-  },
-
-  when: {
-    summary: {
+    title: {
       type: String,
+      required: true,
     },
 
-    times: [
-      {
-        type: Date,
-        required: true,
+    // 모집 중
+    capacity: {
+      type: Number,
+      required: true,
+    },
+
+    cost: {
+      type: Number,
+      required: true,
+    },
+
+    deadLine: {
+      type: Date,
+      required: true,
+    },
+
+    // 진행 중
+    where: {
+      type: String,
+      required: true,
+    },
+
+    when: {
+      summary: {
+        type: String,
       },
-    ],
-  },
 
-  // participation 테이블에 저장 -> 1:1 채팅을 위해 필요.
-  leader: {
-    type: mongoose.Schema.Types.ObjectId,
-  	ref: "User",
-  },
+      times: [
+        {
+          type: Date,
+          required: true,
+        },
+      ],
+    },
 
-  content: {
-    type: String,
-    required: true,
-  }, // 어떤 피클 모임인지? (헬스, 스터디)
+    // participation 테이블에 저장 -> 1:1 채팅을 위해 필요.
+    leader: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
 
-  explanation: {
-    type: String,
-    required: true,
-  },
+    content: {
+      type: String,
+      required: true,
+    }, // 어떤 피클 모임인지? (헬스, 스터디)
 
-  latitude: {
-    type: Number,
-    required: true,
-  },
+    explanation: {
+      type: String,
+      required: true,
+    },
 
-  longitude: {
-    type: Number,
-    required: true,
-  },
+    latitude: {
+      type: Number,
+      required: true,
+    },
 
-  // 노출 시킬 필요 없는 것
-  viewCount: {
-    type: Number,
-    required: true,
+    longitude: {
+      type: Number,
+      required: true,
+    },
+
+    // 노출 시킬 필요 없는 것
+    viewCount: {
+      type: Number,
+      required: true,
+    },
   },
-});
+  // { timestamps: true }
+);
 
 // 가상 필드 생성
 pickleSchema.virtual("status").get(function () {

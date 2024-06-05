@@ -118,3 +118,24 @@ export const getPicklesByStatus = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const getPopularPickles = async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0); // 오늘의 시작 시간
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999); // 오늘의 끝 시간
+
+    const popularPickles = await Pickle.find({
+      createdAt: { $gte: startOfDay, $lte: endOfDay }
+    })
+    .sort({ viewCount: -1 })
+    .limit(10);
+
+    const filteredPickles = popularPickles.map(minimumFormatPickle);
+
+    res.status(200).json({data: filteredPickles});
+  } catch (error) {
+    res.status(500).json({ message: '서버 오류가 발생했습니다.', error });
+  }
+};

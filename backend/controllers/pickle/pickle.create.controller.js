@@ -38,7 +38,7 @@ export const createPickle = async (req, res) => {
       latitude,
       longitude
     });
-    
+
     // 데이터베이스에 저장
     const savedPickle = await newPickle.save();
 
