@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Participation from "./participation.model.js";
+import { isCancel } from "axios";
 
 const pickleSchema = new mongoose.Schema(
   {
@@ -8,17 +9,10 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
-    status: {
-      type: String,
-      enum: [
-        "recruiting",
-        "cancelled",
-        "readytostart",
-        "ongoing",
-        "terminated",
-      ],
+    isCancelled: {
+      type: Boolean,
       required: true,
-      default: "recruiting",
+      default: false,
     },
 
     // 모집 인원

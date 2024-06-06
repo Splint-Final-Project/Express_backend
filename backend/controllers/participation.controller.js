@@ -87,7 +87,7 @@ export const SignUpForPickle = async (req, res) => {
 export const WithdrawFromPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { pickle_id } = req.body;
-  // participation 객체를 찾아서 status를 "Cancelled"로 변경
+
   const participation = await Participation.findOne({
     user: user_id,
     pickle: pickle_id,
@@ -98,14 +98,9 @@ export const WithdrawFromPickle = async (req, res) => {
   }
 
   const refundResult = refund(participation.imp_uid);
-  if (refundResult && refundResult.code === 0) {
-    await Participation.findByIdAndDelete(participation._id);
-    res.status(200).json({ message: "참여 취소 성공" });
-  } else {
-    res
-      .status(400)
-      .json({ message: "참여 취소에 실패했습니다.", refundResult });
-  }
+  await Participation.findByIdAndDelete(participation._id);
+  res.status(200).json({ message: "참여 취소 성공", refundResult });
+  // res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
 };
 
 export const refund = async (imp_uid) => {

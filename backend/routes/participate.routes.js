@@ -11,6 +11,7 @@ const router = express.Router();
 router.post("/", protectRoute, SignUpForPickle);
 
 //피클 신청 취소하기
-router.delete("/", protectRoute, WithdrawFromPickle);
+//개발용
+router.delete("/", WithdrawFromPickle);
 
 export default router;
