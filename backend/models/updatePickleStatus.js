@@ -10,11 +10,11 @@ const updatePickleStatus = async () => {
     pickles.forEach(async (pickle) => {
       console.log(`Pickle ID: ${pickle._id}`);
       const now = new Date();
-      const participants = await Participation.find({ pickle: pickle._id });
 
       // 미달일 경우 로직
-      if (participants.length < pickle.capacity && pickle.deadLine < now) {
+      if (pickle.numParticipants < pickle.capacity && pickle.deadLine < now) {
         await Pickle.findByIdAndUpdate(pickle._id, { isCancelled: true });
+        const participants = await Participation.find({ pickle: pickle._id });
         participants.forEach(async (participant) => {
           console.log("Refunding participant: ", participant._id);
           const refundResult = refund(participant.imp_uid);

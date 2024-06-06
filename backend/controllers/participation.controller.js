@@ -50,8 +50,8 @@ export const SignUpForPickle = async (req, res) => {
     }
 
     // 피클의 최대 신청 인원을 초과했는지 검사하고 환불처리
-    const participants = await Participation.find({ pickle: pickle_id });
-    if (participants.length >= pickle.capacity) {
+    // const participants = await Participation.find({ pickle: pickle_id });
+    if (pickle.numParticipants >= pickle.capacity) {
       const refundResult = refund(imp_uid);
       return res.status(400).json({
         message: "피클의 최대 신청 인원을 초과했습니다. 신청에 실패했습니다.",
