@@ -11,11 +11,12 @@ import { getPickleDetails } from "../controllers/pickle/pickle.get.controller.js
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
 
-import protectRoute from "../middleware/protectRoute.js";
 import {
   JoinPickle,
   WithdrawFromPickle,
 } from "../controllers/pickle/pickle.join.controller.js";
+
+import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-import Pickle from "../models/Pickle.model.js";
-import Participation from "../models/participation.model.js";
+import Pickle from "../../models/Pickle.model.js";
+// import Participation from "../models/participation.model.js";
 import axios from "axios";
 
 export const JoinPickle = async (req, res) => {
@@ -86,17 +86,17 @@ export const WithdrawFromPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { pickle_id } = req.body;
 
-  const participation = await Participation.findOne({
-    user: user_id,
-    pickle: pickle_id,
-  });
+  // const participation = await Participation.findOne({
+  //   user: user_id,
+  //   pickle: pickle_id,
+  // });
 
-  if (!participation) {
-    return res.status(404).json({ message: "참여 정보가 존재하지 않습니다." });
-  }
+  // if (!participation) {
+  //   return res.status(404).json({ message: "참여 정보가 존재하지 않습니다." });
+  // }
 
-  const refundResult = refund(participation.imp_uid);
-  await Participation.findByIdAndDelete(participation._id);
+  // const refundResult = refund(participation.imp_uid);
+  // await Participation.findByIdAndDelete(participation._id);
   res.status(200).json({ message: "참여 취소 성공", refundResult });
   // res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
 };
