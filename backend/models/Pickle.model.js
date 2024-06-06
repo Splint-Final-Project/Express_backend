@@ -7,13 +7,6 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
-    isCancelled: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-
-    // 모집 인원
     capacity: {
       type: Number,
       required: true,
@@ -27,6 +20,31 @@ const pickleSchema = new mongoose.Schema(
     deadLine: {
       type: Date,
       required: true,
+    },
+
+    participants: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        payment_uid: {
+          type: String,
+          required: true,
+        },
+        isLeader: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+      },
+    ],
+
+    isCancelled: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
 
     // 진행 중
@@ -48,18 +66,7 @@ const pickleSchema = new mongoose.Schema(
       ],
     },
 
-    leader: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    numParticipants: {
-      type: Number,
-      required: true,
-      defaultValue: 0,
-    },
-
-    content: {
+    category: {
       type: String,
       required: true,
     }, // 어떤 피클 모임인지? (헬스, 스터디)
@@ -84,8 +91,8 @@ const pickleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-  }
-  ,{ timestamps: true }
+  },
+  { timestamps: true }
 );
 
 const Pickle = mongoose.model("Pickle", pickleSchema);
