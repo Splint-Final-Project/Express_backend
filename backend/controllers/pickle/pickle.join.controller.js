@@ -8,6 +8,8 @@ export const JoinPickle = async (req, res) => {
   try {
     const { payment } = verify(imp_uid);
 
+    const pickle = await Pickle.findById(pickle_id);
+    
     //피클이 신청 기간을 지났는지 검사
     if (pickle.deadLine < new Date()) {
       const refundResult = refund(imp_uid);
@@ -57,18 +59,23 @@ export const WithdrawFromPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { pickle_id } = req.body;
   const pickle = await Pickle.findById(pickle_id);
+
   if (!pickle) {
     return res.status(404).json({ message: "피클이 존재하지 않습니다." });
   }
+
   const participation = pickle.participants.find(
     (participant) => participant.user === user_id
   );
+
   if (!participation) {
     return res.status(404).json({ message: "참여하지 않은 피클입니다." });
   }
+
   pickle.participants = pickle.participants.filter(
     (participant) => participant.user !== user_id
   );
+
   await pickle.save();
 
   const refundResult = refund(participation.imp_uid);
