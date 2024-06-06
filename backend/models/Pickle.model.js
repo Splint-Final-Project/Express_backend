@@ -31,11 +31,11 @@ const pickleSchema = new mongoose.Schema(
         },
         payment_uid: {
           type: String,
-          required: true,
+          // required: true,
         },
         isLeader: {
           type: Boolean,
-          required: true,
+          // required: true,
           default: false,
         },
       },

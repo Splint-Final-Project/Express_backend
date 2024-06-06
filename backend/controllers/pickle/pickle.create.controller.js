@@ -18,26 +18,32 @@ export const createPickle = async (req, res) => {
     // 현재 사용자가 생성 -> 리더가 됩니다.
     const leader = req.user._id;
     const sortedTimes = when.times.sort((a, b) => new Date(a) - new Date(b));
-
     // 새로운 피클 생성
     const newPickle = new Pickle({
-      leader: leader,
       title,
       capacity,
       cost,
       deadLine,
+      participants: [
+        {
+          user: leader,
+          isLeader: true,
+        }
+      ],
+      leader: leader,
       where,
       when: {
         summary: when.summary,
         times: sortedTimes,
       },
-      content,
+      category: content,
       explanation,
       viewCount: 0, // 초기 viewCount 설정
       latitude,
       longitude,
+      isCancelled: false,
     });
-
+    console.log(newPickle)
     // 데이터베이스에 저장
     const savedPickle = await newPickle.save();
     // TODO: 결제 했는지 여부 확인하고 newPickle participants 필드에 push

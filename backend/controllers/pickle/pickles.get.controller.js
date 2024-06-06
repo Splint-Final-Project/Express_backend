@@ -1,5 +1,6 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import { findRecruitingPicklesWithPages, findProceedingPickles } from "../../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
@@ -10,11 +11,7 @@ export const getPickles = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const pickles = await Pickle.find({
-      deadLine: { $gt: now },
-    })
-      .skip(skip)
-      .limit(limit);
+    const pickles = await findRecruitingPicklesWithPages(skip, limit);
 
     const total = await Pickle.countDocuments();
 
@@ -36,6 +33,7 @@ export const getPickles = async (req, res) => {
 };
 
 export const getNearbyPickles = async (req, res) => {
+  const now = new Date();
   const { latitude, longitude } = req.query;
 
   // 쿼리 파라미터를 숫자로 변환합니다.
@@ -57,7 +55,8 @@ export const getNearbyPickles = async (req, res) => {
 
   try {
     const nearbyPickles = await Pickle.find({
-      status: "recruiting",
+      deadLine: { $gt: now },
+      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       latitude: {
         $gte: parsedLatitude - radiusInDegrees,
         $lte: parsedLatitude + radiusInDegrees,
@@ -77,64 +76,6 @@ export const getNearbyPickles = async (req, res) => {
   }
 };
 
-// 로그인 필수
-export const getPicklesByStatus = async (req, res) => {
-  const { status } = req.params;
-  const user = req.user._id;
-
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  try {
-    // const myPickles = await Participation.find({
-    //   user: user
-    // });
-
-    // TODO: 알잘딱깔센 로직으로 변경
-
-    const pickles = await Pickle.find({
-      // _id: myPickles.pickle,
-      // status: status,
-    });
-
-    // 상태별로 필터링된 결과를 저장할 배열
-    let filteredPickles = [];
-    let todayPickles = [];
-
-    pickles.forEach((pickle) => {
-      const isParticipant = pickle.participants.some((participant) =>
-        participant.equals(user)
-      );
-      const lastTime = new Date(
-        pickle.when.times[pickle.when.times.length - 1]
-      );
-
-      // 오늘 날짜와 동일한 시간을 가지는 피클을 따로 저장
-      const isSameDayAsToday =
-        lastTime >= today &&
-        lastTime < new Date(today.getTime() + 24 * 60 * 60 * 1000);
-      if (isSameDayAsToday) {
-        if (isParticipant) {
-          todayPickles.push(pickle);
-        }
-      } else {
-        filteredPickles.push(pickle);
-      }
-    });
-
-    const formattedFilteredPickles = pickles.map(minimumFormatPickle);
-    const formattedTodayPickles = pickles.map(minimumFormatPickle);
-
-    res.json({
-      filteredPickles: formattedFilteredPickles,
-      todayPickles: formattedTodayPickles,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
 export const getPopularPickles = async (req, res) => {
   try {
     const startOfDay = new Date();
@@ -143,7 +84,8 @@ export const getPopularPickles = async (req, res) => {
     endOfDay.setHours(23, 59, 59, 999); // 오늘의 끝 시간
 
     const popularPickles = await Pickle.find({
-      status: "recruiting",
+      deadLine: { $gt: now },
+      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     })
       .sort({ viewCount: -1 })
@@ -165,7 +107,8 @@ export const getHotTimePickles = async (req, res) => {
 
     // 마감 기한이 하루 남은 피클을 찾습니다.
     let hotTimePickles = await Pickle.find({
-      status: "recruiting",
+      deadLine: { $gt: now },
+      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       deadLine: { $gte: now, $lte: oneDayLater },
     }).sort({ deadLine: 1 }); // deadLine 오름차순으로 정렬
 
@@ -181,3 +124,40 @@ export const getHotTimePickles = async (req, res) => {
     res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
+
+// 로그인 필수
+export const getProceedingPickles = async (req, res) => {
+  const user = req.user._id;
+
+  try {
+    const { filteredPickles, todayPickles } = await findProceedingPickles(user);
+
+    const formattedFilteredPickles = filteredPickles.map(minimumFormatPickle);
+    const formattedTodayPickles = todayPickles.map(minimumFormatPickle);
+
+    res.json({
+      proceedingPickles: formattedFilteredPickles,
+      todayPickles: formattedTodayPickles,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getFinishedPickles = async (req, res) => {
+  const user = req.user._id;
+
+  try {
+    const finishedPickles = await findProceedingPickles(user);
+
+    const formattedFilteredPickles = finishedPickles.map(minimumFormatPickle);
+
+    res.json({
+      finishedPickles: formattedFilteredPickles,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
