@@ -1,16 +1,19 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import Participation from "../../models/participation.model.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
-    // const { pickleType } = req.params;
+    const now =  new Date();
+    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-
     const skip = (page - 1) * limit;
 
-    const pickles = await Pickle.find({}).skip(skip).limit(limit);
+    const pickles = await Pickle.find({
+      deadLine: { $gt: now }
+    }).skip(skip).limit(limit);
 
     const total = await Pickle.countDocuments();
 
@@ -53,6 +56,7 @@ export const getNearbyPickles = async (req, res) => {
 
   try {
     const nearbyPickles = await Pickle.find({
+      status: "recruiting",
       latitude: {
         $gte: parsedLatitude - radiusInDegrees,
         $lte: parsedLatitude + radiusInDegrees,
@@ -81,7 +85,15 @@ export const getPicklesByStatus = async (req, res) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   try {
-    const pickles = await Pickle.find().exec();
+    const myPickles = await Participation.find({
+      user: user
+    });
+
+    const pickles = await Pickle.find({
+      _id: myPickles.pickle,
+      status: status,
+
+    });
 
     // 상태별로 필터링된 결과를 저장할 배열
     let filteredPickles = [];
@@ -104,21 +116,7 @@ export const getPicklesByStatus = async (req, res) => {
           todayPickles.push(pickle);
         }
       } else {
-        if (
-          status === "start" &&
-          isParticipant &&
-          pickle.participants.length === pickle.capacity &&
-          lastTime > now
-        ) {
-          filteredPickles.push(pickle);
-        } else if (
-          status === "end" &&
-          isParticipant &&
-          pickle.participants.length === pickle.capacity &&
-          lastTime < now
-        ) {
-          filteredPickles.push(pickle);
-        }
+        filteredPickles.push(pickle);
       }
     });
 
@@ -143,6 +141,7 @@ export const getPopularPickles = async (req, res) => {
     endOfDay.setHours(23, 59, 59, 999); // 오늘의 끝 시간
 
     const popularPickles = await Pickle.find({
+      status: "recruiting",
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     })
       .sort({ viewCount: -1 })
@@ -164,6 +163,7 @@ export const getHotTimePickles = async (req, res) => {
 
     // 마감 기한이 하루 남은 피클을 찾습니다.
     let hotTimePickles = await Pickle.find({
+      status: "recruiting",
       deadLine: { $gte: now, $lte: oneDayLater },
     }).sort({ deadLine: 1 }); // deadLine 오름차순으로 정렬
 

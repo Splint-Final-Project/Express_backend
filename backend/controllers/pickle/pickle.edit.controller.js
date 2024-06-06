@@ -3,7 +3,7 @@ import { pickleEditFormat } from "../dto/pickle.dto.js";
 
 export const editPickle = async (req, res) => {
   try {
-    const pickle = await Pickle.findById(req.params.id).exec();
+    const pickle = await Pickle.findById(req.params.id);
 
     if (!pickle) {
       return res.status(404).json({ error: "Pickle not found" });

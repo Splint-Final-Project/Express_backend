@@ -1,24 +1,10 @@
 import mongoose from "mongoose";
-import Participation from "./participation.model.js";
 
 const pickleSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
-    },
-
-    status: {
-      type: String,
-      enum: [
-        "recruiting",
-        "cancelled",
-        "readytostart",
-        "ongoing",
-        "terminated",
-      ],
-      required: true,
-      default: "recruiting",
     },
 
     // 모집 인원
@@ -61,6 +47,12 @@ const pickleSchema = new mongoose.Schema(
       ref: "User",
     },
 
+    numParticipants: {
+      type: Number,
+      required: true,
+      defaultValue: 0,
+    },
+
     content: {
       type: String,
       required: true,
@@ -87,7 +79,7 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
   }
-  // { timestamps: true }
+  ,{ timestamps: true }
 );
 
 const Pickle = mongoose.model("Pickle", pickleSchema);
