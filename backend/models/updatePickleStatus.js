@@ -1,7 +1,7 @@
+import { refund } from "../controllers/participation.controller.js";
 import Pickle from "./Pickle.model.js";
 import Participation from "./participation.model.js";
 
-// 특정 조건에 맞는 피클 문서 제거
 const updatePickleStatus = async () => {
   try {
     const pickles = await Pickle.find({
@@ -9,11 +9,8 @@ const updatePickleStatus = async () => {
     });
 
     pickles.forEach(async (pickle) => {
-      console.log(`Pickle ID: ${pickle._id}, Status: ${pickle.status}`);
+      console.log(`Pickle ID: ${pickle._id}`);
       const now = new Date();
-      const firstTime = pickle.when.times[0];
-      const lastTime = pickle.when.times[pickle.when.times.length - 1];
-
       const participants = await Participation.find({ pickle: pickle._id });
 
       if (participants.length < pickle.capacity && pickle.deadLine > now) {
@@ -34,6 +31,7 @@ const updatePickleStatus = async () => {
     });
 
     //TODO: 환불 처리하기
+    console.log(`${result.deletedCount} pickles removed.`);
   } catch (error) {
     console.error("Error removing expired pickles:", error);
   }

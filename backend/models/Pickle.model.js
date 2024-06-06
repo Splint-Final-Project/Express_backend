@@ -7,6 +7,12 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
+    isCancelled: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
     // 모집 인원
     capacity: {
       type: Number,

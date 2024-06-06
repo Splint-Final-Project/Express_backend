@@ -16,15 +16,16 @@ const participationSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
-    payment_amount: {
-      type: Number,
-      // required: true,
-    },
-    isRefunded: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
+    // payment_amount: {
+    //   type: Number,
+    //   required: true,
+    // },
+    //환불되면 걍 삭제해버리기
+    // isRefunded: {
+    //   type: Boolean,
+    //   required: true,
+    //   default: false,
+    // },
     // status: {
     //   type: String,
     //   required: true,
