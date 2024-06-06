@@ -84,7 +84,7 @@ export const getPopularPickles = async (req, res) => {
     endOfDay.setHours(23, 59, 59, 999); // 오늘의 끝 시간
 
     const popularPickles = await Pickle.find({
-      deadLine: { $gt: now },
+      deadLine: { $gt: startOfDay },
       $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     })
