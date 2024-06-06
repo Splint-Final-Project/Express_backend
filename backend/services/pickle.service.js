@@ -3,42 +3,26 @@ import Pickle from "../models/Pickle.model";
 export const findRecruitingPickles = async () => {
   const now = new Date();
 
-  const notExpiredPickles = await Pickle.find({
+  const recruitingPickles = await Pickle.find({
     deadLine: { $gt: now },
-  });
-  let recruitingPickles = [];
-
-  notExpiredPickles.forEach(async (pickle) => {
-    if (pickle.participants.length < pickle.capacity) {
-      recruitingPickles.push(pickle);
-    }
+    $expr: { $lt: [{ $size: "$participants" }, "$capacity"] }
   });
 
   return recruitingPickles;
 };
 
-export const findExpiredPickles = async () => {
-  const now = new Date();
-
-  const expiredPickles = await Pickle.find({
-    deadLine: { $lte: now },
-  });
-  let closedPickles = [];
-
-  expiredPickles.forEach(async (pickle) => {
-    if (pickle.participants.length < pickle.capacity) {
-      closedPickles.push(pickle);
-    }
-  });
-
-  return closedPickles;
-};
-
 export const findRecruitmentCompletedPickles = async () => {
   const now = new Date();
 
-  const pickles = await Pickle.find({});
-  let recruitmentCompletedPickles = [];
+  const recruitmentCompletedPickles = await Pickle.find({
+    $expr: { $eq: [{ $size: "$participants" }, "$capacity"] },
+    $expr: {
+      $gt: [
+        { $arrayElemAt: ["$when.times", 0] }, // times 배열의 첫 번째 요소
+        now
+      ]
+    }
+  });
 
-  pickles.forEach(async (pickle) => {});
+  return recruitmentCompletedPickles;
 };
