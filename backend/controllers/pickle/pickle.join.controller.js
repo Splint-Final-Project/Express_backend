@@ -1,5 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
-import { verify, refund } from "../../utils/payment.js";
+import { verify, refund } from "../../utils/payments.js";
 export const JoinPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { imp_uid, pickle_id } = req.body;

@@ -1,5 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
-import { verify, refund } from "../../utils/payment.js";
+import { verify, refund } from "../../utils/payments.js";
 
 export const createPickle = async (req, res) => {
   try {
@@ -74,7 +74,7 @@ export const createPickle = async (req, res) => {
       longitude,
       isCancelled: false,
     });
-    console.log(newPickle)
+
     // 데이터베이스에 저장
     await newPickle.save();
 
