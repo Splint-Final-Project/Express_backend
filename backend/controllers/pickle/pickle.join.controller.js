@@ -1,43 +1,11 @@
 import Pickle from "../../models/Pickle.model.js";
-import axios from "axios";
-
+import { verify, refund } from "../../utils/payment.js";
 export const JoinPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { imp_uid, pickle_id } = req.body;
   console.log("SignUpForPickle", user_id, imp_uid, pickle_id);
   try {
-    const tokenResponse = await axios.post(
-      "https://api.iamport.kr/users/getToken",
-      {
-        imp_key: process.env.IMP_API_KEY,
-        imp_secret: process.env.IMP_API_SECRET,
-      }
-    );
-    const access_token = tokenResponse.data.response.access_token;
-    const paymentResponse = await axios.get(
-      `https://api.iamport.kr/payments/${imp_uid}`,
-      {
-        headers: { Authorization: access_token },
-      }
-    );
-
-    const payment = paymentResponse.data.response;
-    if (!payment?.amount) {
-      const refundResult = refund(imp_uid);
-      return res.status(404).json({
-        message: "결제 정보가 존재하지 않습니다. 신청에 실패했습니다.",
-        refundResult,
-      });
-    }
-
-    const pickle = await Pickle.findById(pickle_id);
-    if (!pickle) {
-      const refundResult = refund(imp_uid);
-      return res.status(404).json({
-        message: "피클이 존재하지 않습니다. 신청에 실패했습니다.",
-        refundResult,
-      });
-    }
+    const { payment } = verify(imp_uid);
 
     //피클이 신청 기간을 지났는지 검사
     if (pickle.deadLine < new Date()) {
@@ -64,6 +32,9 @@ export const JoinPickle = async (req, res) => {
         refundResult,
       });
     }
+
+    // TODO
+    // 이 피클에 대한 결제인지 확인
 
     pickle.participants.push({
       user: user_id,
@@ -102,34 +73,4 @@ export const WithdrawFromPickle = async (req, res) => {
   const refundResult = refund(participation.imp_uid);
   res.status(200).json({ message: "참여 취소 성공", refundResult });
   // res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
-};
-
-export const refund = async (imp_uid) => {
-  try {
-    const tokenResponse = await axios.post(
-      "https://api.iamport.kr/users/getToken",
-      {
-        imp_key: process.env.IMP_API_KEY,
-        imp_secret: process.env.IMP_API_SECRET,
-      }
-    );
-    const access_token = tokenResponse.data.response.access_token;
-    const cancelResponse = await axios({
-      url: "https://api.iamport.kr/payments/cancel",
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: access_token, // 포트원 서버로부터 발급받은 엑세스 토큰
-      },
-      data: {
-        reason: "테스트환불",
-        imp_uid,
-        // amount: cancel_request_amount,
-      },
-    });
-    const cancellation = cancelResponse.data;
-    return { cancellation };
-  } catch (error) {
-    return { message: "환불처리 실패" };
-  }
 };
