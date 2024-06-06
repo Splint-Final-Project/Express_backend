@@ -1,19 +1,20 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
-import Participation from "../../models/participation.model.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
-    const now =  new Date();
-    
+    const now = new Date();
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     const pickles = await Pickle.find({
-      deadLine: { $gt: now }
-    }).skip(skip).limit(limit);
+      deadLine: { $gt: now },
+    })
+      .skip(skip)
+      .limit(limit);
 
     const total = await Pickle.countDocuments();
 
@@ -85,14 +86,15 @@ export const getPicklesByStatus = async (req, res) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   try {
-    const myPickles = await Participation.find({
-      user: user
-    });
+    // const myPickles = await Participation.find({
+    //   user: user
+    // });
+
+    // TODO: 알잘딱깔센 로직으로 변경
 
     const pickles = await Pickle.find({
-      _id: myPickles.pickle,
-      status: status,
-
+      // _id: myPickles.pickle,
+      // status: status,
     });
 
     // 상태별로 필터링된 결과를 저장할 배열

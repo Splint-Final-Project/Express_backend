@@ -1,5 +1,4 @@
 import Pickle from "../models/Pickle.model";
-import Participation from "../models/participation.model";
 
 export const findRecruitingPickles = async () => {
   const now = new Date();
@@ -10,9 +9,7 @@ export const findRecruitingPickles = async () => {
   let recruitingPickles = [];
 
   notExpiredPickles.forEach(async (pickle) => {
-    // const participants = await Participation.find({ pickle: pickle._id });
-
-    if (pickle.numParticipants < pickle.capacity) {
+    if (pickle.participants.length < pickle.capacity) {
       recruitingPickles.push(pickle);
     }
   });
@@ -29,9 +26,7 @@ export const findExpiredPickles = async () => {
   let closedPickles = [];
 
   expiredPickles.forEach(async (pickle) => {
-    // const participants = await Participation.find({ pickle: pickle._id });
-
-    if (pickle.numParticipants < pickle.capacity) {
+    if (pickle.participants.length < pickle.capacity) {
       closedPickles.push(pickle);
     }
   });

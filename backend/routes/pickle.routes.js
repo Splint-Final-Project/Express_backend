@@ -1,16 +1,21 @@
 import express from "express";
 
-import { getPickles, 
-  getNearbyPickles, 
-  getPicklesByStatus, 
-  getPopularPickles, 
-  getHotTimePickles, 
+import {
+  getPickles,
+  getNearbyPickles,
+  getPicklesByStatus,
+  getPopularPickles,
+  getHotTimePickles,
 } from "../controllers/pickle/pickles.get.controller.js";
 import { getPickleDetails } from "../controllers/pickle/pickle.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
 
 import protectRoute from "../middleware/protectRoute.js";
+import {
+  JoinPickle,
+  WithdrawFromPickle,
+} from "../controllers/pickle/pickle.join.controller.js";
 
 const router = express.Router();
 
@@ -18,6 +23,12 @@ router.get("/", protectRoute, getPickles);
 router.get("/nearby", protectRoute, getNearbyPickles);
 router.get("/popular", protectRoute, getPopularPickles);
 router.get("/hotTime", protectRoute, getHotTimePickles);
+
+router.post("/join", protectRoute, JoinPickle);
+
+//개발용
+router.delete("/join", protectRoute, WithdrawFromPickle);
+//개발용
 
 // 동적
 router.get("/:id", protectRoute, getPickleDetails);
