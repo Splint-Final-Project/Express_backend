@@ -6,12 +6,12 @@ export const getPickleDetails = async (req, res) => {
     const pickle = await Pickle.findById(req.params.id).exec();
 
     if (!pickle) {
-      return res.status(404).json({ error: 'Pickle not found' });
+      return res.status(404).json({ error: "Pickle not found" });
     }
 
     res.json(pickle); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 };

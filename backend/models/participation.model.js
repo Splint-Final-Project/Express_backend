@@ -12,13 +12,26 @@ const participationSchema = new mongoose.Schema(
       ref: "Pickle",
       required: true,
     },
+    imp_uid: {
+      type: String,
+      required: true,
+    },
+    payment_amount: {
+      type: Number,
+      required: true,
+    },
+    isRefunded: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     status: {
       type: String,
       required: true,
       enum: ["Pending", "Active", "Cancelled", "Done"],
       default: "Pending",
     },
-    isLeader: { type: Boolean, required: true },
+    isLeader: { type: Boolean, required: true, default: false },
     rating: { type: Number, required: false },
     comment: { type: String, required: false },
   },

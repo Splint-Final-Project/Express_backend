@@ -4,10 +4,10 @@ const pickleSchema = new mongoose.Schema(
   {
     // participation 테이블에 저장
     participants: [
-    	{
-    		type: mongoose.Schema.Types.ObjectId,
-    		ref: "User",
-    	},
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
 
     title: {
@@ -81,7 +81,7 @@ const pickleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-  },
+  }
   // { timestamps: true }
 );
 

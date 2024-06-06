@@ -6,18 +6,20 @@ export const editPickle = async (req, res) => {
     const pickle = await Pickle.findById(req.params.id).exec();
 
     if (!pickle) {
-      return res.status(404).json({ error: 'Pickle not found' });
+      return res.status(404).json({ error: "Pickle not found" });
     }
 
     const updates = req.body;
-    
+
     // DTO에 존재하지 않는 키가 있는지 확인
     const updateKeys = Object.keys(updates);
     const dtoPickle = Object.keys(pickleEditFormat(pickle));
-    
+
     for (let key of updateKeys) {
       if (!dtoPickle.includes(key)) {
-        return res.status(403).json({ error: `${key} 데이터는 수정할 수 없는 데이터 입니다.` });
+        return res
+          .status(403)
+          .json({ error: `${key} 데이터는 수정할 수 없는 데이터 입니다.` });
       }
     }
 
@@ -28,6 +30,6 @@ export const editPickle = async (req, res) => {
     res.json(pickleEditFormat(updatedPickle));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
