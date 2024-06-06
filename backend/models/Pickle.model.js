@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import Participation from "./participation.model.js";
-import { isCancel } from "axios";
 
 const pickleSchema = new mongoose.Schema(
   {

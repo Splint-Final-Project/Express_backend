@@ -4,7 +4,8 @@ import axios from "axios";
 
 export const SignUpForPickle = async (req, res) => {
   const { _id: user_id } = req.user;
-  const { uid: imp_uid, pickle_id } = req.body;
+  const { imp_uid, pickle_id } = req.body;
+  console.log("SignUpForPickle", user_id, imp_uid, pickle_id);
   try {
     const tokenResponse = await axios.post(
       "https://api.iamport.kr/users/getToken",
