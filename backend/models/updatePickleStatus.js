@@ -7,31 +7,22 @@ const updatePickleStatus = async () => {
     const pickles = await Pickle.find({
       status: { $nin: ["cancelled", "terminated"] },
     });
-
     pickles.forEach(async (pickle) => {
       console.log(`Pickle ID: ${pickle._id}`);
       const now = new Date();
       const participants = await Participation.find({ pickle: pickle._id });
 
-      if (participants.length < pickle.capacity && pickle.deadLine > now) {
-        await Pickle.findByIdAndUpdate(pickle._id, { status: "recruiting" });
-      } else if (
-        participants.length < pickle.capacity &&
-        pickle.deadLine < now
-      ) {
-        // 해당하는 Participation들을 모두 찾아서 status: Cancelled, 환불처리, isRefunded를 true로 바꿔줘야함
-        await Pickle.findByIdAndUpdate(pickle._id, { status: "cancelled" });
-      } else if (participants.length === pickle.capacity && firstTime > now) {
-        await Pickle.findByIdAndUpdate(pickle._id, { status: "readytostart" });
-      } else if (participants.length === pickle.capacity && firstTime < now) {
-        await Pickle.findByIdAndUpdate(pickle._id, { status: "ongoing" });
-      } else if (participants.length === pickle.capacity && lastTime < now) {
-        await Pickle.findByIdAndUpdate(pickle._id, { status: "terminated" });
+      // 미달일 경우 로직
+      if (participants.length < pickle.capacity && pickle.deadLine < now) {
+        await Pickle.findByIdAndUpdate(pickle._id, { isCancelled: true });
+        participants.forEach(async (participant) => {
+          console.log("Refunding participant: ", participant._id);
+          const refundResult = refund(participant.imp_uid);
+          console.log(refundResult);
+          await Participation.findByIdAndDelete(participant._id);
+        });
       }
     });
-
-    //TODO: 환불 처리하기
-    console.log(`${result.deletedCount} pickles removed.`);
   } catch (error) {
     console.error("Error removing expired pickles:", error);
   }
