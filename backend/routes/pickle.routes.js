@@ -24,12 +24,6 @@ router.get("/nearby", protectRoute, getNearbyPickles);
 router.get("/popular", protectRoute, getPopularPickles);
 router.get("/hotTime", protectRoute, getHotTimePickles);
 
-router.post("/join", protectRoute, JoinPickle);
-
-//개발용
-router.delete("/join", protectRoute, WithdrawFromPickle);
-//개발용
-
 // 동적
 router.get("/:id", protectRoute, getPickleDetails);
 router.get("/:status", protectRoute, getPicklesByStatus);
@@ -37,6 +31,10 @@ router.get("/:status", protectRoute, getPicklesByStatus);
 // not get
 router.post("/create", protectRoute, createPickle);
 router.put("/:id", protectRoute, editPickle);
+router.post("/join", protectRoute, JoinPickle);
 // router.get("/:pickleType", protectRoute, getPicklesOfType);
+
+//개발용, 피클 참가 취소
+router.delete("/join", protectRoute, WithdrawFromPickle);
 
 export default router;
