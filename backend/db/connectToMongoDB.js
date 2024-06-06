@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// import updatePickleStatus from "../models/updatePickleStatus.js";
+import updatePickleStatus from "../models/updatePickleStatus.js";
 
 const connectToMongoDB = async () => {
   try {
