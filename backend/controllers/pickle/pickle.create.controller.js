@@ -1,4 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
+import Participation from "../../models/participation.model.js";
 
 export const createPickle = async (req, res) => {
   try {
@@ -21,7 +22,6 @@ export const createPickle = async (req, res) => {
 
     // 새로운 피클 생성
     const newPickle = new Pickle({
-      participants: [leader], // leader를 participants 목록에 포함
       leader: leader,
       title,
       capacity,
@@ -41,6 +41,14 @@ export const createPickle = async (req, res) => {
 
     // 데이터베이스에 저장
     const savedPickle = await newPickle.save();
+
+    const newParticipation = new Participation({
+      user: leader,
+      pickle: savedPickle._id,
+    });
+
+    // 참가자 저장
+    await newParticipation.save();
 
     res
       .status(201)

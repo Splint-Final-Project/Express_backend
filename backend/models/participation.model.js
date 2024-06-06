@@ -14,23 +14,23 @@ const participationSchema = new mongoose.Schema(
     },
     imp_uid: {
       type: String,
-      required: true,
+      // required: true,
     },
     payment_amount: {
       type: Number,
-      required: true,
+      // required: true,
     },
     isRefunded: {
       type: Boolean,
       required: true,
       default: false,
     },
-    status: {
-      type: String,
-      required: true,
-      enum: ["Pending", "Active", "Cancelled", "Done"],
-      default: "Pending",
-    },
+    // status: {
+    //   type: String,
+    //   required: true,
+    //   enum: ["Pending", "Active", "Cancelled", "Done"],
+    //   default: "Pending",
+    // },
     rating: { type: Number, required: false },
     comment: { type: String, required: false },
   },
