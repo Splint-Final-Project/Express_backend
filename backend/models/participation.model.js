@@ -31,7 +31,6 @@ const participationSchema = new mongoose.Schema(
       enum: ["Pending", "Active", "Cancelled", "Done"],
       default: "Pending",
     },
-    isLeader: { type: Boolean, required: true, default: false },
     rating: { type: Number, required: false },
     comment: { type: String, required: false },
   },

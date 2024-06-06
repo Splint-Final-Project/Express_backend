@@ -23,7 +23,7 @@ router.post("/", protectRoute, async (req, res) => {
       `https://api.iamport.kr/payments/${imp_uid}`,
       {
         headers: { Authorization: access_token },
-      }
+      
     );
 
     const payment = paymentResponse.data.response;

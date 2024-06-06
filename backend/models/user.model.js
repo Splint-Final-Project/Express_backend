@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       // unique: true,
+      // 이메일 형식 가입일 때에만 unique해야하는데.......
     },
     status: {
       type: String,
