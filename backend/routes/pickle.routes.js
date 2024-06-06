@@ -4,7 +4,7 @@ import { getPickles,
   getNearbyPickles, 
   getPicklesByStatus, 
   getPopularPickles, 
-  // getHotTimePickles, 
+  getHotTimePickles, 
 } from "../controllers/pickle/pickles.get.controller.js";
 import { getPickleDetails } from "../controllers/pickle/pickle.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
@@ -17,7 +17,7 @@ const router = express.Router();
 router.get("/", protectRoute, getPickles);
 router.get("/nearby", protectRoute, getNearbyPickles);
 router.get("/popular", protectRoute, getPopularPickles);
-// router.get("hotTime", protectRoute, getHotTimePickles);
+router.get("/hotTime", protectRoute, getHotTimePickles);
 
 // 동적
 router.get("/:id", protectRoute, getPickleDetails);
