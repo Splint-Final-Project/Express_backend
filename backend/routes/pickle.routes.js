@@ -26,7 +26,7 @@ router.get("/", getPickles);
 router.get("/nearby", getNearbyPickles);
 router.get("/popular", getPopularPickles);
 router.get("/hotTime", getHotTimePickles);
-router.get("search", searchPickles);
+router.get("/search", searchPickles);
 
 // 로그인 필수
 router.get("/proceeding", protectRoute, getProceedingPickles);
