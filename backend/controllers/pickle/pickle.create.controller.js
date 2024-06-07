@@ -1,3 +1,4 @@
+import { vectorDataSaver } from "../../langchain/dataSaver.js";
 import Pickle from "../../models/Pickle.model.js";
 import { verify, refund } from "../../utils/payments.js";
 
@@ -11,7 +12,7 @@ export const createPickle = async (req, res) => {
       deadLine,
       where,
       when,
-      content,
+      category,
       explanation,
       latitude,
       longitude,
@@ -67,7 +68,7 @@ export const createPickle = async (req, res) => {
         summary: when.summary,
         times: sortedTimes,
       },
-      category: content,
+      category,
       explanation,
       viewCount: 0, // 초기 viewCount 설정
       latitude,
@@ -78,6 +79,8 @@ export const createPickle = async (req, res) => {
     // 데이터베이스에 저장
     await newPickle.save();
 
+    // 벡터 db에 저장
+    await vectorDataSaver(newPickle);
     res
       .status(201)
       .json({ message: "Pickle created successfully", pickle: newPickle });

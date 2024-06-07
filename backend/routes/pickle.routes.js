@@ -16,6 +16,7 @@ import {
   JoinPickle,
   WithdrawFromPickle,
 } from "../controllers/pickle/pickle.join.controller.js";
+import { searchPickles } from "../controllers/pickle/pickle.search.controller.js";
 
 import protectRoute from "../middleware/protectRoute.js";
 
@@ -25,6 +26,7 @@ router.get("/", getPickles);
 router.get("/nearby", getNearbyPickles);
 router.get("/popular", getPopularPickles);
 router.get("/hotTime", getHotTimePickles);
+router.get("search", searchPickles);
 
 // 로그인 필수
 router.get("/proceeding", protectRoute, getProceedingPickles);

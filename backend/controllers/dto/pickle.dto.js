@@ -9,7 +9,8 @@ export const minimumFormatPickle = (pickle) => {
     when: pickle.when,
     cost: pickle.cost,
     latitude: pickle.latitude,
-    longtitude: pickle.longitude
+    longitude: pickle.longitude,
+    category: pickle.category
   };
 }
 
