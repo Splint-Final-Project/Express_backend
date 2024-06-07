@@ -10,7 +10,11 @@ export const searchPickles = async (req, res) => {
 
     const formattedPickles = [];
     searchedPickles.forEach(async (pickle) => {
-      const foundPickle = await Pickle.findById(pickle.pickleId);
+      const foundPickle = await Pickle.find({
+        _id: pickle.pickleId,
+        deadLine: { $gt: now },
+        $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      });
 
       const formattedPickle = minimumFormatPickle(foundPickle);
       formattedPickles.push(formattedPickle);
