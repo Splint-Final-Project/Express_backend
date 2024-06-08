@@ -1,17 +1,17 @@
+import { refund } from "../utils/payments.js";
 import Pickle from "./Pickle.model.js";
 
 const updatePickleStatus = async () => {
-  //TODO: 알잘딱
   const now = new Date();
 
   try {
     const result = await Pickle.updateMany(
       {
         deadLine: { $lte: now },
-        $expr: { $lt: [{ $size: "$participants" }, "$capacity"] }
+        $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       },
       {
-        $set: { isCancelled: true }
+        $set: { isCancelled: true },
       }
     );
 
@@ -19,18 +19,19 @@ const updatePickleStatus = async () => {
       isCancelled: true,
     });
 
+    // TODO: 여기 로직이 맞는지 확인
     pickles.forEach(async (pickle) => {
       console.log(`Pickle ID: ${pickle._id}`);
 
       // 미달일 경우 로직
-      pickle.participants.forEach(async (participant) => {
-
+      for (const participant of pickle.participants) {
         console.log("Refunding participant: ", participant.user._id);
-        const refundResult = refund(participant.payment_uid);
+        const refundResult = await refund(participant.payment_uid);
         console.log(refundResult);
-
-      });
-
+      }
+      //empty array
+      pickle.participants = [];
+      await pickle.save();
     });
   } catch (error) {
     console.error("Error removing expired pickles:", error);

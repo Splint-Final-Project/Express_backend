@@ -4,7 +4,7 @@ import { verify, refund } from "../../utils/payments.js";
 export const JoinPickle = async (req, res) => {
   const { _id: user_id } = req.user;
   const { imp_uid, pickle_id } = req.body;
-  console.log("SignUpForPickle", user_id, imp_uid, pickle_id);
+  // console.log("SignUpForPickle", user_id, imp_uid, pickle_id);
   try {
     const { payment } = await verify(imp_uid);
 
@@ -92,7 +92,7 @@ export const WithdrawFromPickle = async (req, res) => {
 
   await pickle.save();
 
-  const refundResult = refund(participation.imp_uid);
+  const refundResult = await refund(participation.imp_uid);
   res.status(200).json({ message: "참여 취소 성공", refundResult });
   // res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
 };
