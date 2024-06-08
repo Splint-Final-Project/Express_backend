@@ -10,22 +10,38 @@ const namespace = "test.langchainPickles";
 const [dbName, collectionName] = namespace.split(".");
 const collection = client.db(dbName).collection(collectionName);
 
-const vectorStore = new MongoDBAtlasVectorSearch(new CohereEmbeddings(), {
-  collection,
-  indexName: "vector-index", // The name of the Atlas search index. Defaults to "default"
-  textKey: "text", // The name of the collection field containing the raw content. Defaults to "text"
-  embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
-});
+// const vectorStore = new MongoDBAtlasVectorSearch(new CohereEmbeddings(), {
+//   collection,
+//   indexName: "vector-index", // The name of the Atlas search index. Defaults to "default"
+//   textKey: "text", // The name of the collection field containing the raw content. Defaults to "text"
+//   embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
+// });
 
-const retriever = vectorStore.asRetriever({
-  searchType: "mmr",
-  searchKwargs: {
-    fetchK: 20,
-    lambda: 0.1,
-    k: 10, // 리턴할 결과의 수를 지정
-  },
-});
+// const retriever = await vectorStore.asRetriever({
+//   searchType: "mmr",
+//   searchKwargs: {
+//     fetchK: 20,
+//     lambda: 0.1,
+//     k: 10, // 리턴할 결과의 수를 지정
+//   },
+// });
 
 export const vectorSearchEngine = async (message) => {
+  const vectorStore = new MongoDBAtlasVectorSearch(new CohereEmbeddings(), {
+    collection,
+    indexName: "vector_index", // The name of the Atlas search index. Defaults to "default"
+    textKey: "text", // The name of the collection field containing the raw content. Defaults to "text"
+    embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
+  });
+  
+  const retriever = await vectorStore.asRetriever({
+    searchType: "mmr",
+    searchKwargs: {
+      fetchK: 20,
+      lambda: 0.1,
+      k: 10, // 리턴할 결과의 수를 지정
+    },
+  });
+
   return await retriever.invoke(message);
 }
