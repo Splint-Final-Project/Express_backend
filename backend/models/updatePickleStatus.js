@@ -5,19 +5,15 @@ const updatePickleStatus = async () => {
   const now = new Date();
 
   try {
-    const result = await Pickle.updateMany(
-      {
-        deadLine: { $lte: now },
-        $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
-      },
-      {
-        $set: { isCancelled: true },
-      }
-    );
-
     const pickles = await Pickle.find({
-      isCancelled: true,
+      deadLine: { $lte: now },
+      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      isCancelled: false,
     });
+
+    // const pickles = await Pickle.find({
+    //   isCancelled: true,
+    // });
 
     // TODO: 여기 로직이 맞는지 확인
     pickles.forEach(async (pickle) => {
@@ -30,7 +26,7 @@ const updatePickleStatus = async () => {
         console.log(refundResult);
       }
       //empty array
-      pickle.participants = [];
+      pickle.isCancelled = true;
       await pickle.save();
     });
   } catch (error) {
