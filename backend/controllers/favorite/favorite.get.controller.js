@@ -8,7 +8,7 @@ export const getFavorites = async (req, res) => {
       userId: user,
     });
 
-    res.status(201).send.json({ data: favorites });
+    res.status(201).json({ data: favorites });
   } catch (error) {
     res.status(500).json({
       success: false,
