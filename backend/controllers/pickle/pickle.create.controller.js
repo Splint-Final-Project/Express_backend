@@ -56,12 +56,12 @@ export const createPickle = async (req, res) => {
       capacity,
       cost,
       deadLine,
-      participants: [
-        {
-          user: leader,
-          isLeader: true,
-        },
-      ],
+      // participants: [
+      //   {
+      //     user: leader,
+      //     isLeader: true,
+      //   },
+      // ],
       leader: leader,
       where,
       when: {

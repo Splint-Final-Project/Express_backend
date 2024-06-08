@@ -8,7 +8,7 @@ const updatePickleStatus = async () => {
     const pickles = await Pickle.find({
       deadLine: { $lte: now },
       $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
-      isCancelled: false,
+      // isCancelled: false,
     });
 
     // const pickles = await Pickle.find({
@@ -22,7 +22,11 @@ const updatePickleStatus = async () => {
       // 미달일 경우 로직
       for (const participant of pickle.participants) {
         console.log("Refunding participant: ", participant.user._id);
+        console.log(participant);
         const refundResult = await refund(participant.payment_uid);
+        if (refundResult.cancellation.code !== 0) {
+          throw new Error("Refund failed");
+        }
         console.log(refundResult);
       }
       //empty array
