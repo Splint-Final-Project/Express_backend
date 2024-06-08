@@ -1,9 +1,9 @@
-import Favorite from "../../models/favorite.model";
+import Favorite from "../../models/favorite.model.js";
 
 export const createFavorite = async (req, res) => {
   try {
     const user = req.user._id; // 현재 로그인 사용자
-    const favoritePickle = req.body.pickleId;
+    const favoritePickle = req.params.pickleId;
 
     const newFavorite = new Favorite({
       userId: user,
