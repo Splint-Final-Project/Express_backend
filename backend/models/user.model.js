@@ -25,7 +25,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    occupation: {
+    area: {
+      // TODO: 지역을 어떻게 저장할지 고민해보기
+      type: String,
+      required: false,
+    },
+    company: {
       type: String,
       required: false,
     },
