@@ -31,7 +31,7 @@ export const vectorDataSaver = async (data) => {
     `;
     const textDocs = text.replace(/\s+/g, ' ').trim();
 
-  const metadata = { pickleId: data._id.toString() };
+  const metadata = { pickleId: data._id };
 
   const vectorstore = await MongoDBAtlasVectorSearch.fromTexts(
     [textDocs],
@@ -39,7 +39,7 @@ export const vectorDataSaver = async (data) => {
     new CohereEmbeddings(),
     {
       collection,
-      indexName: "vector-index", // The name of the Atlas search index. Defaults to "default"
+      indexName: "vector_index", // The name of the Atlas search index. Defaults to "default"
       textKey: "text", // The name of the collection field containing the raw content. Defaults to "text"
       embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
     }

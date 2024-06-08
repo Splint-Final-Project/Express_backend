@@ -78,13 +78,14 @@ export const getNearbyPickles = async (req, res) => {
 
 export const getPopularPickles = async (req, res) => {
   try {
+    const now = new Date();
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0); // 오늘의 시작 시간
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999); // 오늘의 끝 시간
 
     const popularPickles = await Pickle.find({
-      deadLine: { $gt: startOfDay },
+      deadLine: { $gt: now },
       $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     })
