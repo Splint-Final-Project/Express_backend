@@ -9,7 +9,7 @@ export const searchPickles = async (req, res) => {
     const message = req.body.message;
 
     const searchedPickles = await vectorSearchEngine(message); // 리스트
-
+    
     const formattedPickles = [];
 
     for await (const pickle of searchedPickles) {

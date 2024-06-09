@@ -1,13 +1,13 @@
 import Participation from "../../../models/participation.model.js";
 
-const findParticipationNumber = async (pickleId) => {
+export const findParticipationNumber = async (pickleId) => {
   return await Participation.countDocuments({
     pickle: pickleId,
     status: "paid",
   }); // return array
 };
 
-const addParticipantNumber = (pickle, participantNumber) => {
+export const addParticipantNumber = (pickle, participantNumber) => {
   return {
     ...pickle._doc,
     participantNumber: participantNumber
