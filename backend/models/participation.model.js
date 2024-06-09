@@ -32,7 +32,7 @@ const participationSchema = new mongoose.Schema(
     
     status: {
       type: String,
-      enum: ["paid, refunded"],
+      enum: ["paid", "refunded"],
       required: true,
     },
   },
