@@ -8,7 +8,7 @@ const updatePickleStatus = async () => {
     const pickles = await Pickle.find({
       deadLine: { $lte: now },
       $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
-      // isCancelled: false,
+      isCancelled: false,
     });
 
     // const pickles = await Pickle.find({
