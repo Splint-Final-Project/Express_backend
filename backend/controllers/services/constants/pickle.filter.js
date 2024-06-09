@@ -35,9 +35,7 @@ export const PICKLE_FILTER = {
     createdAt: { $gte: new Date().setHours(0, 0, 0, 0), $lte: new Date().setHours(23, 59, 59, 999)},
   },
 
-  HOT_TIME: {
-    deadLine: (oneDayLater) => {
-      return {$gte: new Date(), $lte: oneDayLater}
-    },
+  HOT_TIME: (oneDayLater) => {
+    return {deadLine: {$gte: new Date(), $lte: oneDayLater}}
   }
-}
+};
