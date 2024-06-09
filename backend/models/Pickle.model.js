@@ -22,24 +22,24 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
-    participants: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        payment_uid: {
-          type: String,
-          required: true,
-        },
-        isLeader: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-      },
-    ],
+    // participants: [
+    //   {
+    //     user: {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: "User",
+    //       required: true,
+    //     },
+    //     payment_uid: {
+    //       type: String,
+    //       required: true,
+    //     },
+    //     isLeader: {
+    //       type: Boolean,
+    //       required: true,
+    //       default: false,
+    //     },
+    //   },
+    // ],
 
     isCancelled: {
       type: Boolean,
