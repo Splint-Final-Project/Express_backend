@@ -1,12 +1,38 @@
 import Pickle from "../models/Pickle.model.js";
+import Participation from "../models/participation.model.js";
+import { PICKLE_FILTER } from "./constants/pickle.filter.js";
+import { findParticipationNumber } from "./constants/participation.filter.js";
+
+// const findRecruitingPickles = async (filteredPickles) => {
+//   let recruitingPickles = [];
+
+//   const participantChecks = filteredPickles.map(async (pickle) => {
+//     const participantNumber = await findParticipationNumber(pickle._id);
+
+//     if (participantNumber < )
+//   });
+  
+// }
 
 export const findRecruitingPicklesWithPages = async (skip, limit) => {
   const now = new Date();
 
-  const recruitingPickles = await Pickle.find({
+  const notExpiredPickles = await Pickle.find({
     deadLine: { $gt: now },
-    $expr: { $lt: [{ $size: "$participants" }, "$capacity"] }
-  }).skip(skip).limit(limit);
+  }).skip(skip).limit(limit);;
+
+  let recruitingPickles = [];
+  for await (const notExpiredPickle of notExpiredPickles) {
+
+    const participantNumber = await Participation.countDocuments({
+      pickle: notExpiredPickle._id,
+      status: "paid",
+    });
+
+    if (participantNumber < notExpiredPickle.capacity) {
+      recruitingPickles.push(notExpiredPickle);
+    }
+  }
 
   return recruitingPickles;
 };
@@ -14,8 +40,7 @@ export const findRecruitingPicklesWithPages = async (skip, limit) => {
 export const findRecruitmentCompletedPickles = async () => {
   const now = new Date();
 
-  const recruitmentCompletedPickles = await Pickle.find({
-    $expr: { $eq: [{ $size: "$participants" }, "$capacity"] },
+  const notStartPickles = await Pickle.find({
     $expr: {
       $gt: [
         { $arrayElemAt: ["$when.times", 0] }, // times 배열의 첫 번째 요소
@@ -24,6 +49,19 @@ export const findRecruitmentCompletedPickles = async () => {
     }
   });
 
+  let recruitmentCompletedPickles = [];
+  for await (const notStartPickle of notStartPickles) {
+
+    const participantNumber = await Participation.countDocuments({
+      pickle: notStartPickle._id,
+      status: "paid",
+    });
+
+    if (participantNumber === notStartPickle.capacity) {
+      recruitmentCompletedPickles.push(notStartPickle);
+    }
+  }
+
   return recruitmentCompletedPickles;
 };
 
@@ -31,16 +69,26 @@ export const findProceedingPickles = async (user) => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-  const proceedingPickles = await Pickle.find({
-    $expr: { $eq: [{ $size: "$participants" }, "$capacity"] },
+  const readyToStartPickles = await Pickle.find({
     $and: [
       { $expr: { $gte: [now, { $arrayElemAt: ["$when.times", 0] }] } }, // 첫 번째 요소보다 크거나 같은
       { $expr: { $lte: [now, { $arrayElemAt: ["$when.times", -1] }] } } // 마지막 요소보다 작거나 같은
     ],
-    participants: {
-      $elemMatch: { user: mongoose.Types.ObjectId(user) } // participants 배열에 user 포함
-    }
   });
+
+  let proceedingPickles = [];
+  for await (const readyToStartPickle of readyToStartPickles) {
+
+    const participantNumber = await Participation.countDocuments({
+      pickle: readyToStartPickle._id,
+      user: user,
+      status: "paid",
+    });
+
+    if (participantNumber === readyToStartPickle.capacity) {
+      proceedingPickles.push(readyToStartPickle);
+    }
+  }
 
   let filteredPickles = [];
   let todayPickles = [];
@@ -70,13 +118,23 @@ export const findProceedingPickles = async (user) => {
 }
 
 export const findFinishedPickles = async (user) => {
-  const finishedPickles = await Pickle.find({
-    $expr: { $eq: [{ $size: "$participants" }, "$capacity"] },
+  const timeOutPickles = await Pickle.find({
     $expr: { $gt: [now, { $arrayElemAt: ["$when.times", -1] }] }, // 첫 번째 요소보다 크거나 같은
-    participants: {
-      $elemMatch: { user: mongoose.Types.ObjectId(user) } // participants 배열에 user 포함
-    }
   });
+
+  let finishedPickles = [];
+  for await (const timeOutPickle of timeOutPickles) {
+
+    const participantNumber = await Participation.countDocuments({
+      pickle: timeOutPickle._id,
+      user: user,
+      status: "paid",
+    });
+
+    if (participantNumber === timeOutPickle.capacity) {
+      finishedPickles.push(timeOutPickle);
+    }
+  }
 
   return finishedPickles;
 }

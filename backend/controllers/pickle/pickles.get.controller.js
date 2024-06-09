@@ -1,5 +1,6 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import Participation from "../../models/participation.model.js";
 import { findRecruitingPicklesWithPages, findProceedingPickles } from "../../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
@@ -56,7 +57,7 @@ export const getNearbyPickles = async (req, res) => {
   try {
     const nearbyPickles = await Pickle.find({
       deadLine: { $gt: now },
-      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      // $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       latitude: {
         $gte: parsedLatitude - radiusInDegrees,
         $lte: parsedLatitude + radiusInDegrees,
@@ -67,7 +68,20 @@ export const getNearbyPickles = async (req, res) => {
       },
     });
 
-    const formattedPickles = nearbyPickles.map(minimumFormatPickle);
+    let nearbyAndRecruitingPickles = [];
+    for await (const nearbyPickle of nearbyPickles) {
+
+      const participantNumber = await Participation.countDocuments({
+        pickle: nearbyPickle._id,
+        status: "paid",
+      });
+
+      if (participantNumber < nearbyPickle.capacity) {
+        nearbyAndRecruitingPickles.push(nearbyPickle);
+      }
+    }
+
+    const formattedPickles = nearbyAndRecruitingPickles.map(minimumFormatPickle);
 
     res.json({ data: formattedPickles });
   } catch (error) {
@@ -86,13 +100,25 @@ export const getPopularPickles = async (req, res) => {
 
     const popularPickles = await Pickle.find({
       deadLine: { $gt: now },
-      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      // $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     })
       .sort({ viewCount: -1 })
       .limit(10);
 
-    const filteredPickles = popularPickles.map(minimumFormatPickle);
+    let popularAndRecruitingPickles = [];
+    for await (const popularPickle of popularPickles) {
+
+      const participantNumber = await Participation.countDocuments({
+        pickle: popularPickle._id,
+      });
+
+      if (participantNumber < popularPickle.capacity) {
+        popularAndRecruitingPickles.push(popularPickle);
+      }
+    }
+
+    const filteredPickles = popularAndRecruitingPickles.map(minimumFormatPickle);
 
     res.status(200).json({ data: filteredPickles });
   } catch (error) {
@@ -109,7 +135,7 @@ export const getHotTimePickles = async (req, res) => {
     // 마감 기한이 하루 남은 피클을 찾습니다.
     let hotTimePickles = await Pickle.find({
       deadLine: { $gt: now },
-      $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      // $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
       deadLine: { $gte: now, $lte: oneDayLater },
     }).sort({ deadLine: 1 }); // deadLine 오름차순으로 정렬
 
@@ -118,7 +144,20 @@ export const getHotTimePickles = async (req, res) => {
       hotTimePickles = hotTimePickles.slice(0, 10);
     }
 
-    const filteredPickles = hotTimePickles.map(minimumFormatPickle);
+    let hotTimeAndRecruitingPickles = [];
+    for await (const hotTimePickle of hotTimePickles) {
+
+      const participantNumber = await Participation.countDocuments({
+        pickle: hotTimePickle._id,
+        status: "paid",
+      });
+
+      if (participantNumber < hotTimePickle.capacity) {
+        hotTimeAndRecruitingPickles.push(hotTimePickle);
+      }
+    }
+
+    const filteredPickles = hotTimeAndRecruitingPickles.map(minimumFormatPickle);
 
     res.status(200).json({ data: filteredPickles });
   } catch (error) {

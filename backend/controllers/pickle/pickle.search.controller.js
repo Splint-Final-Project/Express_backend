@@ -1,4 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
+import Participation from "../../models/participation.model.js";
 import { vectorSearchEngine } from "../../langchain/vectorSearch.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
@@ -15,10 +16,19 @@ export const searchPickles = async (req, res) => {
       const foundPickle = await Pickle.find({
         _id: pickle.metadata.pickleId,
         deadLine: { $gt: now },
-        $expr: { $lt: [{ $size: "$participants" }, "$capacity"] },
+      });
+      if (!foundPickle[0]) continue;
+
+
+      const participantNumber = await Participation.countDocuments({
+        pickle: foundPickle[0]._id,
+        status: "paid",
       });
 
-      formattedPickles.push(foundPickle[0]);
+      if (participantNumber < foundPickle[0].capacity) {
+        const filteredPickles = minimumFormatPickle(foundPickle[0]);
+        formattedPickles.push(filteredPickles);
+      }
     }
 
     res.json({ data: formattedPickles }); // 최대 10개
