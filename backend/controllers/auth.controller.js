@@ -74,15 +74,14 @@ export const signup2 = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const { nickname, profilePic, occupation } = req.body;
+    const { nickname, areaCodes } = req.body;
 
     if (!nickname)
       return res.status(400).json({ error: "닉네임을 입력해주세요." });
 
     await User.findByIdAndUpdate(user._id, {
       nickname,
-      profilePic,
-      occupation,
+      areaCodes,
       status: "active",
     });
 
