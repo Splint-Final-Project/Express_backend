@@ -3,14 +3,14 @@ export const minimumFormatPickle = (pickle) => {
     id: pickle._id,
     title: pickle.title,
     capacity: pickle.capacity,
-    participants: pickle.participants,
     deadLine: pickle.deadLine,
     where: pickle.where,
     when: pickle.when,
     cost: pickle.cost,
     latitude: pickle.latitude,
     longitude: pickle.longitude,
-    category: pickle.category
+    category: pickle.category,
+    participantNumber: pickle.participantNumber
   };
 }
 

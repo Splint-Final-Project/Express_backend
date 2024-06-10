@@ -7,24 +7,29 @@ const participationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     pickle: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Pickle",
       required: true,
     },
+
     payment_uid: {
       type: String,
       required: true,
     },
+
     amount: {
       type: Number,
       required: true,
     },
+
     isLeader: {
       type: Boolean,
       required: true,
       default: false,
     },
+    
     status: {
       type: String,
       enum: ["paid", "refunded"],
