@@ -25,11 +25,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    area: {
-      // TODO: 지역을 어떻게 저장할지 고민해보기
-      type: String,
-      required: false,
-    },
+    // 법정 구 코드들을 저장
+    areaCodes: [
+      {
+        type: Number,
+        // required: true,
+      },
+    ],
     company: {
       type: String,
       required: false,

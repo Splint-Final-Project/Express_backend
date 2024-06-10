@@ -22,25 +22,6 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
-    // participants: [
-    //   {
-    //     user: {
-    //       type: mongoose.Schema.Types.ObjectId,
-    //       ref: "User",
-    //       required: true,
-    //     },
-    //     payment_uid: {
-    //       type: String,
-    //       required: true,
-    //     },
-    //     isLeader: {
-    //       type: Boolean,
-    //       required: true,
-    //       default: false,
-    //     },
-    //   },
-    // ],
-
     isCancelled: {
       type: Boolean,
       required: true,
@@ -74,6 +55,12 @@ const pickleSchema = new mongoose.Schema(
     explanation: {
       type: String,
       required: true,
+    },
+
+    //법정 구 코드
+    areaCode: {
+      type: Number,
+      // required: true,
     },
 
     latitude: {
