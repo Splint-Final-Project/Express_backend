@@ -22,18 +22,7 @@ export const createPickle = async (req, res) => {
     // 결제 정보 단건 불러오기
     const { payment } = await verify(imp_uid);
 
-    const {
-      title,
-      capacity,
-      cost,
-      deadLine,
-      where,
-      when,
-      category,
-      explanation,
-      latitude,
-      longitude,
-    } = JSON.parse(payment.custom_data);
+    const pickleData = JSON.parse(payment.custom_data);
 
     // 결제 정보가 없을 경우
     if (!payment?.amount) {
@@ -55,17 +44,9 @@ export const createPickle = async (req, res) => {
 
     // 새로운 피클 생성
     const newPickle = new Pickle({
-      title,
-      capacity,
-      cost,
+      ...pickleData,
       deadLine: tomorrow,
-      // when,
-      where,
-      category,
-      explanation,
       viewCount: 0, // 초기 viewCount 설정
-      latitude,
-      longitude,
       isCancelled: false,
     });
 

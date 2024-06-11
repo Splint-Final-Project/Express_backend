@@ -28,9 +28,37 @@ const pickleSchema = new mongoose.Schema(
       default: false,
     },
 
-    // 진행 중
-    where: {
+    //예: 스타벅스 강남역점
+    place: {
       type: String,
+      required: true,
+    },
+
+    //예: 서울특별시 강남구 역삼동 123-45
+    address: {
+      type: String,
+      required: true,
+    },
+
+    //예: 건물 2층
+    detailedAddress: {
+      type: String,
+      // required: true,
+    },
+
+    //법정 구 코드
+    areaCode: {
+      type: Number,
+      required: true,
+    },
+
+    latitude: {
+      type: Number,
+      required: true,
+    },
+
+    longitude: {
+      type: Number,
       required: true,
     },
 
@@ -54,22 +82,6 @@ const pickleSchema = new mongoose.Schema(
 
     explanation: {
       type: String,
-      required: true,
-    },
-
-    //법정 구 코드
-    areaCode: {
-      type: Number,
-      // required: true,
-    },
-
-    latitude: {
-      type: Number,
-      required: true,
-    },
-
-    longitude: {
-      type: Number,
       required: true,
     },
 
