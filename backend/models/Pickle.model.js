@@ -37,7 +37,7 @@ const pickleSchema = new mongoose.Schema(
     //예: 서울특별시 강남구 역삼동 123-45
     address: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     //예: 건물 2층
@@ -49,7 +49,7 @@ const pickleSchema = new mongoose.Schema(
     //법정 구 코드
     areaCode: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     latitude: {
