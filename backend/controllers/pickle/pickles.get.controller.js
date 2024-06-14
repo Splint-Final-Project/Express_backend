@@ -122,3 +122,13 @@ export const getFinishedPickles = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export const dateTest = async (req, res) => {
+  try {
+    const file = req.file;
+    console.log(file);
+    res.status(200).json({ message: "good", file: file.path });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

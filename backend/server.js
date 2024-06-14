@@ -13,11 +13,10 @@ import favoriteRoutes from "./routes/favorite.routes.js";
 
 import { app, server } from "./socket/socket.js";
 
-// const app = express();
-
 dotenv.config();
 const PORT = process.env.PORT || 8080;
 
+// 보안
 app.use(
   cors({
     origin: "http://localhost:4000",

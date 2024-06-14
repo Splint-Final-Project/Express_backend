@@ -7,6 +7,7 @@ import {
   getPopularPickles,
   getHotTimePickles,
   getFinishedPickles,
+  dateTest
 } from "../controllers/pickle/pickles.get.controller.js";
 import { getPickleDetails } from "../controllers/pickle/pickle.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
@@ -18,7 +19,9 @@ import {
 } from "../controllers/pickle/pickle.join.controller.js";
 import { searchPickles } from "../controllers/pickle/pickle.search.controller.js";
 
+// middleware
 import protectRoute from "../middleware/protectRoute.js";
+import { upload } from "../middleware/storage.multer.js";
 
 const router = express.Router();
 
@@ -42,5 +45,6 @@ router.post("/join", protectRoute, JoinPickle);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
+router.post("/test", upload.single('file'), dateTest);
 
 export default router;
