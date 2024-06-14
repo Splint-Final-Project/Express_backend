@@ -1,10 +1,12 @@
 // 세부 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import Favorite from "../../models/favorite.model.js";
 import { findParticipationNumber, addParticipantNumber } from "../services/utils/index.js";
 
 export const getPickleDetails = async (req, res) => {
   try {
     const pickle = await Pickle.findById(req.params.id).exec();
+    const likeCount = await Favorite.countDocuments({ pickleId: req.params.id});
 
     if (!pickle) {
       return res.status(404).json({ error: "Pickle not found" });
@@ -12,7 +14,9 @@ export const getPickleDetails = async (req, res) => {
     const participantNumber = await findParticipationNumber(req.params.id);
     const picklesWithParticipant = await addParticipantNumber(pickle, participantNumber);
 
-    res.json({data: picklesWithParticipant}); // status 필드가 JSON 응답에 포함됩니다.
+    const addLikeNumber = { ...picklesWithParticipant, like: likeCount}
+
+    res.json({data: addLikeNumber}); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

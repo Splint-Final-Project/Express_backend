@@ -1,13 +1,5 @@
 import multer from "multer";
 import path from 'path';
-import fs from 'fs';
-
-try {
-  fs.readdirSync('images'); // 폴더 확인
-} catch(err) {
-  console.error('uploads 폴더가 없습니다. 폴더를 생성합니다.');
-    fs.mkdirSync('images'); // 폴더 생성
-}
 
 export const upload = multer({
   storage: multer.diskStorage({ // 저장한공간 정보 : 하드디스크에 저장

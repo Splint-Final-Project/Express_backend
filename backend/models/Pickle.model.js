@@ -85,6 +85,16 @@ const pickleSchema = new mongoose.Schema(
       required: true,
     },
 
+    imgUrl: {
+      type: String,
+    },
+
+    goals: [
+      {
+        type: String,
+      }
+    ],
+
     // 노출 시킬 필요 없는 것
     viewCount: {
       type: Number,
