@@ -41,7 +41,7 @@ export const getPickles = async (req, res) => {
 
     const query = req.query.sortBy;
     findPicklesByQueries(pickles, query);
-    
+
     const formattedPickles = pickles.map(minimumFormatPickle);
     const total = pickles.length; 
 
@@ -83,6 +83,19 @@ export const getPopularPickles = async (req, res) => {
       popularAndRecruitingPickles = filteredPickles;
     }
 
+    if (req.query.category) {
+      const query = req.query.category;
+      const filteredPickles = [];
+
+      for (const pickle of popularAndRecruitingPickles) {
+        if (query === pickle.category) {
+          filteredPickles.push(pickle);
+        }
+      }
+
+      popularAndRecruitingPickles = filteredPickles;
+    }
+
     const filteredPickles = popularAndRecruitingPickles.map(minimumFormatPickle);
 
     res.status(200).json({ data: filteredPickles });
@@ -113,6 +126,19 @@ export const getHotTimePickles = async (req, res) => {
             filteredPickles.push(pickle);
           }
         }
+      }
+
+      if (req.query.category) {
+        const query = req.query.category;
+        const filteredPickles = [];
+  
+        for (const pickle of hotTimeAndRecruitingPickles) {
+          if (query === pickle.category) {
+            filteredPickles.push(pickle);
+          }
+        }
+  
+        hotTimeAndRecruitingPickles = filteredPickles;
       }
 
       hotTimeAndRecruitingPickles = filteredPickles;
