@@ -1,6 +1,13 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
-import { findRecruitingPicklesWithPages, findProceedingPickles, findNearbyPickles, findPopularPickles, findHotTimePickles } from "../services/pickle.service.js";
+import { 
+  findRecruitingPicklesWithPages, 
+  findProceedingPickles, 
+  findNearbyPickles, 
+  findPopularPickles, 
+  findHotTimePickles,
+  findPicklesByQueries
+} from "../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
@@ -28,10 +35,13 @@ export const getPickles = async (req, res) => {
           }
         }
       }
-
+  
       pickles = filteredPickles;
     }
 
+    const query = req.query.sortBy;
+    findPicklesByQueries(pickles, query);
+    
     const formattedPickles = pickles.map(minimumFormatPickle);
     const total = pickles.length; 
 
@@ -115,14 +125,6 @@ export const getHotTimePickles = async (req, res) => {
     res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
-
-export const getPopularPicklesInDetailFilter = async (req, res) => {
-  try {
-
-  } catch (error) {
-    
-  }
-}
 
 export const getNearbyPickles = async (req, res) => {
   const now = new Date();

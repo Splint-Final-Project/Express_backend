@@ -48,4 +48,4 @@ export const filterRecruitmentCompletedPickles = async (filteredPickles) => {
   }
 
   return recruitmentCompletedPickles;
-}
+};

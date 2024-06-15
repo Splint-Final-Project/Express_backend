@@ -10,6 +10,26 @@ export const findRecruitingPicklesWithPages = async (skip, limit) => {
   return recruitingPickles;
 };
 
+export const findPicklesByQueries = async (pickles, query) => {
+  switch (query) {
+    case '인기순':
+      pickles.sort((a, b) => b.viewCount - a.viewCount);
+      break;
+    case '가격 낮은 순':
+      pickles.sort((a, b) => a.count - b.count);
+      break;
+    case '가격 높은 순':
+      pickles.sort((a, b) => b.count - a.count);
+      break;
+    case '전체':
+    default:
+      // 기본적으로 정렬하지 않음
+      break;
+  }
+  
+  return pickles
+}
+
 export const findNearbyPickles = async (parsedLatitude, parsedLongitude, radiusInDegrees) => {
   const filterConditions = {
     ...PICKLE_FILTER.NOT_EXPIRED,
