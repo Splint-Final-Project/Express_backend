@@ -21,15 +21,16 @@ import { searchPickles } from "../controllers/pickle/pickle.search.controller.js
 
 // middleware
 import protectRoute from "../middleware/protectRoute.js";
+import optionalAuth from "../middleware/optionalAuth.js";
 import { upload } from "../middleware/storage.multer.js";
 
 const router = express.Router();
 
 router.get("/", getPickles);
 router.get("/nearby", getNearbyPickles);
-router.get("/popular", getPopularPickles);
-router.get("/hotTime", getHotTimePickles);
-router.get("/search", searchPickles);
+router.get("/popular", optionalAuth, getPopularPickles);
+router.get("/hotTime", optionalAuth, getHotTimePickles);
+router.get("/search", optionalAuth, searchPickles);
 
 // 로그인 필수
 router.get("/proceeding", protectRoute, getProceedingPickles);
