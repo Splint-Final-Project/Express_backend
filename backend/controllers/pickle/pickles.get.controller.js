@@ -11,11 +11,29 @@ export const getPickles = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const pickles = await findRecruitingPicklesWithPages(skip, limit);
+    let pickles = await findRecruitingPicklesWithPages(skip, limit);
+    
+    if (req.user) {
+      const userAreaCodes = req.user.areaCodes;
+      const filteredPickles = [];
 
-    const total = await Pickle.countDocuments();
+      for (const userAreaCode of userAreaCodes) {
+        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
+
+        for (const pickle of pickles) {
+          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
+
+          if (userAreaCodePrefix === pickleAreaCodePrefix) {
+            filteredPickles.push(pickle);
+          }
+        }
+      }
+
+      pickles = filteredPickles;
+    }
 
     const formattedPickles = pickles.map(minimumFormatPickle);
+    const total = pickles.length; 
 
     res.status(200).json({
       count: pickles.length,
@@ -29,6 +47,72 @@ export const getPickles = async (req, res) => {
       success: false,
       error: "Server Error",
     });
+  }
+};
+
+export const getPopularPickles = async (req, res) => {
+  try {
+    let popularAndRecruitingPickles = await findPopularPickles();
+    
+    if (req.user) {
+      const userAreaCodes = req.user.areaCodes;
+      const filteredPickles = [];
+
+      for (const userAreaCode of userAreaCodes) {
+        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
+
+        for (const pickle of popularAndRecruitingPickles) {
+          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
+
+          if (userAreaCodePrefix === pickleAreaCodePrefix) {
+            filteredPickles.push(pickle);
+          }
+        }
+      }
+
+      popularAndRecruitingPickles = filteredPickles;
+    }
+
+    const filteredPickles = popularAndRecruitingPickles.map(minimumFormatPickle);
+
+    res.status(200).json({ data: filteredPickles });
+  } catch (error) {
+    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
+  }
+};
+
+export const getHotTimePickles = async (req, res) => {
+  try {
+    const now = new Date();
+    const oneDayLater = new Date(now);
+    oneDayLater.setDate(now.getDate() + 1); // 현재 날짜에서 1일 후의 날짜를 설정
+
+    let hotTimeAndRecruitingPickles = await findHotTimePickles(oneDayLater);
+
+    if (req.user) {
+      const userAreaCodes = req.user.areaCodes;
+      const filteredPickles = [];
+
+      for (const userAreaCode of userAreaCodes) {
+        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
+
+        for (const pickle of hotTimeAndRecruitingPickles) {
+          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
+
+          if (userAreaCodePrefix === pickleAreaCodePrefix) {
+            filteredPickles.push(pickle);
+          }
+        }
+      }
+
+      hotTimeAndRecruitingPickles = filteredPickles;
+    }
+
+    const filteredPickles = hotTimeAndRecruitingPickles.map(minimumFormatPickle);
+
+    res.status(200).json({ data: filteredPickles });
+  } catch (error) {
+    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
 
@@ -57,32 +141,6 @@ export const getNearbyPickles = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-export const getPopularPickles = async (req, res) => {
-  try {
-    const popularAndRecruitingPickles = await findPopularPickles();
-    const filteredPickles = popularAndRecruitingPickles.map(minimumFormatPickle);
-
-    res.status(200).json({ data: filteredPickles });
-  } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
-  }
-};
-
-export const getHotTimePickles = async (req, res) => {
-  try {
-    const now = new Date();
-    const oneDayLater = new Date(now);
-    oneDayLater.setDate(now.getDate() + 1); // 현재 날짜에서 1일 후의 날짜를 설정
-
-    const hotTimeAndRecruitingPickles = await findHotTimePickles(oneDayLater);
-    const filteredPickles = hotTimeAndRecruitingPickles.map(minimumFormatPickle);
-
-    res.status(200).json({ data: filteredPickles });
-  } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
 

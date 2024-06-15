@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User"; // User 모델을 import하세요
+import User from "../models/user.model.js"; // User 모델을 import하세요
 
 const optionalAuth = async (req, res, next) => {
   try {

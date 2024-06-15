@@ -26,8 +26,10 @@ import { upload } from "../middleware/storage.multer.js";
 
 const router = express.Router();
 
-router.get("/", getPickles);
+router.get("/", optionalAuth, getPickles);
 router.get("/nearby", getNearbyPickles);
+
+// 옵션: 로그인/ 미 로그인 로직 분기
 router.get("/popular", optionalAuth, getPopularPickles);
 router.get("/hotTime", optionalAuth, getHotTimePickles);
 router.get("/search", optionalAuth, searchPickles);
