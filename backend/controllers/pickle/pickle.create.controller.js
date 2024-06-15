@@ -12,6 +12,7 @@ export const createPickle = async (req, res) => {
     const already = await Participation.find({
       payment_uid: imp_uid,
     });
+
     if (already.length > 0) {
       // await refund(imp_uid);
       return res.status(400).json({

@@ -116,6 +116,14 @@ export const getHotTimePickles = async (req, res) => {
   }
 };
 
+export const getPopularPicklesInDetailFilter = async (req, res) => {
+  try {
+
+  } catch (error) {
+    
+  }
+}
+
 export const getNearbyPickles = async (req, res) => {
   const now = new Date();
   const { latitude, longitude } = req.query;
