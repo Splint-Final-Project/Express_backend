@@ -82,7 +82,7 @@ export const signup2 = async (req, res) => {
     await User.findByIdAndUpdate(user._id, {
       nickname,
       areaCodes,
-      status: "active",
+      status: "Active",
     });
 
     const updated = await User.findById(user._id).select("-password");
