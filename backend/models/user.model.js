@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    points: {
+      type: Number,
+      default: 1500, //  가입시 1500포인트 지급
+      min: 0,
+    },
     // Participation 테이블에 저장
     // myPickles: [
     //   {

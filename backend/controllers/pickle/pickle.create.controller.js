@@ -34,7 +34,10 @@ export const createPickle = async (req, res) => {
     }
 
     //결제 금액 확인
-    if (pickleData.cost !== payment.amount || payment.status !== "paid") {
+    if (
+      pickleData.cost - pickleData.discount !== payment.amount ||
+      payment.status !== "paid"
+    ) {
       await refund(imp_uid);
       return res.status(400).json({
         message: "결제에 실패했습니다. 금액 위변조가 의심됩니다.",
