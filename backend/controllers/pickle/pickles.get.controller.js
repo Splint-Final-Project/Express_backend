@@ -10,6 +10,9 @@ import {
 } from "../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
+// storage Client
+import { minioClient } from "../../storage/connectMinioStorage.js";
+
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
@@ -220,9 +223,24 @@ export const getFinishedPickles = async (req, res) => {
 export const dateTest = async (req, res) => {
   try {
     const file = req.file;
-    console.log(file);
-    res.status(200).json({ message: "good", file: file.path });
+    const bucket = 'pickle-images'
+    const objectName = `1/hi.png`
+    const metaData = {
+      'Content-Type': file.mimetype,
+    }
+
+    const exists = await minioClient.bucketExists(bucket)
+    if (!exists) {
+      await minioClient.makeBucket(bucket, 'us-east-1')
+      console.log('Bucket ' + bucket + ' created in "us-east-1".')
+    }
+
+    await minioClient.putObject(bucket, objectName, file.buffer, metaData);
+
+    const presignedUrl = await minioClient.presignedUrl('GET', bucket, objectName, 7 * 24 * 60 * 60); // 7일 동안 유효한 URL
+    res.json({ url: presignedUrl });
   } catch (error) {
+    console.error('Error generating presigned URL:', error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

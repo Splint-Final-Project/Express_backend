@@ -22,7 +22,9 @@ import { searchPickles } from "../controllers/pickle/pickle.search.controller.js
 // middleware
 import protectRoute from "../middleware/protectRoute.js";
 import optionalAuth from "../middleware/optionalAuth.js";
-import { upload } from "../middleware/storage.multer.js";
+
+// storage
+import { upload } from "../storage/connectMinioStorage.js";
 
 const router = express.Router();
 
@@ -52,6 +54,6 @@ router.post("/join", protectRoute, JoinPickle);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
-router.post("/test", upload.single('file'), dateTest);
+router.post("/test",  upload.single('image'), dateTest);
 
 export default router;

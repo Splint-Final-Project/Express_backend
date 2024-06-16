@@ -57,6 +57,7 @@ export const getFavoriteCount = async (req, res) => {
         isClicked = false;
       }
     }
+
     res.json({likeCount: likeCount, isClicked: isClicked}); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
