@@ -63,16 +63,46 @@ const pickleSchema = new mongoose.Schema(
     },
 
     when: {
-      summary: {
-        type: String,
-      },
-
       times: [
         {
           type: Date,
           required: true,
         },
       ],
+      startDate: {
+        type: {
+          year: Number,
+          month: Number,
+          day: Number,
+        },
+        required: true,
+      },
+      finishDate: {
+        type: {
+          year: Number,
+          month: Number,
+          day: Number,
+        },
+        required: true,
+      },
+      startTime: {
+        type: {
+          hour: Number,
+          minute: Number,
+        },
+        required: true,
+      },
+      finishTime: {
+        type: {
+          hour: Number,
+          minute: Number,
+        },
+        required: true,
+      },
+      selectedDays: {
+        type: [Number],
+        required: true,
+      },
     },
 
     category: {
@@ -92,7 +122,7 @@ const pickleSchema = new mongoose.Schema(
     goals: [
       {
         type: String,
-      }
+      },
     ],
 
     // 노출 시킬 필요 없는 것

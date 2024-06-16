@@ -9,9 +9,9 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Active"],
+      enum: ["pending", "active"],
       required: false,
-      default: "Pending",
+      default: "pending",
     },
     nickname: {
       type: String,
@@ -46,6 +46,11 @@ const userSchema = new mongoose.Schema(
       type: String || null,
       required: false,
       default: null,
+    },
+    points: {
+      type: Number,
+      default: 1500, //  가입시 1500포인트 지급
+      min: 0,
     },
     // Participation 테이블에 저장
     // myPickles: [
