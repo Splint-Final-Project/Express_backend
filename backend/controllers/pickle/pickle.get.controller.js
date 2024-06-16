@@ -43,3 +43,22 @@ export const getPickleDetails = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getFavoriteCount = async (req, res) => {
+  try {
+    const user = req.user._id;
+    const likeCount = await Favorite.countDocuments({ pickleId: req.params.id });
+    let isClicked ;
+    if (user) {
+      const userClickCount = await Favorite.countDocuments({ pickleId: req.params.id, userId: user }).populate("userId");
+      if (userClickCount === 1) {
+        isClicked = true;
+      } else {
+        isClicked = false;
+      }
+    }
+    res.json({likeCount: likeCount, isClicked: isClicked}); // status 필드가 JSON 응답에 포함됩니다.
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+}

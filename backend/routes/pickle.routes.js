@@ -9,7 +9,7 @@ import {
   getFinishedPickles,
   dateTest
 } from "../controllers/pickle/pickles.get.controller.js";
-import { getPickleDetails } from "../controllers/pickle/pickle.get.controller.js";
+import { getPickleDetails, getFavoriteCount } from "../controllers/pickle/pickle.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
 
@@ -43,6 +43,7 @@ router.get("/finish", protectRoute, getFinishedPickles);
 
 // 동적
 router.get("/:id", getPickleDetails);
+router.get("/:id/favorite", optionalAuth, getFavoriteCount);
 
 // not get
 router.post("/create", protectRoute, createPickle);
