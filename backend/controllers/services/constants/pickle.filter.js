@@ -32,7 +32,7 @@ export const PICKLE_FILTER = {
   },
 
   POPULAR: {
-    createdAt: { $gte: new Date().setHours(0, 0, 0, 0), $lte: new Date().setHours(23, 59, 59, 999)},
+    createdAt: { $gte: new Date().setUTCHours(0, 0, 0, 0), $lte: new Date().setUTCHours(23, 59, 59, 999)},
   },
 
   HOT_TIME: (oneDayLater) => {
