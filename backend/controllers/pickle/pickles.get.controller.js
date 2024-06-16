@@ -22,7 +22,7 @@ export const getPickles = async (req, res) => {
     const skip = (page - 1) * limit;
 
     let pickles = await findRecruitingPicklesWithPages(skip, limit);
-    
+
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
       const filteredPickles = [];

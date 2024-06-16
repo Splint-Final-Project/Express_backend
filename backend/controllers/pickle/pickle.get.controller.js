@@ -46,10 +46,10 @@ export const getPickleDetails = async (req, res) => {
 
 export const getFavoriteCount = async (req, res) => {
   try {
-    const user = req.user._id;
     const likeCount = await Favorite.countDocuments({ pickleId: req.params.id });
     let isClicked = false;
-    if (user) {
+    if (req.user) {
+      const user = req.user._id;
       const userClickCount = await Favorite.countDocuments({ pickleId: req.params.id, userId: user }).populate("userId");
       if (userClickCount === 1) {
         isClicked = true;
