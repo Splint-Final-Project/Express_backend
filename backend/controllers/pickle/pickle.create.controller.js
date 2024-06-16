@@ -6,7 +6,86 @@ var today = new Date();
 var tomorrow = new Date(today.setDate(today.getDate() + 1));
 
 export const createPickle = async (req, res) => {
+  const user = req.user;
   const { imp_uid } = req.body;
+
+  if (!imp_uid) {
+    const {
+      discount,
+      title,
+      category,
+      capacity,
+      imgUrl,
+      explanation,
+      goals,
+      cost,
+      place,
+      address,
+      detailedAddress,
+      areaCode,
+      latitude,
+      longitude,
+      when,
+      deadLine,
+    } = req.body;
+    const points = user.points;
+    if (discount > points) {
+      return res.status(400).json({
+        message: "포인트가 부족합니다.",
+      });
+    }
+    const totalCost = cost - discount;
+    if (totalCost !== 0) {
+      return res.status(400).json({
+        message: "금액이 알맞지 않습니다.",
+      });
+    }
+    const pickleData = {
+      title,
+      category,
+      capacity,
+      imgUrl,
+      explanation,
+      goals,
+      cost,
+      place,
+      address,
+      detailedAddress,
+      areaCode,
+      latitude,
+      longitude,
+      when,
+      deadLine,
+    };
+    const newPickle = new Pickle({
+      ...pickleData,
+      // deadLine: tomorrow,
+      viewCount: 0, // 초기 viewCount 설정
+      isCancelled: false,
+    });
+
+    // 데이터베이스에 저장
+    await newPickle.save();
+
+    // 참가자 정보 생성
+    const newParticipation = new Participation({
+      user: req.user._id,
+      pickle: newPickle._id,
+      payment_uid: null,
+      amount: 0,
+      status: "points",
+      isLeader: true,
+    });
+
+    await newParticipation.save();
+
+    // 벡터 db에 저장
+    await vectorDataSaver(newPickle);
+    res
+      .status(201)
+      .json({ message: "Pickle created successfully", pickle: newPickle });
+  }
+
   try {
     // 이미 존재하는 결제정보인지 확인
     const already = await Participation.find({
