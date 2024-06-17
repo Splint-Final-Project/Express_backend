@@ -7,9 +7,12 @@ import {
   getPopularPickles,
   getHotTimePickles,
   getFinishedPickles,
-  dateTest
+  dateTest,
 } from "../controllers/pickle/pickles.get.controller.js";
-import { getPickleDetails, getFavoriteCount } from "../controllers/pickle/pickle.get.controller.js";
+import {
+  getPickleDetails,
+  getFavoriteCount,
+} from "../controllers/pickle/pickle.get.controller.js";
 import { createPickle } from "../controllers/pickle/pickle.create.controller.js";
 import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
 
@@ -44,7 +47,7 @@ router.get("/proceeding", protectRoute, getProceedingPickles);
 router.get("/finish", protectRoute, getFinishedPickles);
 
 // 동적
-router.get("/:id", getPickleDetails);
+router.get("/:id", optionalAuth, getPickleDetails);
 router.get("/:id/favorite", optionalAuth, getFavoriteCount);
 
 // not get
@@ -54,6 +57,6 @@ router.post("/join", protectRoute, JoinPickle);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
-router.post("/test",  upload.single('image'), dateTest);
+router.post("/test", upload.single("image"), dateTest);
 
 export default router;

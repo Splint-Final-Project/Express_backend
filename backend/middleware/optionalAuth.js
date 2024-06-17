@@ -3,6 +3,7 @@ import User from "../models/user.model.js"; // User 모델을 import하세요
 
 const optionalAuth = async (req, res, next) => {
   try {
+    console.log("optional auth");
     const token = req.cookies.jwt;
 
     if (token) {
@@ -10,8 +11,7 @@ const optionalAuth = async (req, res, next) => {
 
       if (decoded) {
         const user = await User.findById(decoded.userId).select("-password");
-
-        if (user && user.status !== "pending") {
+        if (user) {
           req.user = user;
         }
       }
