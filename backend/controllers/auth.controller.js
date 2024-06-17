@@ -52,14 +52,12 @@ export const signup = async (req, res) => {
 export const signup2 = async (req, res) => {
   try {
     const token = req.cookies.jwt;
-    console.log(token);
     if (!token) {
       return res
         .status(401)
         .json({ error: "Unauthorized - No Token Provided" });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     if (!decoded) {
       return res.status(401).json({ error: "Unauthorized - Invalid Token" });
     }
