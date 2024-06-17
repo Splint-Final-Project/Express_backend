@@ -25,7 +25,7 @@ const protectRoute = async (req, res, next) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    if (user.status === "Pending") {
+    if (user.status === "pending") {
       return res
         .status(403)
         .json({ error: "Unauthorized - User should finish registration" });
