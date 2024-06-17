@@ -10,11 +10,6 @@ import {
 } from "../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
-// storage Client
-import { bucketName, s3Client } from "../../storage/connectS3.js";
-import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
@@ -230,27 +225,3 @@ export const getFinishedPickles = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 }
-
-export const dateTest = async (req, res) => {
-  try {
-    const file = req.file;
-    
-    const params = {
-      Bucket: bucketName,
-      Key: file.originalname,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
-    };
-
-    const command = new PutObjectCommand(params);
-    await s3Client.send(command);
-    const getCommand = new GetObjectCommand({ Bucket: bucketName, Key: file.originalname });
-    const signedUrl = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
-    res.json({ url: signedUrl });
-
-  } catch (error) {
-    console.error('Error generating presigned URL:', error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
