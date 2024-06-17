@@ -21,15 +21,9 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10); // 해싱을 통해 비밀번호 해싱 추적을 어렵게
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // https://avatar-placeholder.iran.liara.run/
-
-    const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${email}`;
-
     const newUser = new User({
       email,
       password: hashedPassword,
-      // gender,
-      profilePic: boyProfilePic,
     });
 
     if (newUser) {
@@ -44,7 +38,6 @@ export const signup = async (req, res) => {
           _id: newUser._id,
           email: newUser.email,
           status: newUser.status,
-          profilePic: newUser.profilePic,
         },
       });
     } else {
@@ -59,12 +52,14 @@ export const signup = async (req, res) => {
 export const signup2 = async (req, res) => {
   try {
     const token = req.cookies.jwt;
+    console.log(token);
     if (!token) {
       return res
         .status(401)
         .json({ error: "Unauthorized - No Token Provided" });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
     if (!decoded) {
       return res.status(401).json({ error: "Unauthorized - Invalid Token" });
     }

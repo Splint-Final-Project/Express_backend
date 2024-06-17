@@ -139,3 +139,7 @@ export const findFinishedPickles = async (user) => {
 
   return completePickles;
 }
+
+export const connectStorage = async () => {
+  
+}
