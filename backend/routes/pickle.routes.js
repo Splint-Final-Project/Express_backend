@@ -24,7 +24,7 @@ import protectRoute from "../middleware/protectRoute.js";
 import optionalAuth from "../middleware/optionalAuth.js";
 
 // storage
-import { upload } from "../storage/connectMinioStorage.js";
+import { upload } from "../storage/connectS3.js";
 
 const router = express.Router();
 

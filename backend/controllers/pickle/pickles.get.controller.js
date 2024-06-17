@@ -11,7 +11,10 @@ import {
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 // storage Client
-import { minioClient } from "../../storage/connectMinioStorage.js";
+// import { minioClient } from "../../storage/connectMinioStorage.js";
+import { bucketName, s3Client } from "../../storage/connectS3.js";
+import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export const getPickles = async (req, res) => {
   try {
@@ -232,22 +235,33 @@ export const getFinishedPickles = async (req, res) => {
 export const dateTest = async (req, res) => {
   try {
     const file = req.file;
-    const bucket = 'pickle-images'
-    const objectName = `1/hi.png`
-    const metaData = {
-      'Content-Type': file.mimetype,
-    }
+    // const bucket = bucketName;
+    // const objectName = `1/hi.png`
+    const params = {
+      Bucket: bucketName,
+      Key: file.originalname,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
+    };
+  
+    // const exists = await minioClient.bucketExists(bucket)
+    // if (!exists) {
+    //   await minioClient.makeBucket(bucket, 'us-east-1')
+    //   console.log('Bucket ' + bucket + ' created in "us-east-1".')
+    // }
 
-    const exists = await minioClient.bucketExists(bucket)
-    if (!exists) {
-      await minioClient.makeBucket(bucket, 'us-east-1')
-      console.log('Bucket ' + bucket + ' created in "us-east-1".')
-    }
+    // await minioClient.putObject(bucket, objectName, file.buffer, metaData);
 
-    await minioClient.putObject(bucket, objectName, file.buffer, metaData);
+    // const presignedUrl = await minioClient.presignedUrl('GET', bucket, objectName, 7 * 24 * 60 * 60); // 7일 동안 유효한 URL
+    // res.json({ url: presignedUrl });
 
-    const presignedUrl = await minioClient.presignedUrl('GET', bucket, objectName, 7 * 24 * 60 * 60); // 7일 동안 유효한 URL
-    res.json({ url: presignedUrl });
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+    const getCommand = new GetObjectCommand({ Bucket: bucketName, Key: file.originalname });
+    const signedUrl = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
+    res.json({ url: signedUrl });
+
   } catch (error) {
     console.error('Error generating presigned URL:', error);
     res.status(500).json({ error: "Internal server error" });
