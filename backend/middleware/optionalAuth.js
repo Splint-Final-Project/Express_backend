@@ -11,7 +11,7 @@ const optionalAuth = async (req, res, next) => {
       if (decoded) {
         const user = await User.findById(decoded.userId).select("-password");
 
-        if (user && user.status !== "Pending") {
+        if (user && user.status !== "pending") {
           req.user = user;
         }
       }
