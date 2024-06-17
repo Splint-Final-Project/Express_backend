@@ -113,31 +113,38 @@ export const createPickle = async (req, res) => {
       // 결제 정보 단건 불러오기
       const { payment } = await verify(imp_uid);
 
-      const pickleData = JSON.parse(payment.custom_data);
-
       // 결제 정보가 없을 경우
       if (!payment?.amount) {
-        await refund(imp_uid);
+        const refundResult = await refund(imp_uid);
         return res.status(404).json({
           message: "결제 정보가 존재하지 않습니다. 피클 생성에 실패했습니다.",
+          refundResult,
         });
       }
+      const pickleData = JSON.parse(payment.custom_data);
 
       //결제 금액 확인
       if (
         pickleData.cost - pickleData.discount !== payment.amount ||
         payment.status !== "paid"
       ) {
-        await refund(imp_uid);
+        const refundResult = await refund(imp_uid);
         return res.status(400).json({
           message: "결제에 실패했습니다. 금액 위변조가 의심됩니다.",
+          refundResult,
+        });
+      }
+
+      if (pickleData.discount > user.points) {
+        const refundResult = await refund(imp_uid);
+        return res.status(400).json({
+          message: "포인트가 부족합니다.",
+          refundResult,
         });
       }
 
       user.points -= pickleData.discount;
       await user.save();
-
-      console.log(tomorrow);
 
       // 새로운 피클 생성
       const newPickle = new Pickle({
@@ -168,9 +175,10 @@ export const createPickle = async (req, res) => {
         .status(201)
         .json({ message: "Pickle created successfully", pickle: newPickle });
     } catch (error) {
-      refund(imp_uid);
+      const refundResult = refund(imp_uid);
       res.status(500).json({
         message: error,
+        refundResult,
       });
     }
   }
