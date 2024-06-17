@@ -65,8 +65,17 @@ export const getPickles = async (req, res) => {
 
 export const getPopularPickles = async (req, res) => {
   try {
+    const startOfDayUTC = new Date();
+    startOfDayUTC.setUTCHours(0, 0, 0, 0);
+
+    const endOfDayUTC = new Date();
+    endOfDayUTC.setUTCHours(23, 59, 59, 999);
+
+    console.log('Query Start Date (UTC):', startOfDayUTC.toISOString());
+    console.log('Query End Date (UTC):', endOfDayUTC.toISOString());
+
     let popularAndRecruitingPickles = await findPopularPickles();
-    
+
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
       const filteredPickles = [];
