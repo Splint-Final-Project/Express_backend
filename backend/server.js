@@ -13,8 +13,12 @@ import favoriteRoutes from "./routes/favorite.routes.js";
 
 import { app, server } from "./socket/socket.js";
 
+import events from 'events';
+
 dotenv.config();
 const PORT = process.env.PORT || 8080;
+
+events.EventEmitter.defaultMaxListeners = 20;
 
 // 보안
 app.use(
