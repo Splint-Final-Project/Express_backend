@@ -9,14 +9,22 @@ import {
 
 export const getPickleDetails = async (req, res) => {
   try {
+    const user = req.user; // can be undefined
     const pickle = await Pickle.findOne({
       _id: req.params.id,
       isCancelled: false,
     }).exec();
-    const participants = await Participation.find({
+    const participations = await Participation.find({
       pickle: req.params.id,
     }).populate("pickle");
-    const leaders = participants.filter((participant) => participant.isLeader);
+    const amIMember =
+      user &&
+      participations.some((participant) => {
+        return participant.user._id.equals(user._id);
+      });
+    const leaders = participations.filter(
+      (participant) => participant.isLeader
+    );
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
@@ -33,8 +41,9 @@ export const getPickleDetails = async (req, res) => {
     const addLikeAndParticipants = {
       ...picklesWithParticipant,
       like: likeCount,
-      participantNumber: participants.length,
+      participantNumber: participations.length,
       leader: leaders[0].user,
+      amIMember: amIMember,
     };
 
     res.json({ data: addLikeAndParticipants }); // status 필드가 JSON 응답에 포함됩니다.
@@ -46,11 +55,16 @@ export const getPickleDetails = async (req, res) => {
 
 export const getFavoriteCount = async (req, res) => {
   try {
-    const likeCount = await Favorite.countDocuments({ pickleId: req.params.id });
+    const likeCount = await Favorite.countDocuments({
+      pickleId: req.params.id,
+    });
     let isClicked = false;
     if (req.user) {
       const user = req.user._id;
-      const userClickCount = await Favorite.countDocuments({ pickleId: req.params.id, userId: user }).populate("userId");
+      const userClickCount = await Favorite.countDocuments({
+        pickleId: req.params.id,
+        userId: user,
+      }).populate("userId");
       if (userClickCount === 1) {
         isClicked = true;
       } else {
@@ -58,8 +72,8 @@ export const getFavoriteCount = async (req, res) => {
       }
     }
 
-    res.json({likeCount: likeCount, isClicked: isClicked}); // status 필드가 JSON 응답에 포함됩니다.
+    res.json({ likeCount: likeCount, isClicked: isClicked }); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
