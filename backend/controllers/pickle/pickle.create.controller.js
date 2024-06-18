@@ -233,8 +233,10 @@ export const createImgUrl = async (req, res) => {
 export const createUrlImgForGeneratedImage = async (req, res) => {
   try {
     const { imageUrl } = req.body;
+    console.log(imageUrl);
 
     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    console.log('Image downloaded successfully'); // 이미지 다운로드 성공 로그
     const imageBuffer = Buffer.from(response.data, 'binary');
     const fileName = `${uuidv4()}.png`;
 
@@ -242,16 +244,16 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
       Bucket: bucketName,
       Key: fileName,
       Body: imageBuffer,
-      ContentType: file.mimetype,
+      ContentType: 'image/png',
       ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
     };
 
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
-    const getCommand = new GetObjectCommand({ Bucket: bucketName, Key: fileName });
-    const signedUrl = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
     
-    res.json({ url: signedUrl });
+    const objectUrl = getObjectUrl(bucketName, aws_key.region, params.Key);
+    
+    res.json({ url: objectUrl });
   } catch (error) {
     res.status(500).json({ message: 'Image download failed', error });
   }
