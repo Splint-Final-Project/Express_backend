@@ -1,6 +1,7 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import Pickle from "../models/Pickle.model.js";
+import Participation from "../models/participation.model.js";
 import { conversationFormat } from "./dto/conversation.dto.js";
 import { findProceedingPickles } from "./services/pickle.service.js";
 
@@ -8,7 +9,8 @@ export const getConversationList = async (req, res) => {
 	try {
 		const senderId = req.user._id;
     const { filteredPickles, todayPickles } = await findProceedingPickles(senderId);
-    const willMakeGroupConversation = [ ...filteredPickles, ...todayPickles ];
+    const proceedingPickles = [ ...filteredPickles, ...todayPickles ];
+    await createGroupConversation(proceedingPickles);
 
 		const conversationList = await Conversation.find({
 			participants: { $in: [senderId] }
@@ -20,7 +22,7 @@ export const getConversationList = async (req, res) => {
       if (conversation.pickleId) {
         const pickle = await Pickle.findById(conversation.pickleId);
         
-        const lastMessage = await Message.findById(conversation.messages[conversation.messages.length -1]);
+        const lastMessage = await Message.findById(conversation?.messages[conversation?.messages.length -1]);
 
         const updatedConversation = {
             ...conversation.toObject(),
@@ -41,6 +43,47 @@ export const getConversationList = async (req, res) => {
 	}
 };
 
-const createGroupConversation = async (willMakeGroupConversation) => {
-  
+const createGroupConversation = async (proceedingPickles) => {
+  const totalConversations = [];
+
+  for await (const proceedingPickle of proceedingPickles) {
+    let conversation = await Conversation.findOne({
+			pickleId: proceedingPickle._id,
+      isGroup: true,
+		}).populate('pickleId');
+
+    if (!conversation) {
+      const participants = await Participation.find({
+        pickle: proceedingPickle._id,
+      });
+
+      // 참가자 && 리더
+      const participantsList = [];
+      let leaderId;
+      for (const participantUser of participants) {
+        participantsList.push(participantUser.user);
+
+        if (participantUser.isLeader) {
+          leaderId = participantUser.user;
+        }
+      }
+
+      // 첫 메시지: 리더가 생성
+      const newMessage = await Message.create({
+        senderId: leaderId,
+        message: `"${proceedingPickle.title}" 피클 타임에 오신 여러분, 환영합니다.`,
+        pickleId: proceedingPickle._id
+      });
+
+      conversation = await Conversation.create({
+        participants: participantsList,
+        pickleId: proceedingPickle._id,
+        isGroup: true,
+        messages: [newMessage],
+        leaderId: leaderId,
+      });
+    }
+
+    totalConversations.push(conversation);
+  }
 }
