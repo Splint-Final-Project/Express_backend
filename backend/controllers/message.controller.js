@@ -5,16 +5,18 @@ import { getReceiverSocketId, io } from "../socket/socket.js";
 export const sendMessage = async (req, res) => {
 	try {
 		const { message } = req.body;
-		const { id: receiverId } = req.params; // params: "send/:id" routes에서
+		const { id: receiverId, pickleId } = req.params; // params: "send/:id" routes에서
 		const senderId = req.user._id; // 로그인 상태에서 존재함
 
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
+			pickleId: pickleId,
 		});
 
 		if (!conversation) {
 			conversation = await Conversation.create({
 				participants: [senderId, receiverId],
+				pickleId: pickleId,
 			});
 		}
 
@@ -22,6 +24,7 @@ export const sendMessage = async (req, res) => {
 			senderId,
 			receiverId,
 			message,
+			pickleId,
 		});
 
 		if (newMessage) {
@@ -48,16 +51,10 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-export const getChatList = async (req, res) => {
-
-}
-
 export const getMessages = async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;
 		const senderId = req.user._id;
-		console.log(userToChatId)
-		console.log(senderId);
 
 		const conversation = await Conversation.findOne({
 			participants: { $all: [senderId, userToChatId] },

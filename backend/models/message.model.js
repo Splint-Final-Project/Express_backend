@@ -19,6 +19,11 @@ const messageSchema = new mongoose.Schema(
 			required: true,
 		},
 		// createdAt, updatedAt
+
+		pickleId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Pickle",
+		}
 	},
 	{ timestamps: true }
 );

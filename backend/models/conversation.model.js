@@ -2,12 +2,23 @@ import mongoose from "mongoose";
 
 const conversationSchema = new mongoose.Schema(
 	{
+		leader: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+		},
+
+		sender: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+		},
+
 		participants: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "User",
 			},
 		],
+
 		messages: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +26,13 @@ const conversationSchema = new mongoose.Schema(
 				default: [],
 			},
 		],
+
+		pickleId: {
+			type: mongoose.Schema.Types.ObjectId,
+			rer: "Pickle",
+		},
 	},
+
 	{ timestamps: true }
 );
 

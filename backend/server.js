@@ -10,6 +10,7 @@ import messageRoutes from "./routes/message.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import pickleRoutes from "./routes/pickle.routes.js";
 import favoriteRoutes from "./routes/favorite.routes.js";
+import conversationRoutes from "./routes/conversation.routes.js";
 
 import { app, server } from "./socket/socket.js";
 
@@ -33,6 +34,7 @@ app.use(cookieParser());
 // middleware -> "api/auth/${authRoutes의 경로가 추가: signup, login, logout}"
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/messages", messageRoutes);
+app.use("/api/v1/conversations", conversationRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/pickle", pickleRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
