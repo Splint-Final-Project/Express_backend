@@ -3,11 +3,13 @@ import Participation from "../../models/participation.model.js";
 import { PICKLE_FILTER } from "./constants/pickle.filter.js";
 import { filterRecruitingPickles, filterRecruitmentCompletedPickles } from "./utils/index.js";
 
-export const findRecruitingPicklesWithPages = async (skip, limit) => {
-  const notExpiredPickles = await Pickle.find(PICKLE_FILTER.NOT_EXPIRED).skip(skip).limit(limit);
-  const recruitingPickles = await filterRecruitingPickles(notExpiredPickles);
+export const findRecruitingPickles = async (skip, limit) => {
+  const notExpiredTotalPickles = await Pickle.find(PICKLE_FILTER.NOT_EXPIRED);
+  const recruitingTotalPickles = await filterRecruitingPickles(notExpiredTotalPickles);
+  // const notExpiredPickles = await Pickle.find(PICKLE_FILTER.NOT_EXPIRED).skip(skip).limit(limit);
+  // const recruitingPickles = await filterRecruitingPickles(notExpiredPickles);
 
-  return recruitingPickles;
+  return recruitingTotalPickles;
 };
 
 export const findPicklesByQueries = async (pickles, query) => {
