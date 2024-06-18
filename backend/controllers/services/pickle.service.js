@@ -70,13 +70,14 @@ export const findHotTimePickles = async (oneDayLater) => {
   return hotTimeAndRecruitingPickles;
 }
 
-export const findRecruitmentCompletedPickles = async (user) => {
-  const notStartPickles = await Pickle.find(PICKLE_FILTER.NOT_STARTED);
+// 레거시
+// export const findRecruitmentCompletedPickles = async (user) => {
+//   const notStartPickles = await Pickle.find(PICKLE_FILTER.NOT_STARTED);
 
-  const recruitmentCompletedPickles = await filterRecruitmentCompletedPickles(notStartPickles);
+//   const recruitmentCompletedPickles = await filterRecruitmentCompletedPickles(notStartPickles);
 
-  return recruitmentCompletedPickles;
-};
+//   return recruitmentCompletedPickles;
+// };
 
 export const findProceedingPickles = async (user) => {
   const now = new Date();
@@ -93,6 +94,7 @@ export const findProceedingPickles = async (user) => {
       _id: myPickleId.pickle,
       ...PICKLE_FILTER.READY_TO_START
     };
+
     const readyToStartPickle = await Pickle.find(filterConditions);
 
     readyToStartPickles.push(readyToStartPickle[0]);
@@ -105,6 +107,8 @@ export const findProceedingPickles = async (user) => {
   let todayPickles = [];
 
   proceedingPickles.forEach((pickle) => {
+    const lastTime = pickle.when.times[pickle.when.times.length -1];
+
     const isSameDayAsToday =
       lastTime >= today &&
       lastTime < new Date(today.getTime() + 24 * 60 * 60 * 1000);

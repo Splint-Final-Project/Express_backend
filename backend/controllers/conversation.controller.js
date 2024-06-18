@@ -2,10 +2,13 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import Pickle from "../models/Pickle.model.js";
 import { conversationFormat } from "./dto/conversation.dto.js";
+import { findProceedingPickles } from "./services/pickle.service.js";
 
 export const getConversationList = async (req, res) => {
 	try {
 		const senderId = req.user._id;
+    const { filteredPickles, todayPickles } = await findProceedingPickles(senderId);
+    const willMakeGroupConversation = [ ...filteredPickles, ...todayPickles ];
 
 		const conversationList = await Conversation.find({
 			participants: { $in: [senderId] }
@@ -30,10 +33,14 @@ export const getConversationList = async (req, res) => {
       }
     }
     const formattedConversationList = updatedConversationList.map(conversationFormat);
-    console.log(formattedConversationList);
+
 		res.status(200).json({data: formattedConversationList});
 	} catch (error) {
     console.error(error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+
+const createGroupConversation = async (willMakeGroupConversation) => {
+  
+}
