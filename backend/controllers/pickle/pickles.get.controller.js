@@ -1,7 +1,7 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
 import { 
-  findRecruitingPicklesWithPages, 
+  findRecruitingPickles, 
   findProceedingPickles, 
   findNearbyPickles, 
   findPopularPickles, 
@@ -14,11 +14,8 @@ export const getPickles = async (req, res) => {
   try {
     const now = new Date();
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    let pickles = await findRecruitingPicklesWithPages(skip, limit);
+    let pickles = await findRecruitingPickles();
+    const total = pickles.length;
 
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
@@ -42,15 +39,16 @@ export const getPickles = async (req, res) => {
     const query = req.query.sortBy;
     findPicklesByQueries(pickles, query);
 
-    const formattedPickles = pickles.map(minimumFormatPickle);
-    const total = pickles.length; 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const skip = (page - 1) * limit;
+
+    const paginatedPickles = pickles.slice(skip, skip + limit);
+    const formattedPickles = paginatedPickles.map(minimumFormatPickle);
 
     res.status(200).json({
-      count: pickles.length,
-      total,
-      page,
-      pages: Math.ceil(total / limit),
       data: formattedPickles,
+      total: paginatedPickles.length
     });
   } catch (error) {
     res.status(500).json({
