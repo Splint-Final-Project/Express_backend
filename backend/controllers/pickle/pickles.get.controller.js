@@ -165,7 +165,7 @@ export const getNearbyPickles = async (req, res) => {
   const now = new Date();
   const { level, latitude, longitude } = req.query;
 
-  const radius = 250 * Math.pow(2, level - 3);
+  const radius = 300 * Math.pow(2, level - 3);
   const parsedLatitude = parseFloat(latitude);
   const parsedLongitude = parseFloat(longitude);
 
