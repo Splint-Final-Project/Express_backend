@@ -16,13 +16,20 @@ export const getReceiverSocketId = (receiverId) => {
 	return userSocketMap[receiverId];
 };
 
+export const getReceiverSocketIds = (receiverIds) => {
+  return receiverIds.map(receiverId => {
+    return userSocketMap[receiverId];
+  }).filter(socketId => socketId); // 유효한 소켓 ID만 반환
+};
+
+
 const userSocketMap = {};
 
 io.on("connection", (socket) => {
 	console.log("a user connected", socket.id);
 
 	const userId = socket.handshake.query.userId;
-	console.log(userId)
+
 	if (userId != "undefined") userSocketMap[userId] = socket.id;
 
 	socket.on("newMessage", (message) => {

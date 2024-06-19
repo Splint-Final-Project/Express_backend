@@ -29,7 +29,7 @@ export const getConversationList = async (req, res) => {
             imageUrl: pickle.imgUrl,
             title: pickle.title,
             lastMessage: lastMessage.message,
-            lastUpdatedAt: lastMessage.updatedAt
+            lastUpdatedAt: conversation.updatedAt
         }
         updatedConversationList.push(updatedConversation);
       }

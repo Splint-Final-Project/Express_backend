@@ -1,11 +1,14 @@
 import express from "express";
 
-import { getMessages, sendMessage } from "../controllers/message.controller.js";
+import { getMessages, getMessagesInOneToOne, sendMessageOneToOne, sendMessage } from "../controllers/message.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
-router.get("/:id", protectRoute, getMessages);
-router.post("/send/:pickleId/:id", protectRoute, sendMessage); // protectRoute에 의해 
+router.get('/:conversationId',protectRoute, getMessages);
+router.get("/:pickleId/:id", protectRoute, getMessagesInOneToOne);
+
+router.post("/send/:conversationId", protectRoute, sendMessage);
+router.post("/send/:pickleId/:id", protectRoute, sendMessageOneToOne); // protectRoute에 의해 
 
 export default router;
