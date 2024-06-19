@@ -32,10 +32,10 @@ const userSchema = new mongoose.Schema(
         // required: true,
       },
     ],
-    company: {
-      type: String,
-      required: false,
-    },
+    // company: {
+    //   type: String,
+    //   required: false,
+    // },
     oauthType: {
       type: String || null,
       enum: ["naver", "kakao"],

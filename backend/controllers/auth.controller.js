@@ -88,7 +88,7 @@ export const signup2 = async (req, res) => {
         status: updated.status,
         profilePic: updated.profilePic,
         nickname: updated.nickname,
-        occupation: updated.occupation,
+        areaCodes: updated.areaCodes,
       },
     });
   } catch (err) {
@@ -118,7 +118,7 @@ export const login = async (req, res) => {
           status: user.status,
           profilePic: user.profilePic,
           nickname: user.nickname,
-          occupation: user.occupation,
+          areaCodes: user.areaCodes,
         },
       });
   } catch (error) {
@@ -151,7 +151,7 @@ export const getMe = async (req, res) => {
         status: user.status,
         profilePic: user.profilePic,
         nickname: user.nickname,
-        occupation: user.occupation,
+        areaCodes: user.areaCodes,
       },
     });
   } catch (error) {

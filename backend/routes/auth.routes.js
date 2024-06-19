@@ -79,7 +79,7 @@ router.get("/oauth/:provider", async (req, res) => {
       generateToken(found._id, res);
       // 로그인
       res.redirect(
-        `${process.env.FRONTEND_URL}/oauth/success?status=${found.status}&nickname=${found.nickname}&profilePic=${found.profilePic}&occupation=${found.occupation}&_id=${found._id}&oauthType=${found.oauthType}&oauthId=${found.oauthId}`
+        `${process.env.FRONTEND_URL}/oauth/success?status=${found.status}&nickname=${found.nickname}&profilePic=${found.profilePic}&areaCodes=${found.areaCodes}&_id=${found._id}&oauthType=${found.oauthType}&oauthId=${found.oauthId}`
       );
     } else {
       // 회원가입
@@ -92,7 +92,7 @@ router.get("/oauth/:provider", async (req, res) => {
 
       generateToken(newUser._id, res);
       res.redirect(
-        `${process.env.FRONTEND_URL}/oauth/success?status=${newUser.status}&nickname=${newUser.nickname}&profilePic=${newUser.profilePic}&occupation=${newUser.occupation}&_id=${newUser._id}&oauthType=${newUser.oauthType}&oauthId=${newUser.oauthId}`
+        `${process.env.FRONTEND_URL}/oauth/success?status=${newUser.status}&nickname=${newUser.nickname}&profilePic=${newUser.profilePic}&areaCodes=${newUser.areaCodes}&_id=${newUser._id}&oauthType=${newUser.oauthType}&oauthId=${newUser.oauthId}`
       );
     }
   } catch (error) {
