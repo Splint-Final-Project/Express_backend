@@ -18,8 +18,9 @@ export const minimumFormatPickle = (pickle) => {
 export const pickleEditFormat = (pickle) => {
   return {
     title: pickle.title,
-    capacity: pickle.capacity,
+    category: pickle.category,
     explanation: pickle.explanation,
-    deadLine: pickle.deadLine,
+    imgUrl: pickle.imgUrl,
+    goals: pickle.goals,
   };
 };
