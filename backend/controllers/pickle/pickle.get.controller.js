@@ -10,21 +10,26 @@ import {
 export const getPickleDetails = async (req, res) => {
   try {
     const user = req.user; // can be undefined
+
     const pickle = await Pickle.findOne({
       _id: req.params.id,
       isCancelled: false,
     }).exec();
+
     const participations = await Participation.find({
       pickle: req.params.id,
     }).populate("pickle");
+
     const amIMember =
       user &&
       participations.some((participant) => {
         return participant.user._id.equals(user._id);
       });
+
     const leaders = participations.filter(
       (participant) => participant.isLeader
     );
+
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
@@ -45,6 +50,9 @@ export const getPickleDetails = async (req, res) => {
       participantNumber: participations.length,
       leader: leaders[0].user,
       amIMember: amIMember,
+      isRecruitingFinished: picklesWithParticipant.capacity === participations.length,
+      isProceeding: picklesWithParticipant.when.times[0] < new Date() <= picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
+      isFinished: new Date() > picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
       over: over,
     };
 

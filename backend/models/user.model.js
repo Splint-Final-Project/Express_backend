@@ -7,24 +7,29 @@ const userSchema = new mongoose.Schema(
       // unique: true,
       // 이메일 형식 가입일 때에만 unique해야하는데.......
     },
+
     status: {
       type: String,
       enum: ["pending", "active"],
       required: false,
       default: "pending",
     },
+
     nickname: {
       type: String,
       required: false,
     },
+
     password: {
       type: String,
       minlength: 6,
     },
+
     profilePic: {
       type: String,
       default: "",
     },
+    
     // 법정 구 코드들을 저장
     areaCodes: [
       {
@@ -47,6 +52,7 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+
     points: {
       type: {
         current: {

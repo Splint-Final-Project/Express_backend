@@ -1,5 +1,13 @@
 import User from "../models/user.model.js";
 
+//storage
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { bucketName, s3Client, aws_key } from "../storage/connectS3.js";
+
+import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+
 export const getUsersForSidebar = async (req, res) => {
 	try {
 		const loggedInUserId = req.user._id;
@@ -11,5 +19,79 @@ export const getUsersForSidebar = async (req, res) => {
 	} catch (error) {
 		console.error("Error in getUsersForSidebar: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+const getObjectUrl = (bucketName, region, objectKey) => {
+  return `https://${bucketName}.s3.${region}.amazonaws.com/${objectKey}`;
+};
+
+export const createImgUrl = async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const ext = path.extname(file.originalname);
+    const fileName = `${uuidv4()}${ext}`;
+
+    const params = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+
+    const objectUrl = getObjectUrl(bucketName, aws_key.region, params.Key);
+
+    res.json({ url: objectUrl });
+
+  } catch (error) {
+    console.error('Error generating presigned URL:', error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const createUrlImgForGeneratedImage = async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+
+    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    console.log('Image downloaded successfully'); // 이미지 다운로드 성공 로그
+    const imageBuffer = Buffer.from(response.data, 'binary');
+    const fileName = `${uuidv4()}.png`;
+
+    const params = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: imageBuffer,
+      ContentType: 'image/png',
+      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+    
+    const objectUrl = getObjectUrl(bucketName, aws_key.region, params.Key);
+    
+    res.json({ url: objectUrl });
+  } catch (error) {
+    res.status(500).json({ message: 'Image download failed', error });
+  }
+}
+
+export const editProfile = (req, res) => {
+	try {
+		const user = req.user;
+
+	} catch (error) {
+		console.error(error);
+    res.status(500).json({ error: "Internal server error" });
 	}
 };
