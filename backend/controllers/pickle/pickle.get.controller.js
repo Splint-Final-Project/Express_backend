@@ -33,6 +33,7 @@ export const getPickleDetails = async (req, res) => {
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
+    const over = pickle.deadLine < new Date();
 
     if (!pickle) {
       return res.status(404).json({ error: "Pickle not found" });
@@ -52,6 +53,7 @@ export const getPickleDetails = async (req, res) => {
       isRecruitingFinished: picklesWithParticipant.capacity === participations.length,
       isProceeding: picklesWithParticipant.when.times[0] < new Date() <= picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
       isFinished: new Date() > picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
+      over: over,
     };
 
     res.json({ data: addLikeAndParticipants }); // status 필드가 JSON 응답에 포함됩니다.
