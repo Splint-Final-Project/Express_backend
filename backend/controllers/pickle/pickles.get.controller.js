@@ -1,5 +1,6 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import Pickle from "../../models/Pickle.model.js";
+import Participation from "../../models/participation.model.js";
 import {
   findRecruitingPickles,
   findProceedingPickles,
@@ -9,7 +10,8 @@ import {
   findHotTimePickles,
   findPicklesByQueries,
 } from "../services/pickle.service.js";
-import { minimumFormatPickle, todayPickleFormat } from "../dto/pickle.dto.js";
+import { minimumFormatPickle, myPickleFormat } from "../dto/pickle.dto.js";
+import User from "../../models/user.model.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -203,8 +205,8 @@ export const getProceedingPickles = async (req, res) => {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
 
     const formattedFilteredPickles =
-      filteredPickles?.map(minimumFormatPickle) || [];
-    const formattedTodayPickles = todayPickles?.map(todayPickleFormat) || [];
+      filteredPickles?.map(myPickleFormat) || [];
+    const formattedTodayPickles = todayPickles?.map(myPickleFormat) || [];
 
     res.json({
       proceedingPickles: formattedFilteredPickles,
@@ -231,4 +233,19 @@ export const getFinishedPickles = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
+};
+
+export const getPendingPickles = async (req, res) => {
+  const user = req.user._id;
+
+  try {
+    const findUser = await User(user);
+    const pendingPickles = await Participation.find({
+      user: user,
+    }).populate('user').populate('pickle');
+    console.log(pendingPickles)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  };
 };

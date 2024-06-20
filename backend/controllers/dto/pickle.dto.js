@@ -15,7 +15,7 @@ export const minimumFormatPickle = (pickle) => {
   };
 };
 
-export const todayPickleFormat = (pickle) => {
+export const myPickleFormat = (pickle) => {
   return {
     id: pickle._id,
     title: pickle.title,

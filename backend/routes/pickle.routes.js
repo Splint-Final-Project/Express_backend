@@ -7,6 +7,7 @@ import {
   getPopularPickles,
   getHotTimePickles,
   getFinishedPickles,
+  getPendingPickles,
 } from "../controllers/pickle/pickles.get.controller.js";
 import {
   getPickleDetails,
@@ -53,6 +54,7 @@ router.get("/detail/highCount", optionalAuth);
 // 로그인 필수
 router.get("/proceeding", protectRoute, getProceedingPickles);
 router.get("/finish", protectRoute, getFinishedPickles);
+router.get('pending', protectRoute, getPendingPickles);
 
 // 동적
 router.get("/:id", optionalAuth, getPickleDetails);
