@@ -30,8 +30,8 @@ export const getConversationList = async (req, res) => {
             ...conversation.toObject(),
             imageUrl: pickle?.imgUrl,
             title: pickle?.title,
-            lastMessage: lastMessage.message,
-            lastUpdatedAt: conversation.updatedAt
+            lastMessage: lastMessage?.message,
+            lastUpdatedAt: conversation?.updatedAt
         }
         updatedConversationList.push(updatedConversation);
       }

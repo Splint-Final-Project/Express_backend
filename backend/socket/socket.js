@@ -22,7 +22,6 @@ export const getReceiverSocketIds = (receiverIds) => {
   }).filter(socketId => socketId); // 유효한 소켓 ID만 반환
 };
 
-
 const userSocketMap = {};
 
 io.on("connection", (socket) => {
@@ -32,11 +31,24 @@ io.on("connection", (socket) => {
 
 	if (userId != "undefined") userSocketMap[userId] = socket.id;
 
-	socket.on("newMessage", (message) => {
-		console.log('New message received:', message);
-		
-		io.emit("newMessage", message);
-})
+	// socket.on("chatBotMessage", async (message) => {
+	// 	console.log('New message received:', message);
+
+	// 	if (message.startsWith('!!')) {
+	// 			console.log("Command detected, triggering music play...");
+			
+	// 			try {
+	// 					const botResponse = await playPickleSoundTrack(message);
+	// 					console.log('Bot response:', botResponse);
+	// 					socket.emit('newMessage', botResponse);
+	// 			} catch (error) {
+	// 					console.error('Error playing sound track:', error);
+	// 			}
+	// 	} else {
+	// 		console.log('invalid command');
+	// 	}
+	// });
+
 	// io.emit() is used to send events to all the connected clients
 	// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
@@ -44,7 +56,7 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		console.log("user disconnected", socket.id);
 		delete userSocketMap[userId];
-		io.emit("getOnlineUsers", Object.keys(userSocketMap));
+		// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 	});
 });
 
