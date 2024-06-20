@@ -72,7 +72,7 @@ export const findHotTimePickles = async (oneDayLater) => {
 
 export const findProceedingPickles = async (user) => {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
 
   const myPickleIds = await Participation.find({
     user: user,
@@ -83,7 +83,7 @@ export const findProceedingPickles = async (user) => {
   for await (const myPickleId of myPickleIds) {
     const filterConditions = {
       _id: myPickleId.pickle,
-      ...PICKLE_FILTER.READY_TO_START
+      ...PICKLE_FILTER.READY_TO_START(today)
     };
 
     const readyToStartPickle = await Pickle.find(filterConditions);
@@ -98,16 +98,20 @@ export const findProceedingPickles = async (user) => {
   let todayPickles = [];
 
   proceedingPickles.forEach((pickle) => {
-    const lastTime = pickle.when.times[pickle.when.times.length -1];
+    let isTodayPickle = false;
 
-    const isSameDayAsToday =
-      lastTime >= today &&
-      lastTime < new Date(today.getTime() + 24 * 60 * 60 * 1000);
-    if (isSameDayAsToday) {
-      if (isParticipant) {
-        todayPickles.push(pickle);
+    for (const time in pickle.when.times) {
+      const savedTime = pickle.when.times[time];
+
+      if (today.getTime() ===  savedTime.getTime()) {
+        const pickleWithToday = { ...pickle, today };
+        todayPickles.push(pickleWithToday);
+        isTodayPickle = true;
+        break;
       }
-    } else {
+    }
+
+    if (!isTodayPickle) {
       filteredPickles.push(pickle);
     }
   });
@@ -135,8 +139,4 @@ export const findFinishedPickles = async (user) => {
   const completePickles = await filterRecruitmentCompletedPickles(finishedPickles);
 
   return completePickles;
-}
-
-export const connectStorage = async () => {
-  
 }

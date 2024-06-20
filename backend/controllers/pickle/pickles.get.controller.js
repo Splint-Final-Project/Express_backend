@@ -3,12 +3,13 @@ import Pickle from "../../models/Pickle.model.js";
 import {
   findRecruitingPickles,
   findProceedingPickles,
+  findFinishedPickles,
   findNearbyPickles,
   findPopularPickles,
   findHotTimePickles,
   findPicklesByQueries,
 } from "../services/pickle.service.js";
-import { minimumFormatPickle } from "../dto/pickle.dto.js";
+import { minimumFormatPickle, todayPickleFormat } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -198,13 +199,12 @@ export const getNearbyPickles = async (req, res) => {
 // 로그인 필수
 export const getProceedingPickles = async (req, res) => {
   const user = req.user._id;
-
   try {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
 
     const formattedFilteredPickles =
       filteredPickles?.map(minimumFormatPickle) || [];
-    const formattedTodayPickles = todayPickles?.map(minimumFormatPickle) || [];
+    const formattedTodayPickles = todayPickles?.map(todayPickleFormat) || [];
 
     res.json({
       proceedingPickles: formattedFilteredPickles,
@@ -220,10 +220,9 @@ export const getFinishedPickles = async (req, res) => {
   const user = req.user._id;
 
   try {
-    const finishedPickles = await findProceedingPickles(user);
-    console.log(finishedPickles);
-    const formattedFilteredPickles =
-      finishedPickles?.map(minimumFormatPickle) || [];
+    const finishedPickles = await findFinishedPickles(user);
+
+    const formattedFilteredPickles = finishedPickles.map(minimumFormatPickle);
 
     res.json({
       finishedPickles: formattedFilteredPickles,

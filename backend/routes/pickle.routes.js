@@ -79,4 +79,7 @@ router.get("/review", protectRoute, getReviews);
 router.post("/:id/review", protectRoute, postReview);
 router.delete("/:id/review", protectRoute, deleteReview);
 
+//개발용, 피클 참가 취소
+router.delete("/join", protectRoute, WithdrawFromPickle);
+
 export default router;
