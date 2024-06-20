@@ -12,7 +12,11 @@ import {
   getPickleDetails,
   getFavoriteCount,
 } from "../controllers/pickle/pickle.get.controller.js";
-import { createPickle, createImgUrl, createUrlImgForGeneratedImage } from "../controllers/pickle/pickle.create.controller.js";
+import {
+  createPickle,
+  createImgUrl,
+  createUrlImgForGeneratedImage,
+} from "../controllers/pickle/pickle.create.controller.js";
 import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
 
 import {
@@ -27,6 +31,11 @@ import optionalAuth from "../middleware/optionalAuth.js";
 
 // storage
 import { upload } from "../storage/connectS3.js";
+import {
+  deleteReview,
+  getReviews,
+  postReview,
+} from "../controllers/pickle/pickle.review.controller.js";
 
 const router = express.Router();
 
@@ -56,7 +65,18 @@ router.post("/join", protectRoute, JoinPickle);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
+
+// 이미지 업로드
 router.post("/img", upload.single("image"), createImgUrl);
-router.post("/generatedImg", upload.single("image"), createUrlImgForGeneratedImage);
+router.post(
+  "/generatedImg",
+  upload.single("image"),
+  createUrlImgForGeneratedImage
+);
+
+//리뷰 달기
+router.get("/review", protectRoute, getReviews);
+router.post("/review/:id", protectRoute, postReview);
+router.delete("/review/:id", protectRoute, deleteReview);
 
 export default router;

@@ -36,14 +36,18 @@ const participationSchema = new mongoose.Schema(
       required: true,
     },
 
-    stars: {
-      type: Number,
-      enum: [1, 2, 3, 4, 5],
-      default: null,
-    },
-
     review: {
-      type: String,
+      type: {
+        stars: {
+          type: Number,
+          enum: [1, 2, 3, 4, 5],
+          required: true,
+        },
+        content: {
+          type: String,
+          required: true,
+        },
+      },
       default: null,
     },
   },
