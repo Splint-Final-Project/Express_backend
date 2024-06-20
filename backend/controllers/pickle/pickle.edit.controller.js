@@ -11,6 +11,11 @@ export const editPickle = async (req, res) => {
       return res.status(404).json({ error: "Pickle not found" });
     }
 
+    //check if pickle's deadline has passed
+    if (pickle.deadLine < new Date()) {
+      return res.status(403).json({ error: "Pickle deadline has passed" });
+    }
+
     // find leader of the pickle from participation table
     const leader = await Participation.findOne({
       pickle: pickle._id,

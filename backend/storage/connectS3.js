@@ -1,5 +1,5 @@
-import { S3Client } from '@aws-sdk/client-s3';
-import multer from 'multer';
+import { S3Client } from "@aws-sdk/client-s3";
+import multer from "multer";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,7 +18,6 @@ export const s3Client = new S3Client({
   },
 });
 
-export const bucketName = 'pickle-time-ducket';  // 스펠링 틀린 거 짜치네요...ㅠㅠ
-
+export const bucketName = "pickle-time-ducket"; // 스펠링 틀린 거 짜치네요...ㅠㅠ ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
 const storage = multer.memoryStorage();
 export const upload = multer({ storage: storage });
