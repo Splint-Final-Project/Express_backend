@@ -48,17 +48,55 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     points: {
-      type: Number,
-      default: 1500, //  가입시 1500포인트 지급
-      min: 0,
+      type: {
+        current: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        history: {
+          type: [
+            {
+              type: {
+                type: String,
+                enum: ["earn", "use"],
+                required: true,
+              },
+              message: {
+                type: String,
+                required: true,
+              },
+              date: {
+                type: Date,
+                required: true,
+              },
+              amount: {
+                type: Number,
+                required: true,
+              },
+              remaining: {
+                type: Number,
+                required: true,
+              },
+            },
+          ],
+          required: true,
+        },
+      },
+      required: true,
+      default: {
+        current: 1500,
+        history: [
+          {
+            type: "earn",
+            message: "가입 축하 포인트",
+            date: new Date(),
+            amount: 1500,
+            remaining: 1500,
+          },
+        ],
+      },
     },
-    // Participation 테이블에 저장
-    // myPickles: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Pickle",
-    //   },
-    // ],
   },
   { timestamps: true }
 );
