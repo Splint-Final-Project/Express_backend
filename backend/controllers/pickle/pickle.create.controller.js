@@ -4,12 +4,12 @@ import Participation from "../../models/participation.model.js";
 import { verify, refund } from "../../utils/payments.js";
 
 //storage
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { bucketName, s3Client, aws_key } from "../../storage/connectS3.js";
 
 import axios from "axios";
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
 
 var today = new Date();
 var tomorrow = new Date(today.setDate(today.getDate() + 1));
@@ -38,7 +38,7 @@ export const createPickle = async (req, res) => {
         when,
         deadLine,
       } = req.body;
-      const points = user.points;
+      const points = user.points.current;
       if (discount > points) {
         return res.status(400).json({
           message: "포인트가 부족합니다.",
@@ -51,7 +51,14 @@ export const createPickle = async (req, res) => {
         });
       }
       // Deduct points from the user
-      user.points -= discount;
+      user.points.current -= discount;
+      user.points.history.push({
+        type: "use",
+        message: `피클 생성: ${title}`,
+        date: new Date(),
+        amount: discount,
+        remaining: user.points.current,
+      });
       await user.save();
 
       const pickleData = {
@@ -144,7 +151,7 @@ export const createPickle = async (req, res) => {
         });
       }
 
-      if (pickleData.discount > user.points) {
+      if (pickleData.discount > user.points.current) {
         const refundResult = await refund(imp_uid);
         return res.status(400).json({
           message: "포인트가 부족합니다.",
@@ -152,7 +159,15 @@ export const createPickle = async (req, res) => {
         });
       }
 
-      user.points -= pickleData.discount;
+      user.points.current -= pickleData.discount;
+      user.points.history.push({
+        type: "use",
+        message: `피클 생성: ${pickleData.title}`,
+        date: new Date(),
+        amount: pickleData.discount,
+        remaining: user.points.current,
+      });
+
       await user.save();
 
       // 새로운 피클 생성
@@ -202,7 +217,7 @@ export const createImgUrl = async (req, res) => {
     const file = req.file;
 
     if (!file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     const ext = path.extname(file.originalname);
@@ -213,7 +228,7 @@ export const createImgUrl = async (req, res) => {
       Key: fileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
+      ACL: "public-read", // 파일을 공개적으로 읽을 수 있도록 설정
     };
 
     const command = new PutObjectCommand(params);
@@ -222,9 +237,8 @@ export const createImgUrl = async (req, res) => {
     const objectUrl = getObjectUrl(bucketName, aws_key.region, params.Key);
 
     res.json({ url: objectUrl });
-
   } catch (error) {
-    console.error('Error generating presigned URL:', error);
+    console.error("Error generating presigned URL:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -234,26 +248,26 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
     const { imageUrl } = req.body;
     console.log(imageUrl);
 
-    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-    console.log('Image downloaded successfully'); // 이미지 다운로드 성공 로그
-    const imageBuffer = Buffer.from(response.data, 'binary');
+    const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+    console.log("Image downloaded successfully"); // 이미지 다운로드 성공 로그
+    const imageBuffer = Buffer.from(response.data, "binary");
     const fileName = `${uuidv4()}.png`;
 
     const params = {
       Bucket: bucketName,
       Key: fileName,
       Body: imageBuffer,
-      ContentType: 'image/png',
-      ACL: 'public-read', // 파일을 공개적으로 읽을 수 있도록 설정
+      ContentType: "image/png",
+      ACL: "public-read", // 파일을 공개적으로 읽을 수 있도록 설정
     };
 
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
-    
+
     const objectUrl = getObjectUrl(bucketName, aws_key.region, params.Key);
-    
+
     res.json({ url: objectUrl });
   } catch (error) {
-    res.status(500).json({ message: 'Image download failed', error });
+    res.status(500).json({ message: "Image download failed", error });
   }
-}
+};

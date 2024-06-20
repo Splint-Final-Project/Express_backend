@@ -9,7 +9,7 @@ export const JoinPickle = async (req, res) => {
   if (!imp_uid) {
     try {
       const pickle = await Pickle.findById(pickle_id);
-      const points = user.points;
+      const points = user.points.current;
       const { discount } = req.body;
       if (discount > points) {
         return res.status(400).json({
@@ -53,7 +53,15 @@ export const JoinPickle = async (req, res) => {
       }
 
       // Deduct points from the user
-      user.points -= discount;
+      user.points.current -= discount;
+      user.points.history.push({
+        type: "use",
+        message: `피클 참가: ${pickle.title}`,
+        date: new Date(),
+        amount: discount,
+        remaining: user.points.current,
+      });
+
       await user.save();
       const newParticipation = new Participation({
         user: user_id,
@@ -148,7 +156,7 @@ export const JoinPickle = async (req, res) => {
         });
       }
 
-      if (paymentData.discount > user.points) {
+      if (paymentData.discount > user.points.current) {
         await refund(imp_uid);
         return res.status(400).json({
           message: "포인트가 부족합니다.",
@@ -156,7 +164,14 @@ export const JoinPickle = async (req, res) => {
         });
       }
 
-      user.points -= paymentData.discount;
+      user.points.current -= paymentData.discount;
+      user.points.history.push({
+        type: "use",
+        message: `피클 참가: ${pickle.title}`,
+        date: new Date(),
+        amount: paymentData.discount,
+        remaining: user.points.current,
+      });
       await user.save();
 
       const newParticipation = new Participation({

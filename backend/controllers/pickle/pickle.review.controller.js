@@ -28,7 +28,7 @@ export const postReview = async (req, res) => {
   try {
     const user = req.user;
     const pickleId = req.params.id;
-    const participation = Participation.findOne({
+    const participation = await Participation.findOne({
       user: user._id,
       pickle: pickleId,
     });
@@ -36,14 +36,15 @@ export const postReview = async (req, res) => {
     if (!participation) {
       return res.status(404).json({ message: "Invalid participation" });
     }
-    const pickle = Pickle.findOne({ _id: pickleId });
+    const pickle = await Pickle.findOne({ _id: pickleId });
     if (!pickle) {
       return res.status(404).json({ message: "Invalid pickle" });
     }
     if (pickle.when.finishDate > new Date()) {
       return res.status(400).json({ message: "Pickle has not finished" });
     }
-    const { stars, content } = req.body;
+    const { stars, content } = req.body.data;
+    console.log(req.body);
     if (!stars) {
       return res.status(400).json({ message: "Invalid review" });
     }
