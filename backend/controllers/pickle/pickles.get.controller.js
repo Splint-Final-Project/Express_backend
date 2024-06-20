@@ -9,8 +9,10 @@ import {
   findPopularPickles,
   findHotTimePickles,
   findPicklesByQueries,
+  findPendingPickles,
+  findCancelledPickles
 } from "../services/pickle.service.js";
-import { minimumFormatPickle, myPickleFormat } from "../dto/pickle.dto.js";
+import { minimumFormatPickle, myPickleFormat, finishedPickleFormat } from "../dto/pickle.dto.js";
 import User from "../../models/user.model.js";
 
 export const getPickles = async (req, res) => {
@@ -223,11 +225,18 @@ export const getFinishedPickles = async (req, res) => {
 
   try {
     const finishedPickles = await findFinishedPickles(user);
+    const cancelledPickles = await findCancelledPickles(user);
 
-    const formattedFilteredPickles = finishedPickles.map(minimumFormatPickle);
+    const formattedFilteredPickles = finishedPickles?.map((pickle)=> finishedPickleFormat(pickle, false)) || [];
+    const formattedCancelledPickles = cancelledPickles?.map((pickle)=> finishedPickleFormat(pickle, true)) || [];
+
+    const finalFormat = [
+      ...formattedFilteredPickles,
+      ...formattedCancelledPickles
+    ];
 
     res.json({
-      finishedPickles: formattedFilteredPickles,
+      finishedPickles: finalFormat,
     });
   } catch (error) {
     console.error(error);
@@ -239,11 +248,10 @@ export const getPendingPickles = async (req, res) => {
   const user = req.user._id;
 
   try {
-    const findUser = await User(user);
-    const pendingPickles = await Participation.find({
-      user: user,
-    }).populate('user').populate('pickle');
-    console.log(pendingPickles)
+    const pendingPickles = await findPendingPickles(user);
+    const formattedPendingPickles = pendingPickles?.map(myPickleFormat) || [];
+
+    res.status(201).json({ pendingPickles: formattedPendingPickles});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

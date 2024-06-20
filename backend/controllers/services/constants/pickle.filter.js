@@ -3,6 +3,10 @@ export const PICKLE_FILTER = {
     deadLine: { $gt: new Date() },
   },
 
+  EXPIRED: {
+    deadLine: { $lt: new Date() },
+  },
+
   NOT_STARTED: {
     $expr: { $gt: [{ $arrayElemAt: ["$when.times", 0] }, new Date()]},
   },

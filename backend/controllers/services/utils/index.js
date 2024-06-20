@@ -14,7 +14,7 @@ export const addParticipantNumber = (pickle, participantNumber) => {
   };
 }
 
-// 모집중 피클 필터링
+// 모집중 피클 필터링: 참가 수 비교만
 export const filterRecruitingPickles = async (filteredPickles) => {
   let recruitingPickles = [];
 
@@ -22,17 +22,17 @@ export const filterRecruitingPickles = async (filteredPickles) => {
     // 참가자 수 찾기
     const participantNumber = await findParticipationNumber(filteredPickle);
 
-    if (participantNumber < filteredPickle.capacity) {
+    if (participantNumber < filteredPickle?.capacity) {
       const pickleWithParticipant = addParticipantNumber(filteredPickle, participantNumber);
 
       recruitingPickles.push(pickleWithParticipant);
     }
   }
-  
+
   return recruitingPickles;
 };
 
-// 모집 완료 피클 필터링
+// 모집 완료 피클 필터링: 참가 수 비교만 담당
 export const filterRecruitmentCompletedPickles = async (filteredPickles) => {
   let recruitmentCompletedPickles = [];
 

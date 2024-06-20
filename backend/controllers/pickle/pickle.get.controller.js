@@ -18,7 +18,7 @@ export const getPickleDetails = async (req, res) => {
 
     const participations = await Participation.find({
       pickle: req.params.id,
-    }).populate("pickle");
+    });
 
     const amIMember =
       user &&
@@ -33,6 +33,7 @@ export const getPickleDetails = async (req, res) => {
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
+    
     const over = pickle.deadLine < new Date();
 
     if (!pickle) {

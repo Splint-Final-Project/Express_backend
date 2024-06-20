@@ -70,12 +70,34 @@ export const findHotTimePickles = async (oneDayLater) => {
   return hotTimeAndRecruitingPickles;
 }
 
+export const findPendingPickles = async (user) => {
+  const payedPickles = await Participation.find({
+    user: user,
+    status: 'paid',
+  }).populate('user');
+
+  let findPickles = [];
+  for await (const pickle of payedPickles) {
+    const filterConditions = {
+      ...PICKLE_FILTER.NOT_EXPIRED,
+      _id: pickle.pickle,
+    };
+    const findPickle = await Pickle.find(filterConditions);
+    findPickles.push(findPickle[0]);
+  };
+
+  const pendingPickles = await filterRecruitingPickles(findPickles);
+
+  return pendingPickles;
+};
+
 export const findProceedingPickles = async (user) => {
   const now = new Date();
   const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
 
   const myPickleIds = await Participation.find({
     user: user,
+    status: 'paid',
   }).populate("user");
 
   let readyToStartPickles = [];
@@ -127,16 +149,40 @@ export const findFinishedPickles = async (user) => {
   let finishedPickles = [];
   
   for await (const myPickleId of myPickleIds) {
-    const filterConditions = {
+    const finishedConditions = {
       _id: myPickleId.pickle,
       ...PICKLE_FILTER.FINISHED
     };
-    const timeOutPickle = await Pickle.find(filterConditions);
 
-    finishedPickles.push(timeOutPickle[0]);
+    const finishedPickle = await Pickle.find(finishedConditions);
+
+    finishedPickles.push(finishedPickle[0]);
   }
 
   const completePickles = await filterRecruitmentCompletedPickles(finishedPickles);
 
+  return completePickles;
+}
+
+export const findCancelledPickles = async (user) => {
+  const myPickleIds = await Participation.find({
+    user: user,
+  }).populate("user");
+
+  let finishedPickles = [];
+  
+  for await (const myPickleId of myPickleIds) {
+    const cancelledConditions = {
+      _id: myPickleId.pickle,
+      ...PICKLE_FILTER.EXPIRED
+    };
+
+    const cancelledPickles = await Pickle.find(cancelledConditions);
+
+    finishedPickles.push(cancelledPickles[0]);
+  }
+
+  const completePickles = await filterRecruitingPickles(finishedPickles);
+  console.log(completePickles);
   return completePickles;
 }
