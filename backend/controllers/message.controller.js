@@ -1,6 +1,7 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io, getReceiverSocketIds } from "../socket/socket.js";
+import { playPickleSoundTrack } from "../langchain/pickleSoundTrack.js";
 
 export const sendMessage = async (req, res) => {
 	try {
@@ -9,6 +10,7 @@ export const sendMessage = async (req, res) => {
 		const senderId = req.user._id; // 로그인 상태에서 존재함
 
 		const conversation = await Conversation.findOne({_id: conversationId}).populate("messages");
+		// await chatBotMessage(conversation.isGroup, message);
 
 		const newMessage = new Message({
 			senderId,
@@ -22,12 +24,15 @@ export const sendMessage = async (req, res) => {
 		// this will run in parallel
 		await Promise.all([conversation.save(), newMessage.save()]);
 
-		// SOCKET IO FUNCTIONALITY WILL GO HERE
+		// // SOCKET IO FUNCTIONALITY WILL GO HERE
 		const receiverSocketIds = getReceiverSocketIds(conversation.participants);
+
 		for (const receiverSocketId of receiverSocketIds) {
 			if (receiverSocketId) {
 				// io.to(<socket_id>).emit() used to send events to specific client
 				io.to(receiverSocketId).emit("newMessage", newMessage);
+
+				await chatBotMessage(conversation, message, receiverSocketId);
 			}
 		}
 
@@ -37,6 +42,30 @@ export const sendMessage = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+
+const chatBotMessage = async (conversation, message, receiverSocketId) => {
+	if (!conversation.isGroup) return message;
+
+	if (message.startsWith('!!')) {
+		console.log("hi");
+
+		const newMessage = new Message({
+			senderId: "chatBot",
+			message: "안녕",
+		});
+
+		if (newMessage) {
+			conversation.messages.push(newMessage._id);
+		}
+
+		newMessage.save();
+		
+		io.to(receiverSocketId).emit("chatBotMessage", newMessage);
+		return message;
+	}
+
+	return message;
+}
 
 export const sendMessageOneToOne = async (req, res) => {
 	try {

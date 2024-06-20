@@ -8,14 +8,16 @@ import { findProceedingPickles } from "./services/pickle.service.js";
 export const getConversationList = async (req, res) => {
 	try {
 		const senderId = req.user._id;
+    const { category } = req.query;
+
     const { filteredPickles, todayPickles } = await findProceedingPickles(senderId);
     const proceedingPickles = [ ...filteredPickles, ...todayPickles ];
     await createGroupConversation(proceedingPickles);
 
-		const conversationList = await Conversation.find({
-			participants: { $in: [senderId] }
-		}).populate('pickleId');
+    // 필터링
+		const conversationList = await filterConversationsByQuery(category, senderId);
 
+    // dto
     const updatedConversationList = [];
 
     for await (const conversation of conversationList) {
@@ -26,10 +28,10 @@ export const getConversationList = async (req, res) => {
 
         const updatedConversation = {
             ...conversation.toObject(),
-            imageUrl: pickle.imgUrl,
-            title: pickle.title,
-            lastMessage: lastMessage.message,
-            lastUpdatedAt: conversation.updatedAt
+            imageUrl: pickle?.imgUrl,
+            title: pickle?.title,
+            lastMessage: lastMessage?.message,
+            lastUpdatedAt: conversation?.updatedAt
         }
         updatedConversationList.push(updatedConversation);
       }
@@ -43,6 +45,42 @@ export const getConversationList = async (req, res) => {
 	}
 };
 
+const filterConversationsByQuery = async (query, senderId) => {
+  let result;
+
+  switch (query) {
+    case "1:1 문의":
+      result = await filterOneToOneChats(senderId);
+      break;
+
+    case "진행 중":
+      result = await filterOngoingConversations(senderId);
+      break;
+
+    default:
+      result = await Conversation.find({
+        participants: { $in: [senderId] }
+      }).populate('pickleId');
+  }
+
+  return result;
+};
+
+const filterOneToOneChats = async (senderId) => {
+  return await Conversation.find({
+    participants: { $in: [senderId] },
+    isGroup: false,
+  }).populate('pickleId');
+};
+
+const filterOngoingConversations = async (senderId) => {
+  return await Conversation.find({
+    participants: { $in: [senderId] },
+    isGroup: true,
+  }).populate('pickleId');
+}
+
+ 
 const createGroupConversation = async (proceedingPickles) => {
   const totalConversations = [];
 
