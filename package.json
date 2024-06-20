@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "preinstall": "npx only-allow npm",
     "server": "nodemon backend/server.js",
     "start": "node backend/server.js",
     "build": "npm install"
