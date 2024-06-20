@@ -28,6 +28,7 @@ export const getPickleDetails = async (req, res) => {
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
+    const over = pickle.deadLine < new Date();
 
     if (!pickle) {
       return res.status(404).json({ error: "Pickle not found" });
@@ -44,6 +45,7 @@ export const getPickleDetails = async (req, res) => {
       participantNumber: participations.length,
       leader: leaders[0].user,
       amIMember: amIMember,
+      over: over,
     };
 
     res.json({ data: addLikeAndParticipants }); // status 필드가 JSON 응답에 포함됩니다.
