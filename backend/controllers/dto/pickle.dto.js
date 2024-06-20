@@ -5,7 +5,7 @@ export const minimumFormatPickle = (pickle) => {
     imgUrl: pickle.imgUrl,
     capacity: pickle.capacity,
     deadLine: pickle.deadLine,
-    palce: pickle.place,
+    place: pickle.place,
     when: pickle.when,
     cost: pickle.cost,
     latitude: pickle.latitude,
@@ -14,6 +14,27 @@ export const minimumFormatPickle = (pickle) => {
     participantNumber: pickle.participantNumber,
   };
 };
+
+export const todayPickleFormat = (pickle) => {
+  return {
+    id: pickle._id,
+    title: pickle.title,
+    imgUrl: pickle.imgUrl,
+    capacity: pickle.capacity,
+    deadLine: pickle.deadLine,
+    place: pickle.place,
+    when: pickle.when,
+    cost: pickle.cost,
+    latitude: pickle.latitude,
+    longitude: pickle.longitude,
+    category: pickle.category,
+    participantNumber: pickle.participantNumber,
+    latitude: pickle.latitude,
+    longitude: pickle.longitude,
+    detailAddress: pickle.detailedAddress,
+    today: pickle.today,
+  }
+}
 
 export const pickleEditFormat = (pickle) => {
   return {

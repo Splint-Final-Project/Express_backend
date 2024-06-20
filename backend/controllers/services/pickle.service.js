@@ -104,7 +104,8 @@ export const findProceedingPickles = async (user) => {
       const savedTime = pickle.when.times[time];
 
       if (today.getTime() ===  savedTime.getTime()) {
-        todayPickles.push(pickle);
+        const pickleWithToday = { ...pickle, today };
+        todayPickles.push(pickleWithToday);
         isTodayPickle = true;
         break;
       }

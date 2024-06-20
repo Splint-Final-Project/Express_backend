@@ -9,7 +9,7 @@ import {
   findHotTimePickles,
   findPicklesByQueries,
 } from "../services/pickle.service.js";
-import { minimumFormatPickle } from "../dto/pickle.dto.js";
+import { minimumFormatPickle, todayPickleFormat } from "../dto/pickle.dto.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -204,7 +204,7 @@ export const getProceedingPickles = async (req, res) => {
 
     const formattedFilteredPickles =
       filteredPickles?.map(minimumFormatPickle) || [];
-    const formattedTodayPickles = todayPickles?.map(minimumFormatPickle) || [];
+    const formattedTodayPickles = todayPickles?.map(todayPickleFormat) || [];
 
     res.json({
       proceedingPickles: formattedFilteredPickles,

@@ -4,7 +4,8 @@ import Participation from "../../models/participation.model.js";
 import { verify, refund } from "../../utils/payments.js";
 
 //storage
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { bucketName, s3Client, aws_key } from "../../storage/connectS3.js";
 
 import axios from "axios";
