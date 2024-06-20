@@ -61,7 +61,6 @@ export const createImgUrl = async (req, res) => {
 export const createUrlImgForGeneratedImage = async (req, res) => {
   try {
     const { imageUrl } = req.body;
-    console.log(imageUrl);
 
     const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
     console.log('Image downloaded successfully'); // 이미지 다운로드 성공 로그
@@ -86,3 +85,13 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
     res.status(500).json({ message: 'Image download failed', error });
   }
 }
+
+export const editProfile = (req, res) => {
+	try {
+		const user = req.user;
+
+	} catch (error) {
+		console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+	}
+};

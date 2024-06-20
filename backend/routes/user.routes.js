@@ -12,7 +12,7 @@ router.get("/points", protectRoute, (req, res) => {
   console.log(user.points);
   res.json({ points: user.points.current, history: user.points.history });
 });
-router.post("/profile", upload.single("image"), protectRoute, createImgUrl);
-router.post("/generatedProfile", upload.single("image"), protectRoute, createUrlImgForGeneratedImage)
+router.post("/profileImg", upload.single("image"), protectRoute, createImgUrl);
+router.post("/generatedProfileImg", upload.single("image"), protectRoute, createUrlImgForGeneratedImage)
 
 export default router;
