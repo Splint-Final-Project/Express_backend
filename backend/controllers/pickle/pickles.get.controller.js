@@ -202,8 +202,9 @@ export const getProceedingPickles = async (req, res) => {
   try {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
 
-    const formattedFilteredPickles = filteredPickles.map(minimumFormatPickle);
-    const formattedTodayPickles = todayPickles.map(minimumFormatPickle);
+    const formattedFilteredPickles =
+      filteredPickles?.map(minimumFormatPickle) || [];
+    const formattedTodayPickles = todayPickles?.map(minimumFormatPickle) || [];
 
     res.json({
       proceedingPickles: formattedFilteredPickles,
@@ -220,8 +221,9 @@ export const getFinishedPickles = async (req, res) => {
 
   try {
     const finishedPickles = await findProceedingPickles(user);
-
-    const formattedFilteredPickles = finishedPickles.map(minimumFormatPickle);
+    console.log(finishedPickles);
+    const formattedFilteredPickles =
+      finishedPickles?.map(minimumFormatPickle) || [];
 
     res.json({
       finishedPickles: formattedFilteredPickles,

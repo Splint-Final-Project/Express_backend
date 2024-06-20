@@ -44,7 +44,7 @@ export const postReview = async (req, res) => {
       return res.status(400).json({ message: "Pickle has not finished" });
     }
     const { stars, content } = req.body;
-    if (!stars || !content) {
+    if (!stars) {
       return res.status(400).json({ message: "Invalid review" });
     }
     participation.review = { stars, content };

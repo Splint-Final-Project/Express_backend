@@ -76,7 +76,7 @@ router.post(
 
 //리뷰 달기
 router.get("/review", protectRoute, getReviews);
-router.post("/review/:id", protectRoute, postReview);
-router.delete("/review/:id", protectRoute, deleteReview);
+router.post("/:id/review", protectRoute, postReview);
+router.delete("/:id/review", protectRoute, deleteReview);
 
 export default router;
