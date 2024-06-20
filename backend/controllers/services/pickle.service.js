@@ -70,15 +70,6 @@ export const findHotTimePickles = async (oneDayLater) => {
   return hotTimeAndRecruitingPickles;
 }
 
-// 레거시
-// export const findRecruitmentCompletedPickles = async (user) => {
-//   const notStartPickles = await Pickle.find(PICKLE_FILTER.NOT_STARTED);
-
-//   const recruitmentCompletedPickles = await filterRecruitmentCompletedPickles(notStartPickles);
-
-//   return recruitmentCompletedPickles;
-// };
-
 export const findProceedingPickles = async (user) => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
