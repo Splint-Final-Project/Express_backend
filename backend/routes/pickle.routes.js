@@ -53,10 +53,10 @@ router.get("/:id/favorite", optionalAuth, getFavoriteCount);
 router.post("/create", protectRoute, createPickle);
 router.put("/:id", protectRoute, editPickle);
 router.post("/join", protectRoute, JoinPickle);
+router.post("/img", upload.single("image"), createImgUrl);
+router.post("/generatedImg", upload.single("image"), createUrlImgForGeneratedImage);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
-router.post("/img", upload.single("image"), createImgUrl);
-router.post("/generatedImg", upload.single("image"), createUrlImgForGeneratedImage);
 
 export default router;

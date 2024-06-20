@@ -3,6 +3,7 @@ import Pickle from "../../models/Pickle.model.js";
 import {
   findRecruitingPickles,
   findProceedingPickles,
+  findFinishedPickles,
   findNearbyPickles,
   findPopularPickles,
   findHotTimePickles,
@@ -198,7 +199,6 @@ export const getNearbyPickles = async (req, res) => {
 // 로그인 필수
 export const getProceedingPickles = async (req, res) => {
   const user = req.user._id;
-
   try {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
 
@@ -219,7 +219,7 @@ export const getFinishedPickles = async (req, res) => {
   const user = req.user._id;
 
   try {
-    const finishedPickles = await findProceedingPickles(user);
+    const finishedPickles = await findFinishedPickles(user);
 
     const formattedFilteredPickles = finishedPickles.map(minimumFormatPickle);
 

@@ -89,7 +89,8 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
 export const editProfile = (req, res) => {
 	try {
 		const user = req.user;
-
+		
+		res.status(200).json({})
 	} catch (error) {
 		console.error(error);
     res.status(500).json({ error: "Internal server error" });
