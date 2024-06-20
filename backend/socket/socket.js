@@ -31,24 +31,6 @@ io.on("connection", (socket) => {
 
 	if (userId != "undefined") userSocketMap[userId] = socket.id;
 
-	// socket.on("chatBotMessage", async (message) => {
-	// 	console.log('New message received:', message);
-
-	// 	if (message.startsWith('!!')) {
-	// 			console.log("Command detected, triggering music play...");
-			
-	// 			try {
-	// 					const botResponse = await playPickleSoundTrack(message);
-	// 					console.log('Bot response:', botResponse);
-	// 					socket.emit('newMessage', botResponse);
-	// 			} catch (error) {
-	// 					console.error('Error playing sound track:', error);
-	// 			}
-	// 	} else {
-	// 		console.log('invalid command');
-	// 	}
-	// });
-
 	// io.emit() is used to send events to all the connected clients
 	// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
