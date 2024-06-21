@@ -232,7 +232,7 @@ export const getFinishedPickles = async (req, res) => {
   try {
     const finishedPickles = await findFinishedPickles(user);
     const cancelledPickles = await findCancelledPickles(user);
-
+    console.log(finishedPickles)
     const formattedFinishedPickles =
       finishedPickles?.map((pickle) => finishedPickleFormat(pickle, "done")) ||
       [];
@@ -245,7 +245,7 @@ export const getFinishedPickles = async (req, res) => {
       ...formattedFinishedPickles,
       ...formattedCancelledPickles,
     ];
-    console.log(finalFormat);
+
     //TODO: formattedFinishedPickles에
 
     res.json({

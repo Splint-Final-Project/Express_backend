@@ -4,6 +4,7 @@ import { PICKLE_FILTER } from "./constants/pickle.filter.js";
 import {
   filterRecruitingPickles,
   filterRecruitmentCompletedPickles,
+  filterRecruitmentCompletedPicklesWithReviews
 } from "./utils/index.js";
 
 export const findRecruitingPickles = async (skip, limit) => {
@@ -166,6 +167,12 @@ export const findProceedingPickles = async (user) => {
 export const findFinishedPickles = async (user) => {
   const myPickleIds = await Participation.find({
     user: user,
+    review: null,
+  }).populate("user");
+
+  const reviewedMyPickleIds = await Participation.find({
+    user: user,
+    review: { $ne: null }
   }).populate("user");
 
   let finishedPickles = [];
@@ -177,10 +184,29 @@ export const findFinishedPickles = async (user) => {
     };
 
     const finishedPickle = await Pickle.find(finishedConditions);
-    finishedPickles.push(finishedPickle[0]);
+
+    if (finishedPickle[0]) {
+      const newFinishedPickle = { ...finishedPickle[0]._doc, review: false};
+
+      finishedPickles.push(newFinishedPickle);
+    }
   }
 
-  const completePickles = await filterRecruitmentCompletedPickles(
+  for await (const myPickleId of reviewedMyPickleIds) {
+    const finishedConditions = {
+      _id: myPickleId.pickle,
+      ...PICKLE_FILTER.FINISHED,
+    };
+
+    const finishedPickle = await Pickle.find(finishedConditions);
+    if (finishedPickle[0]) {
+      const newFinishedPickle = { ...finishedPickle[0]._doc, review: true};
+
+      finishedPickles.push(newFinishedPickle);
+    }
+  }
+
+  const completePickles = await filterRecruitmentCompletedPicklesWithReviews(
     finishedPickles
   );
 
