@@ -33,7 +33,7 @@ import optionalAuth from "../middleware/optionalAuth.js";
 // storage
 import { upload } from "../storage/connectS3.js";
 import {
-  deleteReview,
+  // deleteReview,
   getReviews,
   postReview,
 } from "../controllers/pickle/pickle.review.controller.js";
@@ -59,7 +59,7 @@ router.get("/pending", protectRoute, getPendingPickles);
 //리뷰 달기
 router.get("/reviews", protectRoute, getReviews);
 router.post("/:id/review", protectRoute, postReview);
-router.delete("/:id/review", protectRoute, deleteReview);
+// router.delete("/:id/review", protectRoute, deleteReview);
 
 // 동적
 router.get("/:id", optionalAuth, getPickleDetails);

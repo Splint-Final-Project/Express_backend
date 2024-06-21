@@ -49,8 +49,21 @@ export const postReview = async (req, res) => {
     if (!stars) {
       return res.status(400).json({ message: "Invalid review" });
     }
+    if (participation.review) {
+      return res.status(400).json({ message: "Review already exists" });
+    }
     participation.review = { date: new Date(), stars, content };
     await participation.save();
+    // 유저에게 포인트 지급
+    user.points.current += 500;
+    user.point.history.push({
+      type: "earn",
+      message: `리뷰 작성: ${pickle.title}`,
+      date: new Date(),
+      amount: 500,
+      remaining: user.points.current,
+    });
+    await user.save();
     res.status(200).json({ message: "Review posted successfully" });
   } catch (error) {
     console.error(error);
@@ -58,26 +71,26 @@ export const postReview = async (req, res) => {
   }
 };
 
-export const deleteReview = async (req, res) => {
-  try {
-    const user = req.user;
-    const pickleId = req.params.id;
-    const participation = Participation.findOne({
-      user: user._id,
-      pickle: pickleId,
-    });
+// export const deleteReview = async (req, res) => {
+//   try {
+//     const user = req.user;
+//     const pickleId = req.params.id;
+//     const participation = Participation.findOne({
+//       user: user._id,
+//       pickle: pickleId,
+//     });
 
-    if (!participation) {
-      return res.status(404).json({ message: "Invalid participation" });
-    }
-    if (!participation.review) {
-      return res.status(404).json({ message: "No review found" });
-    }
-    participation.review = null;
-    await participation.save();
-    res.status(200).json({ message: "Review deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+//     if (!participation) {
+//       return res.status(404).json({ message: "Invalid participation" });
+//     }
+//     if (!participation.review) {
+//       return res.status(404).json({ message: "No review found" });
+//     }
+//     participation.review = null;
+//     await participation.save();
+//     res.status(200).json({ message: "Review deleted successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
