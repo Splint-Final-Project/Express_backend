@@ -17,17 +17,10 @@ export const vectorDataSaver = async (data) => {
         capacity: ${data.capacity || ""}
         cost: ${data.cost || ""}
         deadLine: ${data.deadLine || ""}
-        participants: ${JSON.stringify(data.participants) || ""}
-        isCancelled: ${data.isCancelled || ""}
         where: ${data.where || ""}
         when: ${JSON.stringify(data.when) || ""}
         category: ${data.category || ""}
         explanation: ${data.explanation || ""}
-        latitude: ${data.latitude || ""}
-        longitude: ${data.longitude || ""}
-        viewCount: ${data.viewCount || ""}
-        createdAt: ${data.createdAt || ""}
-        updatedAt: ${data.updatedAt || ""}
     `;
     const textDocs = text.replace(/\s+/g, ' ').trim();
 

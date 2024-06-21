@@ -18,11 +18,11 @@ export const vectorSearchEngine = async (message) => {
     embeddingKey: "embedding", // The name of the collection field containing the embedded text. Defaults to "embedding"
   });
   
-  const retriever = await vectorStore.asRetriever({
+  const retriever = vectorStore.asRetriever({
     searchType: "mmr",
     searchKwargs: {
       fetchK: 20,
-      lambda: 0.1,
+      lambda: 0.8,
       k: 10, // 리턴할 결과의 수를 지정
     },
   });
