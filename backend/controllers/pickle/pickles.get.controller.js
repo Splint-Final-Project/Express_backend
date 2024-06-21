@@ -238,7 +238,7 @@ export const getFinishedPickles = async (req, res) => {
       ...formattedFilteredPickles,
       ...formattedCancelledPickles,
     ];
-    // console.log(finalFormat);
+    console.log(finalFormat);
 
     res.json({
       finishedPickles: finalFormat,
@@ -256,7 +256,7 @@ export const getPendingPickles = async (req, res) => {
     const pendingPickles = await findPendingPickles(user);
 
     const formattedPendingPickles = pendingPickles?.map((pickle) => myPickleFormat(pickle, "pending")) || [];
-    
+
     res.status(201).json({ pendingPickles: formattedPendingPickles});
   } catch (error) {
     console.error(error);
