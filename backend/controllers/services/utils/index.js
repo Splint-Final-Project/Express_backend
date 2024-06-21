@@ -58,8 +58,7 @@ export const filterRecruitmentCompletedPickles = async (filteredPickles) => {
   return recruitmentCompletedPickles;
 };
 
-
-export const filterRecruitmentCompletedPicklesWithReviews = async (filteredPickles) => {
+export const filterRecruitmentCompletedPicklesWithReview = async (filteredPickles) => {
   let recruitmentCompletedPickles = [];
 
   for await (const filteredPickle of filteredPickles) {
@@ -73,7 +72,24 @@ export const filterRecruitmentCompletedPicklesWithReviews = async (filteredPickl
       recruitmentCompletedPickles.push(pickleWithParticipant);
     }
   }
-  console.log(recruitmentCompletedPickles)
+
+  return recruitmentCompletedPickles;
+}
+
+export const filterRecruitmentCompletedPicklesWithSome = async (filteredPickles) => {
+  console.log(filteredPickles)
+  let recruitmentCompletedPickles = [];
+
+  for await (const filteredPickle of filteredPickles) {
+    const participantNumber = await findParticipationNumber(filteredPickle);
+
+    if (participantNumber === filteredPickle?.capacity) {
+
+      const pickleWithParticipant = addParticipantNumberWithReviews(filteredPickle, participantNumber);
+
+      recruitmentCompletedPickles.push(pickleWithParticipant);
+    }
+  }
 
   return recruitmentCompletedPickles;
 }

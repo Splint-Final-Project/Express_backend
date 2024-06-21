@@ -4,7 +4,8 @@ import { PICKLE_FILTER } from "./constants/pickle.filter.js";
 import {
   filterRecruitingPickles,
   filterRecruitmentCompletedPickles,
-  filterRecruitmentCompletedPicklesWithReviews
+  filterRecruitmentCompletedPicklesWithReview,
+  filterRecruitmentCompletedPicklesWithSome
 } from "./utils/index.js";
 
 export const findRecruitingPickles = async (skip, limit) => {
@@ -132,9 +133,14 @@ export const findProceedingPickles = async (user) => {
 
     const readyToStartPickle = await Pickle.find(filterConditions);
 
-    readyToStartPickles.push(readyToStartPickle[0]);
+    if (readyToStartPickle[0]) {
+      const newFinishedPickle = { ...readyToStartPickle[0]._doc, attendance: myPickleId._doc.attendance };
+
+      readyToStartPickles.push(newFinishedPickle);
+    }
   }
-  const proceedingPickles = await filterRecruitmentCompletedPickles(
+
+  const proceedingPickles = await filterRecruitmentCompletedPicklesWithSome(
     readyToStartPickles
   );
 
@@ -143,7 +149,6 @@ export const findProceedingPickles = async (user) => {
   let todayPickles = [];
 
   proceedingPickles.forEach((pickle) => {
-    let isTodayPickle = false;
 
     for (const time in pickle.when.times) {
       const savedTime = pickle.when.times[time];
@@ -151,14 +156,11 @@ export const findProceedingPickles = async (user) => {
       if (today.getTime() === savedTime.getTime()) {
         const pickleWithToday = { ...pickle, today };
         todayPickles.push(pickleWithToday);
-        isTodayPickle = true;
-        break;
+
       }
     }
 
-    if (!isTodayPickle) {
-      filteredPickles.push(pickle);
-    }
+    filteredPickles.push(pickle);
   });
 
   return { filteredPickles, todayPickles };
@@ -206,7 +208,7 @@ export const findFinishedPickles = async (user) => {
     }
   }
 
-  const completePickles = await filterRecruitmentCompletedPicklesWithReviews(
+  const completePickles = await filterRecruitmentCompletedPicklesWithReview(
     finishedPickles
   );
 
