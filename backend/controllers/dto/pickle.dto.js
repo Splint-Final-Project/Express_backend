@@ -34,7 +34,7 @@ export const myPickleFormat = (pickle, status) => {
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
     status: status,
-  }
+  };
 };
 
 export const finishedPickleFormat = (pickle, status) => {
@@ -56,7 +56,8 @@ export const finishedPickleFormat = (pickle, status) => {
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
     status: status,
-  }
+    review: pickle.review,
+  };
 };
 
 export const pickleEditFormat = (pickle) => {

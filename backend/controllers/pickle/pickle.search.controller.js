@@ -6,10 +6,10 @@ import { minimumFormatPickle } from "../dto/pickle.dto.js";
 export const searchPickles = async (req, res) => {
   try {
     const now = new Date();
-    const message = req.body.message;
+    const { text, term, sort } = req.query;
 
-    const searchedPickles = await vectorSearchEngine(message); // 리스트
-    
+    const searchedPickles = await vectorSearchEngine(text); // 리스트
+
     const formattedPickles = [];
 
     for await (const pickle of searchedPickles) {
@@ -18,7 +18,6 @@ export const searchPickles = async (req, res) => {
         deadLine: { $gt: now },
       });
       if (!foundPickle[0]) continue;
-
 
       const participantNumber = await Participation.countDocuments({
         pickle: foundPickle[0]._id,
@@ -30,6 +29,9 @@ export const searchPickles = async (req, res) => {
         formattedPickles.push(filteredPickles);
       }
     }
+
+    //TODO: term(기간)에 따라 필터링 'any' | '1m' | '3m' | '6m'
+    //TODO: sort(정렬기준)에 따라 정렬 'popular' | 'recent' | 'lowPrice' | 'highPrice'
 
     res.json({ data: formattedPickles }); // 최대 10개
   } catch (error) {

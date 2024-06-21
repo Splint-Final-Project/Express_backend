@@ -56,6 +56,11 @@ router.get("/proceeding", protectRoute, getProceedingPickles);
 router.get("/finish", protectRoute, getFinishedPickles);
 router.get("/pending", protectRoute, getPendingPickles);
 
+//리뷰 달기
+router.get("/reviews", protectRoute, getReviews);
+router.post("/:id/review", protectRoute, postReview);
+router.delete("/:id/review", protectRoute, deleteReview);
+
 // 동적
 router.get("/:id", optionalAuth, getPickleDetails);
 router.get("/:id/favorite", optionalAuth, getFavoriteCount);
@@ -75,11 +80,6 @@ router.post(
   upload.single("image"),
   createUrlImgForGeneratedImage
 );
-
-//리뷰 달기
-router.get("/review", protectRoute, getReviews);
-router.post("/:id/review", protectRoute, postReview);
-router.delete("/:id/review", protectRoute, deleteReview);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
