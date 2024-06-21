@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import { userEditFormat } from "./dto/user.dto.js";
 
 //storage
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -86,11 +87,28 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
   }
 }
 
-export const editProfile = (req, res) => {
+export const editProfile = async (req, res) => {
 	try {
-		const user = req.user;
-		
-		res.status(200).json({})
+		const updates = req.body;
+    const user = req.user;
+
+    // DTO에 존재하지 않는 키가 있는지 확인
+    const updateKeys = Object.keys(updates);
+    const userDto = Object.keys(userEditFormat(user));
+
+    for (let key of updateKeys) {
+      if (!userDto.includes(key)) {
+        return res
+          .status(404)
+          .json({ error: `${key} 데이터는 수정할 수 없는 데이터 입니다.` });
+      }
+    }
+
+    Object.assign(user, updates);
+
+    const updatedUser = await user.save();
+
+		res.status(200).json({updates: userEditFormat(updatedUser)})
 	} catch (error) {
 		console.error(error);
     res.status(500).json({ error: "Internal server error" });
