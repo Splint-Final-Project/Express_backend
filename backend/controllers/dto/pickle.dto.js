@@ -33,7 +33,7 @@ export const myPickleFormat = (pickle) => {
     longitude: pickle.longitude,
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
-  }
+  };
 };
 
 export const finishedPickleFormat = (pickle, boolean) => {
@@ -54,8 +54,8 @@ export const finishedPickleFormat = (pickle, boolean) => {
     longitude: pickle.longitude,
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
-    isCanceled: boolean,
-  }
+    isCancelled: boolean,
+  };
 };
 
 export const pickleEditFormat = (pickle) => {

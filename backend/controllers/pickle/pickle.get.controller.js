@@ -13,7 +13,7 @@ export const getPickleDetails = async (req, res) => {
 
     const pickle = await Pickle.findOne({
       _id: req.params.id,
-      isCancelled: false,
+      // isCancelled: false,
     }).exec();
 
     const participations = await Participation.find({
@@ -33,7 +33,7 @@ export const getPickleDetails = async (req, res) => {
     const likeCount = await Favorite.countDocuments({
       pickleId: req.params.id,
     });
-    
+
     const over = pickle.deadLine < new Date();
 
     if (!pickle) {
@@ -51,9 +51,19 @@ export const getPickleDetails = async (req, res) => {
       participantNumber: participations.length,
       leader: leaders[0].user,
       amIMember: amIMember,
-      isRecruitingFinished: picklesWithParticipant.capacity === participations.length,
-      isProceeding: picklesWithParticipant.when.times[0] < new Date() <= picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
-      isFinished: new Date() > picklesWithParticipant.when.times[picklesWithParticipant.when.times.length -1],
+      isRecruitingFinished:
+        picklesWithParticipant.capacity === participations.length,
+      isProceeding:
+        picklesWithParticipant.when.times[0] <
+        new Date() <=
+        picklesWithParticipant.when.times[
+          picklesWithParticipant.when.times.length - 1
+        ],
+      isFinished:
+        new Date() >
+        picklesWithParticipant.when.times[
+          picklesWithParticipant.when.times.length - 1
+        ],
       over: over,
     };
 
