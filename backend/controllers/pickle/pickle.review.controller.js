@@ -13,6 +13,7 @@ export const getReviews = async (req, res) => {
         pickleId: participation.pickle._id,
         pickleTitle: participation.pickle.title,
         pickleImageUrl: participation.pickle.imgUrl,
+        date: participation.review.date,
         stars: participation.review.stars,
         content: participation.review.content,
       };
@@ -48,7 +49,7 @@ export const postReview = async (req, res) => {
     if (!stars) {
       return res.status(400).json({ message: "Invalid review" });
     }
-    participation.review = { stars, content };
+    participation.review = { date: new Date(), stars, content };
     await participation.save();
     res.status(200).json({ message: "Review posted successfully" });
   } catch (error) {

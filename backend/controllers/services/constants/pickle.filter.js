@@ -8,7 +8,7 @@ export const PICKLE_FILTER = {
   },
 
   NOT_STARTED: {
-    $expr: { $gt: [{ $arrayElemAt: ["$when.times", 0] }, new Date()]},
+    $expr: { $gt: [{ $arrayElemAt: ["$when.times", 0] }, new Date()] },
   },
 
   READY_TO_START: (today) => {
@@ -16,11 +16,11 @@ export const PICKLE_FILTER = {
     //   { $expr: { $gte: [new Date(), { $arrayElemAt: ["$when.times", 0] }] } }, // 첫 번째 요소보다 크거나 같은
     //   { $expr: { $lte: [new Date(), { $arrayElemAt: ["$when.times", -1] }] } } // 마지막 요소보다 작거나 같은
     // ],
-    return {$expr: { $lte: [today, { $arrayElemAt: ["$when.times", -1] }] }}  // 마지막 요소보다 작거나 같은
+    return { $expr: { $lte: [today, { $arrayElemAt: ["$when.times", -1] }] } }; // 마지막 요소보다 작거나 같은
   },
 
   FINISHED: {
-    $expr: { $gt: [new Date(), { $arrayElemAt: ["$when.times", -1] }] }, // 첫 번째 요소보다 크거나 같은
+    $expr: { $gt: [new Date(), { $arrayElemAt: ["$when.times", -1] }] }, // 마지막 요소보다 크거나 같은
   },
 
   NEARBY: (parsedLatitude, parsedLongitude, radiusInDegrees) => {
@@ -33,14 +33,17 @@ export const PICKLE_FILTER = {
         $gte: parsedLongitude - radiusInDegrees,
         $lte: parsedLongitude + radiusInDegrees,
       },
-    }
+    };
   },
 
   POPULAR: {
-    createdAt: { $gte: new Date().setUTCHours(0, 0, 0, 0), $lte: new Date().setUTCHours(23, 59, 59, 999)},
+    createdAt: {
+      $gte: new Date().setUTCHours(0, 0, 0, 0),
+      $lte: new Date().setUTCHours(23, 59, 59, 999),
+    },
   },
 
   HOT_TIME: (oneDayLater) => {
-    return {deadLine: {$gte: new Date(), $lte: oneDayLater}}
-  }
+    return { deadLine: { $gte: new Date(), $lte: oneDayLater } };
+  },
 };

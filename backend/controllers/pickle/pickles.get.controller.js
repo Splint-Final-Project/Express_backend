@@ -10,9 +10,13 @@ import {
   findHotTimePickles,
   findPicklesByQueries,
   findPendingPickles,
-  findCancelledPickles
+  findCancelledPickles,
 } from "../services/pickle.service.js";
-import { minimumFormatPickle, myPickleFormat, finishedPickleFormat } from "../dto/pickle.dto.js";
+import {
+  minimumFormatPickle,
+  myPickleFormat,
+  finishedPickleFormat,
+} from "../dto/pickle.dto.js";
 import User from "../../models/user.model.js";
 
 export const getPickles = async (req, res) => {
@@ -232,8 +236,9 @@ export const getFinishedPickles = async (req, res) => {
 
     const finalFormat = [
       ...formattedFilteredPickles,
-      ...formattedCancelledPickles
+      ...formattedCancelledPickles,
     ];
+    // console.log(finalFormat);
 
     res.json({
       finishedPickles: finalFormat,
@@ -249,11 +254,12 @@ export const getPendingPickles = async (req, res) => {
 
   try {
     const pendingPickles = await findPendingPickles(user);
+
     const formattedPendingPickles = pendingPickles?.map((pickle) => myPickleFormat(pickle, "pending")) || [];
-    console.log(formattedPendingPickles)
+    
     res.status(201).json({ pendingPickles: formattedPendingPickles});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
-  };
+  }
 };
