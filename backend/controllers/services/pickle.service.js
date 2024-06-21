@@ -112,9 +112,8 @@ export const findProceedingPickles = async (user) => {
 
     readyToStartPickles.push(readyToStartPickle[0]);
   }
-
   const proceedingPickles = await filterRecruitmentCompletedPickles(readyToStartPickles);
-
+  console.log(proceedingPickles);
   // 오늘 날짜와 동일한 시간을 가지는 피클을 따로 저장
   let filteredPickles = [];
   let todayPickles = [];
@@ -160,7 +159,7 @@ export const findFinishedPickles = async (user) => {
   }
 
   const completePickles = await filterRecruitmentCompletedPickles(finishedPickles);
-
+  
   return completePickles;
 }
 
@@ -183,6 +182,5 @@ export const findCancelledPickles = async (user) => {
   }
 
   const completePickles = await filterRecruitingPickles(finishedPickles);
-  console.log(completePickles);
   return completePickles;
 }

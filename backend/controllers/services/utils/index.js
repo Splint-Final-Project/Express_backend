@@ -41,6 +41,7 @@ export const filterRecruitmentCompletedPickles = async (filteredPickles) => {
     const participantNumber = await findParticipationNumber(filteredPickle);
 
     if (participantNumber === filteredPickle?.capacity) {
+
       const pickleWithParticipant = addParticipantNumber(filteredPickle, participantNumber);
 
       recruitmentCompletedPickles.push(pickleWithParticipant);
