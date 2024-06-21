@@ -9,7 +9,6 @@ const router = express.Router();
 router.get("/", protectRoute, getUsersForSidebar);
 router.get("/points", protectRoute, (req, res) => {
   const user = req.user;
-  console.log(user.points);
   res.json({ points: user.points.current, history: user.points.history });
 });
 

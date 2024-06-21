@@ -113,7 +113,7 @@ export const findProceedingPickles = async (user) => {
     readyToStartPickles.push(readyToStartPickle[0]);
   }
   const proceedingPickles = await filterRecruitmentCompletedPickles(readyToStartPickles);
-  console.log(proceedingPickles);
+
   // 오늘 날짜와 동일한 시간을 가지는 피클을 따로 저장
   let filteredPickles = [];
   let todayPickles = [];
