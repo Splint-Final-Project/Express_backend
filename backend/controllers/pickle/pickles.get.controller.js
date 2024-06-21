@@ -211,8 +211,10 @@ export const getProceedingPickles = async (req, res) => {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
 
     const formattedFilteredPickles =
-      filteredPickles?.map((pickle) => myPickleFormat(pickle, "progress")) || [];
-    const formattedTodayPickles = todayPickles?.map((pickle) => myPickleFormat(pickle, "progress")) || [];
+      filteredPickles?.map((pickle) => myPickleFormat(pickle, "progress")) ||
+      [];
+    const formattedTodayPickles =
+      todayPickles?.map((pickle) => myPickleFormat(pickle, "progress")) || [];
 
     res.json({
       proceedingPickles: formattedFilteredPickles,
@@ -231,14 +233,20 @@ export const getFinishedPickles = async (req, res) => {
     const finishedPickles = await findFinishedPickles(user);
     const cancelledPickles = await findCancelledPickles(user);
 
-    const formattedFilteredPickles = finishedPickles?.map((pickle)=> finishedPickleFormat(pickle, "done")) || [];
-    const formattedCancelledPickles = cancelledPickles?.map((pickle)=> finishedPickleFormat(pickle, "cancelled")) || [];
+    const formattedFinishedPickles =
+      finishedPickles?.map((pickle) => finishedPickleFormat(pickle, "done")) ||
+      [];
+    const formattedCancelledPickles =
+      cancelledPickles?.map((pickle) =>
+        finishedPickleFormat(pickle, "cancelled")
+      ) || [];
 
     const finalFormat = [
-      ...formattedFilteredPickles,
+      ...formattedFinishedPickles,
       ...formattedCancelledPickles,
     ];
     console.log(finalFormat);
+    //TODO: formattedFinishedPickles에
 
     res.json({
       finishedPickles: finalFormat,
@@ -255,9 +263,10 @@ export const getPendingPickles = async (req, res) => {
   try {
     const pendingPickles = await findPendingPickles(user);
 
-    const formattedPendingPickles = pendingPickles?.map((pickle) => myPickleFormat(pickle, "pending")) || [];
+    const formattedPendingPickles =
+      pendingPickles?.map((pickle) => myPickleFormat(pickle, "pending")) || [];
 
-    res.status(201).json({ pendingPickles: formattedPendingPickles});
+    res.status(201).json({ pendingPickles: formattedPendingPickles });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
