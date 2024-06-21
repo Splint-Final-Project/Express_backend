@@ -52,15 +52,17 @@ export const createPickle = async (req, res) => {
         });
       }
       // Deduct points from the user
-      user.points.current -= discount;
-      user.points.history.push({
-        type: "use",
-        message: `피클 생성: ${title}`,
-        date: new Date(),
-        amount: discount,
-        remaining: user.points.current,
-      });
-      await user.save();
+      if (discount > 0) {
+        user.points.current -= discount;
+        user.points.history.push({
+          type: "use",
+          message: `피클 생성: ${title}`,
+          date: new Date(),
+          amount: discount,
+          remaining: user.points.current,
+        });
+        await user.save();
+      }
 
       const pickleData = {
         title,
@@ -159,17 +161,17 @@ export const createPickle = async (req, res) => {
           refundResult,
         });
       }
-
-      user.points.current -= pickleData.discount;
-      user.points.history.push({
-        type: "use",
-        message: `피클 생성: ${pickleData.title}`,
-        date: new Date(),
-        amount: pickleData.discount,
-        remaining: user.points.current,
-      });
-
-      await user.save();
+      if (pickleData.discount > 0) {
+        user.points.current -= pickleData.discount;
+        user.points.history.push({
+          type: "use",
+          message: `피클 생성: ${pickleData.title}`,
+          date: new Date(),
+          amount: pickleData.discount,
+          remaining: user.points.current,
+        });
+        await user.save();
+      }
 
       // 새로운 피클 생성
       const newPickle = new Pickle({
