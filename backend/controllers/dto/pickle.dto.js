@@ -15,7 +15,7 @@ export const minimumFormatPickle = (pickle) => {
   };
 };
 
-export const myPickleFormat = (pickle) => {
+export const myPickleFormat = (pickle, status) => {
   return {
     id: pickle._id,
     title: pickle.title,
@@ -33,10 +33,11 @@ export const myPickleFormat = (pickle) => {
     longitude: pickle.longitude,
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
+    status: status,
   }
 };
 
-export const finishedPickleFormat = (pickle, boolean) => {
+export const finishedPickleFormat = (pickle, status) => {
   return {
     id: pickle._id,
     title: pickle.title,
@@ -54,7 +55,7 @@ export const finishedPickleFormat = (pickle, boolean) => {
     longitude: pickle.longitude,
     detailAddress: pickle.detailedAddress,
     today: pickle.today,
-    isCanceled: boolean,
+    status: status,
   }
 };
 
