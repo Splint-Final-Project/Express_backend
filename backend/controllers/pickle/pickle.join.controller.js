@@ -53,14 +53,16 @@ export const JoinPickle = async (req, res) => {
       }
 
       // Deduct points from the user
-      user.points.current -= discount;
-      user.points.history.push({
-        type: "use",
-        message: `피클 참가: ${pickle.title}`,
-        date: new Date(),
-        amount: discount,
-        remaining: user.points.current,
-      });
+      if (discount > 0) {
+        user.points.current -= discount;
+        user.points.history.push({
+          type: "use",
+          message: `피클 참가: ${pickle.title}`,
+          date: new Date(),
+          amount: discount,
+          remaining: user.points.current,
+        });
+      }
 
       await user.save();
       const newParticipation = new Participation({
@@ -164,15 +166,17 @@ export const JoinPickle = async (req, res) => {
         });
       }
 
-      user.points.current -= paymentData.discount;
-      user.points.history.push({
-        type: "use",
-        message: `피클 참가: ${pickle.title}`,
-        date: new Date(),
-        amount: paymentData.discount,
-        remaining: user.points.current,
-      });
-      await user.save();
+      if (paymentData.discount > 0) {
+        user.points.current -= paymentData.discount;
+        user.points.history.push({
+          type: "use",
+          message: `피클 참가: ${pickle.title}`,
+          date: new Date(),
+          amount: paymentData.discount,
+          remaining: user.points.current,
+        });
+        await user.save();
+      }
 
       const newParticipation = new Participation({
         user: user_id,
