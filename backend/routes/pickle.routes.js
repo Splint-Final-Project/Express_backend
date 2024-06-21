@@ -37,6 +37,7 @@ import {
   getReviews,
   postReview,
 } from "../controllers/pickle/pickle.review.controller.js";
+import { pickleAttendance } from "../controllers/pickle/pickle.attendance.controller.js";
 
 const router = express.Router();
 
@@ -60,6 +61,9 @@ router.get("/pending", protectRoute, getPendingPickles);
 router.get("/reviews", protectRoute, getReviews);
 router.post("/:id/review", protectRoute, postReview);
 // router.delete("/:id/review", protectRoute, deleteReview);
+
+//출첵
+router.post("/:id/attendance", protectRoute, pickleAttendance);
 
 // 동적
 router.get("/:id", optionalAuth, getPickleDetails);

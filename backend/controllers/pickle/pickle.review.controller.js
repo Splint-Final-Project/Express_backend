@@ -42,15 +42,17 @@ export const postReview = async (req, res) => {
       return res.status(404).json({ message: "Invalid pickle" });
     }
     if (pickle.when.finishDate > new Date()) {
-      return res.status(400).json({ message: "Pickle has not finished" });
+      return res
+        .status(400)
+        .json({ message: "아직 종료되지 않은 피클입니다." });
     }
     const { stars, content } = req.body.data;
     console.log(req.body);
     if (!stars) {
-      return res.status(400).json({ message: "Invalid review" });
+      return res.status(400).json({ message: "리뷰 형식이 잘못됐습니다." });
     }
     if (participation.review) {
-      return res.status(400).json({ message: "Review already exists" });
+      return res.status(400).json({ message: "이미 리뷰를 남기셨습니다." });
     }
     participation.review = { date: new Date(), stars, content };
     await participation.save();
@@ -64,7 +66,7 @@ export const postReview = async (req, res) => {
       remaining: user.points.current,
     });
     await user.save();
-    res.status(200).json({ message: "Review posted successfully" });
+    res.status(200).json({ message: "리뷰 작성 완료! 500P가 지급됐습니다." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

@@ -36,6 +36,12 @@ const participationSchema = new mongoose.Schema(
       required: true,
     },
 
+    attendance: {
+      type: [Date],
+      required: true,
+      default: [],
+    },
+
     review: {
       type: {
         date: {
