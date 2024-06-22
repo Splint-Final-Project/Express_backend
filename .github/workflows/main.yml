@@ -53,5 +53,5 @@ jobs:
           script: |
             cd ~/Express_backend
             git pull origin main --ff-only
-            yarn
+            npm install
             pm2 restart ~/Express_backend/backend/server.js
