@@ -24,6 +24,7 @@ export const sendMessage = async (req, res) => {
 		// this will run in parallel
 		await Promise.all([conversation.save(), newMessage.save()]);
 
+		
 		// // SOCKET IO FUNCTIONALITY WILL GO HERE
 		const receiverSocketIds = getReceiverSocketIds(conversation.participants);
 
@@ -32,9 +33,10 @@ export const sendMessage = async (req, res) => {
 				// io.to(<socket_id>).emit() used to send events to specific client
 				io.to(receiverSocketId).emit("newMessage", newMessage);
 
-				await chatBotMessage(conversation, message, receiverSocketId);
 			}
 		}
+
+		await chatBotMessage(conversation, message, receiverSocketIds);
 
 		res.status(201).json(newMessage);
 	} catch (error) {
@@ -43,14 +45,12 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-const chatBotMessage = async (conversation, message, receiverSocketId) => {
-	if (!conversation.isGroup) return message;
+const chatBotMessage = async (conversation, message, receiverSocketIds) => {
+	if (!conversation.isGroup) return;
 
 	if (message.startsWith('!!')) {
-		console.log("hi");
-
 		const newMessage = new Message({
-			senderId: "chatBot",
+			senderId: "6676a2dd02763d733afa8892",
 			message: "안녕",
 		});
 
@@ -58,14 +58,15 @@ const chatBotMessage = async (conversation, message, receiverSocketId) => {
 			conversation.messages.push(newMessage._id);
 		}
 
-		newMessage.save();
-		
-		io.to(receiverSocketId).emit("chatBotMessage", newMessage);
-		return message;
-	}
+		await Promise.all([conversation.save(), newMessage.save()]);
 
-	return message;
-}
+		for (const receiverSocketId of receiverSocketIds) {
+			if (receiverSocketId) {
+				io.to(receiverSocketId).emit("chatBotMessage", newMessage);
+			}
+		}
+	}
+};
 
 export const sendMessageOneToOne = async (req, res) => {
 	try {
