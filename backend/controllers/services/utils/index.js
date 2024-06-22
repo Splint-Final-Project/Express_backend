@@ -77,7 +77,6 @@ export const filterRecruitmentCompletedPicklesWithReview = async (filteredPickle
 }
 
 export const filterRecruitmentCompletedPicklesWithSome = async (filteredPickles) => {
-  console.log(filteredPickles)
   let recruitmentCompletedPickles = [];
 
   for await (const filteredPickle of filteredPickles) {
