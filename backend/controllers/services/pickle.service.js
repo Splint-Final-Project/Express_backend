@@ -72,12 +72,19 @@ export const findPopularPickles = async () => {
     ...PICKLE_FILTER.NOT_EXPIRED,
     ...PICKLE_FILTER.POPULAR,
   };
-  const popularPickles = await Pickle.find(filterConditions)
-    .sort({ viewCount: -1 })
-    .limit(10);
-  const popularAndRecruitingPickles = await filterRecruitingPickles(
+  const popularPickles = await Pickle.find(filterConditions);
+
+  const newPickles = await filterRecruitingPickles(
     popularPickles
   );
+
+  let popularAndRecruitingPickles = [];
+  for await (const pickle of newPickles) {
+    const newPickle = await likeRank(pickle);
+
+    popularAndRecruitingPickles.push(newPickle);
+  };
+  popularAndRecruitingPickles.sort((a, b) => b.likeRank - a.likeRank);
 
   return popularAndRecruitingPickles;
 };

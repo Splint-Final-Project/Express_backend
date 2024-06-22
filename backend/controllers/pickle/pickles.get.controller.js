@@ -1,6 +1,4 @@
 // 다양한 종류 피클에 대한 컨트롤러
-import Pickle from "../../models/Pickle.model.js";
-import Participation from "../../models/participation.model.js";
 import {
   findRecruitingPickles,
   findProceedingPickles,
@@ -17,7 +15,6 @@ import {
   myPickleFormat,
   finishedPickleFormat,
 } from "../dto/pickle.dto.js";
-import User from "../../models/user.model.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -74,9 +71,6 @@ export const getPopularPickles = async (req, res) => {
 
     const endOfDayUTC = new Date();
     endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
-    console.log("Query Start Date (UTC):", startOfDayUTC.toISOString());
-    console.log("Query End Date (UTC):", endOfDayUTC.toISOString());
 
     let popularAndRecruitingPickles = await findPopularPickles();
 
