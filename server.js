@@ -4,16 +4,16 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import connectToMongoDB from "./db/connectToMongoDB.js";
+import connectToMongoDB from "./src/db/connectToMongoDB.js";
 
-import authRoutes from "./routes/auth.routes.js";
-import messageRoutes from "./routes/message.routes.js";
-import userRoutes from "./routes/user.routes.js";
-import pickleRoutes from "./routes/pickle.routes.js";
-import favoriteRoutes from "./routes/favorite.routes.js";
-import conversationRoutes from "./routes/conversation.routes.js";
+import authRoutes from "./src/routes/auth.routes.js";
+import messageRoutes from "./src/routes/message.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
+import pickleRoutes from "./src/routes/pickle.routes.js";
+import favoriteRoutes from "./src/routes/favorite.routes.js";
+import conversationRoutes from "./src/routes/conversation.routes.js";
 
-import { app, server } from "./socket/socket.js";
+import { app, server } from "./src/socket/socket.js";
 
 import events from "events";
 dotenv.config();
