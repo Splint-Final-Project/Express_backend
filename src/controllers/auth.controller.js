@@ -58,10 +58,10 @@ export const oauth = async (req, res) => {
       oauthId: oauthId,
     });
     if (found) {
-      generateToken(found._id, res);
+      const token = generateToken(found._id, res);
       // 로그인
       res.redirect(
-        `${process.env.FRONTEND_URL}/oauth/success?status=${found.status}&nickname=${found.nickname}&profilePic=${found.profilePic}&areaCodes=${found.areaCodes}&_id=${found._id}&oauthType=${found.oauthType}&oauthId=${found.oauthId}`
+        `${process.env.FRONTEND_URL}/oauth/success?token=${token}&status=${found.status}&nickname=${found.nickname}&profilePic=${found.profilePic}&areaCodes=${found.areaCodes}&_id=${found._id}&oauthType=${found.oauthType}&oauthId=${found.oauthId}`
       );
     } else {
       // 회원가입
@@ -72,9 +72,9 @@ export const oauth = async (req, res) => {
       await newUser.save();
       console.log("회원가입 완료");
 
-      generateToken(newUser._id, res);
+      const token = generateToken(newUser._id, res);
       res.redirect(
-        `${process.env.FRONTEND_URL}/oauth/success?status=${newUser.status}&nickname=${newUser.nickname}&profilePic=${newUser.profilePic}&areaCodes=${newUser.areaCodes}&_id=${newUser._id}&oauthType=${newUser.oauthType}&oauthId=${newUser.oauthId}`
+        `${process.env.FRONTEND_URL}/oauth/success?token=${token}&status=${newUser.status}&nickname=${newUser.nickname}&profilePic=${newUser.profilePic}&areaCodes=${newUser.areaCodes}&_id=${newUser._id}&oauthType=${newUser.oauthType}&oauthId=${newUser.oauthId}`
       );
     }
   } catch (error) {
@@ -166,14 +166,14 @@ export const signup = async (req, res) => {
     });
 
     if (newUser) {
-      // Generate JWT token here
-      // generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
 
-      generateToken(newUser._id, res);
+      const token = generateToken(newUser._id, res);
       res.status(201).json({
         message: "회원가입 성공, 추가정보 입력 페이지로 리다이렉트합니다.",
+        token: token,
         user: {
+          token: token,
           _id: newUser._id,
           email: newUser.email,
           status: newUser.status,
@@ -248,18 +248,19 @@ export const login = async (req, res) => {
     if (!user || !isPasswordCorrect) {
       return res.status(400).json({ error: "Invalid email or password" });
     }
-    generateToken(user._id, res),
-      res.status(200).json({
-        message: "로그인 성공",
-        user: {
-          _id: user._id,
-          email: user.email,
-          status: user.status,
-          profilePic: user.profilePic,
-          nickname: user.nickname,
-          areaCodes: user.areaCodes,
-        },
-      });
+    const token = generateToken(user._id, res);
+    res.status(200).json({
+      message: "로그인 성공",
+      token: token,
+      user: {
+        _id: user._id,
+        email: user.email,
+        status: user.status,
+        profilePic: user.profilePic,
+        nickname: user.nickname,
+        areaCodes: user.areaCodes,
+      },
+    });
   } catch (error) {
     console.log("Error in login controller", error.message);
     res.status(500).json({ error: "Internal Server Error" });
