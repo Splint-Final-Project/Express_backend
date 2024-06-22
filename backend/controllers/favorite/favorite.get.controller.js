@@ -1,5 +1,6 @@
 import Pickle from "../../models/Pickle.model.js";
 import Favorite from "../../models/favorite.model.js";
+import Participation from "../../models/participation.model.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const getFavorites = async (req, res) => {
@@ -23,15 +24,18 @@ export const getFavorites = async (req, res) => {
         _id: favorite.pickleId,
       });
 
-      const filteredPickles = minimumFormatPickle(foundPickle[0]);
+      const participantNumber = await Participation.countDocuments({
+        pickle: favorite.pickleId,
+      }).populate('pickle');
+
+      const format = { ...foundPickle[0]._doc, participantNumber}
+      
+      const filteredPickles = minimumFormatPickle(format);
       favoritePickles.push(filteredPickles);
     }
 
-    console.log(favoritePickles);
-
     const totalFavorites = await Favorite.countDocuments({ userId: user });
     const totalPages = Math.ceil(totalFavorites / limit);
-
     res.status(201).json({
       currentPage: page,
       totalPages: totalPages,

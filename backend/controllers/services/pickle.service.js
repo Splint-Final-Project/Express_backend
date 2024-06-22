@@ -7,6 +7,7 @@ import {
   filterRecruitmentCompletedPicklesWithReview,
   filterRecruitmentCompletedPicklesWithSome
 } from "./utils/index.js";
+import { likeRank } from "./utils/likeRank.js";
 
 export const findRecruitingPickles = async (skip, limit) => {
   const notExpiredTotalPickles = await Pickle.find(PICKLE_FILTER.NOT_EXPIRED);
@@ -22,18 +23,28 @@ export const findRecruitingPickles = async (skip, limit) => {
 export const findPicklesByQueries = async (pickles, query) => {
   switch (query) {
     case "인기순":
-      pickles.sort((a, b) => b.viewCount - a.viewCount);
-      break;
+      let newPickles = [];
+      for await (const pickle of pickles) {
+        const newPickle = await likeRank(pickle);
+
+        newPickles.push(newPickle);
+      };
+      newPickles.sort((a, b) => b.likeRank - a.likeRank);
+      return newPickles;
+
     case "가격 낮은 순":
-      pickles.sort((a, b) => a.count - b.count);
-      break;
+      pickles.sort((a, b) => a.cost - b.cost);
+      return pickles
+
     case "가격 높은 순":
-      pickles.sort((a, b) => b.count - a.count);
-      break;
+      pickles.sort((a, b) => b.cost - a.cost);
+      return pickles
+
     case "전체":
+      return pickles
+
     default:
-      // 기본적으로 정렬하지 않음
-      break;
+      return pickles
   }
 
   return pickles;
@@ -61,12 +72,19 @@ export const findPopularPickles = async () => {
     ...PICKLE_FILTER.NOT_EXPIRED,
     ...PICKLE_FILTER.POPULAR,
   };
-  const popularPickles = await Pickle.find(filterConditions)
-    .sort({ viewCount: -1 })
-    .limit(10);
-  const popularAndRecruitingPickles = await filterRecruitingPickles(
+  const popularPickles = await Pickle.find(filterConditions);
+
+  const newPickles = await filterRecruitingPickles(
     popularPickles
   );
+
+  let popularAndRecruitingPickles = [];
+  for await (const pickle of newPickles) {
+    const newPickle = await likeRank(pickle);
+
+    popularAndRecruitingPickles.push(newPickle);
+  };
+  popularAndRecruitingPickles.sort((a, b) => b.likeRank - a.likeRank);
 
   return popularAndRecruitingPickles;
 };
