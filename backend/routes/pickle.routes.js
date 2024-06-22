@@ -18,7 +18,7 @@ import {
   createImgUrl,
   createUrlImgForGeneratedImage,
 } from "../controllers/pickle/pickle.create.controller.js";
-import { editPickle } from "../controllers/pickle/pickle.edit.controller.js";
+import { editPickle, pickleViewCountUp } from "../controllers/pickle/pickle.edit.controller.js";
 
 import {
   JoinPickle,
@@ -73,6 +73,7 @@ router.get("/:id/favorite", optionalAuth, getFavoriteCount);
 router.post("/create", protectRoute, createPickle);
 router.put("/:id", protectRoute, editPickle);
 router.post("/join", protectRoute, JoinPickle);
+router.put("/:id/viewCountUp", pickleViewCountUp);
 
 //개발용, 피클 참가 취소
 router.delete("/join", protectRoute, WithdrawFromPickle);
