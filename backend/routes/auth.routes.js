@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 import {
+  emailVerify,
   getMe,
   login,
   logout,
@@ -17,6 +18,8 @@ const router = express.Router();
 router.get("/me", protectRoute, getMe);
 
 router.post("/join", signup);
+
+router.post("/verify-email", emailVerify);
 
 router.put("/join2", signup2);
 

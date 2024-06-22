@@ -3,10 +3,63 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
 import generateToken from "../utils/generateToken.js";
+import Verification from "../models/verification.model.js";
+
+import nodemailer from "nodemailer";
+export const emailVerify = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Email is required" });
+  try {
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email))
+      return res.status(400).json({ error: "Invalid email format" });
+    const user = await User.findOne({
+      email,
+    });
+    if (user) {
+      return res.status(400).json({
+        error: "User already exists",
+      });
+    }
+    await Verification.deleteMany({ email });
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    const newVerification = new Verification({
+      email,
+      verificationCode,
+    });
+    await newVerification.save();
+
+    console.log("Email: ", email);
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: '"피클타임 운영팀 👻" <vinoankr@gmail.com>', // sender address
+      to: email, // list of receivers
+      subject: "피클타임 이메일 인증", // Subject line
+      text: `이메일 인증 코드: ${verificationCode}`, // plain text body
+      html: `<h1>이메일 인증 코드: ${verificationCode}<h1>`, // html body
+    });
+    console.log("Message sent: %s", info.messageId);
+    res.status(200).json({
+      message: "Email is available",
+    });
+  } catch (error) {
+    console.log("Error in emailVerify controller", error.message);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+};
 
 export const signup = async (req, res) => {
   try {
-    const { email, password, checkPassword } = req.body;
+    const { email, verify, password, checkPassword } = req.body;
 
     if (password !== checkPassword) {
       return res.status(400).json({ error: "Passwords don't match" });
@@ -16,6 +69,15 @@ export const signup = async (req, res) => {
 
     if (user) {
       return res.status(400).json({ error: "User already exists" });
+    }
+
+    const verification = await Verification.findOne({
+      email,
+      verificationCode: verify,
+    });
+
+    if (!verification) {
+      return res.status(400).json({ error: "Invalid verification code" });
     }
 
     const salt = await bcrypt.genSalt(10); // 해싱을 통해 비밀번호 해싱 추적을 어렵게
