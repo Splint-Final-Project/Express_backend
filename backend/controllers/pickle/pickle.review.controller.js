@@ -58,7 +58,7 @@ export const postReview = async (req, res) => {
     await participation.save();
     // 유저에게 포인트 지급
     user.points.current += 500;
-    user.point.history.push({
+    user.points.history.push({
       type: "earn",
       message: `리뷰 작성: ${pickle.title}`,
       date: new Date(),
