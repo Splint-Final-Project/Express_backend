@@ -46,7 +46,7 @@ export const getPickles = async (req, res) => {
     }
 
     const query = req.query.sortBy;
-    findPicklesByQueries(pickles, query);
+    await findPicklesByQueries(pickles, query);
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 100;

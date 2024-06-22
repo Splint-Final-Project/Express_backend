@@ -25,10 +25,10 @@ export const findPicklesByQueries = async (pickles, query) => {
       pickles.sort((a, b) => b.viewCount - a.viewCount);
       break;
     case "가격 낮은 순":
-      pickles.sort((a, b) => a.count - b.count);
+      pickles.sort((a, b) => a.cost - b.cost);
       break;
     case "가격 높은 순":
-      pickles.sort((a, b) => b.count - a.count);
+      pickles.sort((a, b) => b.cost - a.cost);
       break;
     case "전체":
     default:
