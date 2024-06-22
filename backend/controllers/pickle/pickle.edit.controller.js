@@ -62,7 +62,6 @@ export const pickleViewCountUp = async (req, res) => {
 
     Object.assign(pickle, { viewCount: pickle.viewCount + 1 });
     await pickle.save();
-    console.log(pickle)
 
     res.status(201).json({message: "successfully viewCount updated" });
   } catch (error) {
