@@ -52,6 +52,6 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd ~/Express_backend
-            git pull origin main --ff-only
+            git pull
             npm install
-            pm2 restart ~/Express_backend/backend/server.js
+            pm2 restart server
