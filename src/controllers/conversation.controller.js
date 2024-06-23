@@ -25,13 +25,13 @@ export const getConversationList = async (req, res) => {
         const pickle = await Pickle.findById(conversation.pickleId);
         
         const lastMessage = await Message.findById(conversation?.messages[conversation?.messages.length -1]);
-
         const updatedConversation = {
             ...conversation.toObject(),
             imageUrl: pickle?.imgUrl,
             title: pickle?.title,
             lastMessage: lastMessage?.message,
-            lastUpdatedAt: conversation?.updatedAt
+            lastUpdatedAt: conversation?.updatedAt,
+            lastMessageIsTrack: lastMessage?.isTrack
         }
         updatedConversationList.push(updatedConversation);
       }
