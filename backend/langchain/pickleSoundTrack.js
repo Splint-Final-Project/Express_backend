@@ -1,5 +1,4 @@
-export const playPickleSoundTrack = async (command, isGroup) => {
-  if (!isGroup) return;
+export const playPickleSoundTrack = async (command) => {
   if (command.startsWith('!!play')) {
     const musicTitle = command.slice(6).trim();
     return `Playing music: ${musicTitle}`;
