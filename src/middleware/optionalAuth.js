@@ -3,7 +3,7 @@ import User from "../models/user.model.js"; // User 모델을 import하세요
 
 const optionalAuth = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization;
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);

@@ -5,7 +5,7 @@ import User from "../models/user.model.js";
 // 인가정보가 부족할 때는 401, 추가회원가입 미완료 유저는 403, 유저가 없을 때는 404
 const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization;
 
     if (!token) {
       return res
