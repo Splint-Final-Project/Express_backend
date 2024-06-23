@@ -36,7 +36,7 @@ export const sendMessage = async (req, res) => {
 			}
 		}
 
-		await chatBotMessage(conversation, message, receiverSocketIds);
+		await chatBotMessage(conversation, message, receiverSocketIds, req.access_token);
 
 		res.status(201).json(newMessage);
 	} catch (error) {
@@ -45,13 +45,16 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-const chatBotMessage = async (conversation, message, receiverSocketIds) => {
+const chatBotMessage = async (conversation, message, receiverSocketIds, token) => {
 	if (!conversation.isGroup) return;
 
 	if (message.startsWith('!!')) {
+		const result = await playPickleSoundTrack(message, token);
+
 		const newMessage = new Message({
 			senderId: "6676a2dd02763d733afa8892",
-			message: "안녕",
+			message: result.messages,
+			isTrack: result.isTrack,
 		});
 
 		if (newMessage) {

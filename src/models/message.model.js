@@ -23,6 +23,11 @@ const messageSchema = new mongoose.Schema(
 		pickleId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Pickle",
+		},
+
+		isTrack : {
+			type: Boolean,
+			default: false,
 		}
 	},
 	{ timestamps: true }
