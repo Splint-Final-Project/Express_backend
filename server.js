@@ -23,7 +23,7 @@ events.EventEmitter.defaultMaxListeners = 20;
 // 보안
 app.use(
   cors({
-    origin: "http://localhost:4000",
+    origin: ["http://localhost:4000", "https://pickle-time.net"],
   })
 );
 app.use(express.json());
