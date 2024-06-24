@@ -106,7 +106,6 @@ export const emailVerify = async (req, res) => {
     });
     await newVerification.save();
 
-    console.log("Email: ", email);
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {

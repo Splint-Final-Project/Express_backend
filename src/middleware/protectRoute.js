@@ -6,7 +6,6 @@ import User from "../models/user.model.js";
 const protectRoute = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
-    console.log(req.headers);
 
     if (!token) {
       return res
