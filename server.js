@@ -16,6 +16,7 @@ import { app, server } from "./src/socket/socket.js";
 
 import events from "events";
 dotenv.config();
+
 const PORT = process.env.PORT || 3000;
 
 events.EventEmitter.defaultMaxListeners = 20;
@@ -24,6 +25,7 @@ events.EventEmitter.defaultMaxListeners = 20;
 app.use(
   cors({
     origin: "https://pickle-time-frontend.vercel.app",
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json());
@@ -36,7 +38,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/pickle", pickleRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
 
-server.listen(PORT, async () => {
+server.listen(PORT, () => {
   connectToMongoDB();
   console.log(`server Running on ${PORT}`);
 });

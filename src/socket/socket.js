@@ -11,9 +11,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: [`${process.env.FRONTEND_URL}`],
+		origin: "https://pickle-time-frontend.vercel.app",
 		methods: ["GET", "POST"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true // 필요한 경우 자격 증명 허용
 	},
+	transports: ['websocket', 'polling'] // 폴링을 백업 전송 프로토콜로 사용
 });
 
 export const getReceiverSocketId = (receiverId) => {
@@ -44,6 +47,14 @@ io.on("connection", (socket) => {
 		delete userSocketMap[userId];
 		// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 	});
+
+	socket.on("connect_error", (err) => {
+    console.error("Connection error:", err);
+  });
+
+  socket.on("error", (err) => {
+    console.error("Socket error:", err);
+  });
 });
 
 export { app, io, server };
