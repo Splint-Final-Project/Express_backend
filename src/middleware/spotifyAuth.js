@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const client_id = "3a2d857058d946ad87da5722e4c6b9e3";
+const client_secret = "582ef46003964fb894531f07c46bfd78";
 
 export const spotifyAuth = async (req, res, next) => {
   const authOptions = {

@@ -52,12 +52,12 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    // await chatBotMessage(
-    //   conversation,
-    //   message,
-    //   receiverSocketIds,
-    //   req.access_token
-    // );
+    await chatBotMessage(
+      conversation,
+      message,
+      receiverSocketIds,
+      req.access_token
+    );
 
     res.status(201).json(newMessage);
   } catch (error) {
