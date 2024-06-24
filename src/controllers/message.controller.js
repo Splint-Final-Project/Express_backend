@@ -2,7 +2,11 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 
 import User from "../models/user.model.js";
-import { getReceiverSocketId, io, getReceiverSocketIds } from "../socket/socket.js";
+import {
+  getReceiverSocketId,
+  io,
+  getReceiverSocketIds,
+} from "../socket/socket.js";
 import { playPickleSoundTrack } from "../langchain/pickleSoundTrack.js";
 
 export const sendMessage = async (req, res) => {
@@ -11,15 +15,17 @@ export const sendMessage = async (req, res) => {
     const { conversationId } = req.params; // params: "send/:id" routes에서
     const senderId = req.user._id; // 로그인 상태에서 존재함
 
-		const conversation = await Conversation.findOne({_id: conversationId}).populate("messages");
-		const userForProfile = await User.findOne({_id: senderId});
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+    }).populate("messages");
+    const userForProfile = await User.findOne({ _id: senderId });
 
-		const newMessage = new Message({
-			senderId,
-			message,
-			profilePic: userForProfile.profilePic,
-			senderNickname: userForProfile.nickname
-		});
+    const newMessage = new Message({
+      senderId,
+      message,
+      profilePic: userForProfile.profilePic,
+      senderNickname: userForProfile.nickname,
+    });
 
     if (newMessage) {
       conversation.messages.push(newMessage._id);
@@ -28,22 +34,29 @@ export const sendMessage = async (req, res) => {
     // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
 
+    console.log("newMessage: ", newMessage);
+    console.log("now socketio");
+
     // // SOCKET IO FUNCTIONALITY WILL GO HERE
     const receiverSocketIds = getReceiverSocketIds(conversation.participants);
+
+    console.log(receiverSocketIds);
 
     for (const receiverSocketId of receiverSocketIds) {
       if (receiverSocketId) {
         // io.to(<socket_id>).emit() used to send events to specific client
+        console.log(io);
+        console.log(receiverSocketId);
         io.to(receiverSocketId).emit("newMessage", newMessage);
       }
     }
 
-    await chatBotMessage(
-      conversation,
-      message,
-      receiverSocketIds,
-      req.access_token
-    );
+    // await chatBotMessage(
+    //   conversation,
+    //   message,
+    //   receiverSocketIds,
+    //   req.access_token
+    // );
 
     res.status(201).json(newMessage);
   } catch (error) {
@@ -60,17 +73,19 @@ const chatBotMessage = async (
 ) => {
   if (!conversation.isGroup) return;
 
-	if (message.startsWith('!!')) {
-		const result = await playPickleSoundTrack(message, token);
-		const userForProfile = await User.findOne({_id: "6676a2dd02763d733afa8892"});
-		
-		const newMessage = new Message({
-			senderId: "6676a2dd02763d733afa8892",
-			message: result.messages,
-			isTrack: result.isTrack,
-			profilePic: userForProfile.profilePic,
-			senderNickname: userForProfile.nickname
-		});
+  if (message.startsWith("!!")) {
+    const result = await playPickleSoundTrack(message, token);
+    const userForProfile = await User.findOne({
+      _id: "6676a2dd02763d733afa8892",
+    });
+
+    const newMessage = new Message({
+      senderId: "6676a2dd02763d733afa8892",
+      message: result.messages,
+      isTrack: result.isTrack,
+      profilePic: userForProfile.profilePic,
+      senderNickname: userForProfile.nickname,
+    });
 
     if (newMessage) {
       conversation.messages.push(newMessage._id);
@@ -78,13 +93,13 @@ const chatBotMessage = async (
 
     await Promise.all([conversation.save(), newMessage.save()]);
 
-		for (const receiverSocketId of receiverSocketIds) {
-			if (receiverSocketId) {
-				// const messageWithProfile = { ...newMessage._doc, profilePic: userForProfile.profilePic}
-				io.to(receiverSocketId).emit("chatBotMessage", newMessage);
-			}
-		}
-	}
+    for (const receiverSocketId of receiverSocketIds) {
+      if (receiverSocketId) {
+        // const messageWithProfile = { ...newMessage._doc, profilePic: userForProfile.profilePic}
+        io.to(receiverSocketId).emit("chatBotMessage", newMessage);
+      }
+    }
+  }
 };
 
 export const sendMessageOneToOne = async (req, res) => {
@@ -93,13 +108,13 @@ export const sendMessageOneToOne = async (req, res) => {
     const { id: receiverId, pickleId } = req.params; // params: "send/:id" routes에서
     const senderId = req.user._id; // 로그인 상태에서 존재함
 
-		const userForProfile = await User.findOne({_id: senderId});
+    const userForProfile = await User.findOne({ _id: senderId });
 
-		let conversation = await Conversation.findOne({
-			participants: { $all: [senderId, receiverId] },
-			pickleId: pickleId,
-			isGroup: false,
-		});
+    let conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiverId] },
+      pickleId: pickleId,
+      isGroup: false,
+    });
 
     if (!conversation) {
       conversation = await Conversation.create({
@@ -109,12 +124,12 @@ export const sendMessageOneToOne = async (req, res) => {
       });
     }
 
-		const newMessage = new Message({
-			senderId,
-			message,
-			profilePic: userForProfile.profilePic,
-			senderNickname: userForProfile.nickname
-		});
+    const newMessage = new Message({
+      senderId,
+      message,
+      profilePic: userForProfile.profilePic,
+      senderNickname: userForProfile.nickname,
+    });
 
     if (newMessage) {
       conversation.messages.push(newMessage._id);
