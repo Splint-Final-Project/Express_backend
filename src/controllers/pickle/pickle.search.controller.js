@@ -7,7 +7,7 @@ import { minimumFormatPickle } from "../dto/pickle.dto.js";
 export const searchPickles = async (req, res) => {
   try {
     const now = new Date();
-    const { text, term, sort } = req.query;
+    const { text, sort } = req.query;
 
     const searchedPickles = await vectorSearchEngine(text); // 리스트
 
@@ -26,13 +26,15 @@ export const searchPickles = async (req, res) => {
       });
 
       if (participantNumber < foundPickle[0].capacity) {
-        const filteredPickles = minimumFormatPickle({...foundPickle[0]._doc, participantNumber});
+        const filteredPickles = minimumFormatPickle({
+          ...foundPickle[0]._doc,
+          participantNumber,
+        });
         formattedPickles.push(filteredPickles);
       }
     }
 
     formattedPickles = await findPicklesByQueries(formattedPickles, sort);
-    console.log(formattedPickles);
     res.json({ data: formattedPickles }); // 최대 10개
   } catch (error) {
     console.error(error);
