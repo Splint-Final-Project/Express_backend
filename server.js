@@ -16,14 +16,14 @@ import { app, server } from "./src/socket/socket.js";
 
 import events from "events";
 dotenv.config();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 events.EventEmitter.defaultMaxListeners = 20;
 
 // 보안
 app.use(
   cors({
-    origin: ["http://localhost:4000", "https://pickle-time.net"],
+    origin: "https://pickle-time-frontend.vercel.app",
   })
 );
 app.use(express.json());
