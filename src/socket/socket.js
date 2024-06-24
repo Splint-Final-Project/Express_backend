@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
 		origin: "https://pickle-time-frontend.vercel.app",
+		credentials: true,
 	},
 });
 
