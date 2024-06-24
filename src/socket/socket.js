@@ -47,6 +47,14 @@ io.on("connection", (socket) => {
 		delete userSocketMap[userId];
 		// io.emit("getOnlineUsers", Object.keys(userSocketMap));
 	});
+
+	socket.on("connect_error", (err) => {
+    console.error("Connection error:", err);
+  });
+
+  socket.on("error", (err) => {
+    console.error("Socket error:", err);
+  });
 });
 
 export { app, io, server };
