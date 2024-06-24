@@ -11,10 +11,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: "https://pickle-time-frontend.vercel.app",
-		methods: ["GET", "POST"],
+		origin: "*",
 	},
-	transports: ['websocket', 'polling'] // 폴링을 백업 전송 프로토콜로 사용
 });
 
 export const getReceiverSocketId = (receiverId) => {
