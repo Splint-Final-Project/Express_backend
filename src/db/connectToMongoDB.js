@@ -7,7 +7,7 @@ const connectToMongoDB = async () => {
     await mongoose.connect(process.env.MONGO_DB_URI);
     console.log("Connected to MongoDB");
 
-    setInterval(updatePickleStatus, 1000 * 60 * 5); // 5분마다 실행
+    setInterval(updatePickleStatus, 1000 * 60 * 1); // 1분마다 실행
   } catch (error) {
     console.log("Error connecting to MongoDB", error.message);
   }

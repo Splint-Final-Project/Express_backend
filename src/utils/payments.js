@@ -18,7 +18,7 @@ export const refund = async (imp_uid) => {
         Authorization: access_token, // 포트원 서버로부터 발급받은 엑세스 토큰
       },
       data: {
-        reason: "테스트환불",
+        reason: "피클타임 환불",
         imp_uid,
         // amount: cancel_request_amount,
       },

@@ -68,9 +68,10 @@ export const JoinPickle = async (req, res) => {
       const newParticipation = new Participation({
         user: user_id,
         pickle: pickle_id,
-        payment_uid: imp_uid,
-        amount: payment.amount,
-        status: "paid",
+        payment_uid: "points",
+        amount: 0,
+        discount: discount,
+        status: "points",
       });
 
       await newParticipation.save();
@@ -183,6 +184,7 @@ export const JoinPickle = async (req, res) => {
         pickle: pickle_id,
         payment_uid: imp_uid,
         amount: payment.amount,
+        discount: paymentData.discount,
         status: "paid",
       });
 

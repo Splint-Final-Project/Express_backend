@@ -240,8 +240,6 @@ export const getFinishedPickles = async (req, res) => {
       ...formattedCancelledPickles,
     ];
 
-    //TODO: formattedFinishedPickles에
-
     res.json({
       finishedPickles: finalFormat,
     });
