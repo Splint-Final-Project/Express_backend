@@ -1,5 +1,6 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
 import { getReceiverSocketId, io, getReceiverSocketIds } from "../socket/socket.js";
 import { playPickleSoundTrack } from "../langchain/pickleSoundTrack.js";
 
@@ -10,11 +11,13 @@ export const sendMessage = async (req, res) => {
 		const senderId = req.user._id; // 로그인 상태에서 존재함
 
 		const conversation = await Conversation.findOne({_id: conversationId}).populate("messages");
-		// await chatBotMessage(conversation.isGroup, message);
+		const userForProfile = await User.findOne({_id: senderId});
 
 		const newMessage = new Message({
 			senderId,
 			message,
+			profilePic: userForProfile.profilePic,
+			senderNickname: userForProfile.nickname
 		});
 
 		if (newMessage) {
@@ -50,11 +53,14 @@ const chatBotMessage = async (conversation, message, receiverSocketIds, token) =
 
 	if (message.startsWith('!!')) {
 		const result = await playPickleSoundTrack(message, token);
-
+		const userForProfile = await User.findOne({_id: "6676a2dd02763d733afa8892"});
+		
 		const newMessage = new Message({
 			senderId: "6676a2dd02763d733afa8892",
 			message: result.messages,
 			isTrack: result.isTrack,
+			profilePic: userForProfile.profilePic,
+			senderNickname: userForProfile.nickname
 		});
 
 		if (newMessage) {
@@ -65,6 +71,7 @@ const chatBotMessage = async (conversation, message, receiverSocketIds, token) =
 
 		for (const receiverSocketId of receiverSocketIds) {
 			if (receiverSocketId) {
+				// const messageWithProfile = { ...newMessage._doc, profilePic: userForProfile.profilePic}
 				io.to(receiverSocketId).emit("chatBotMessage", newMessage);
 			}
 		}
@@ -76,6 +83,8 @@ export const sendMessageOneToOne = async (req, res) => {
 		const { message } = req.body;
 		const { id: receiverId, pickleId } = req.params; // params: "send/:id" routes에서
 		const senderId = req.user._id; // 로그인 상태에서 존재함
+
+		const userForProfile = await User.findOne({_id: senderId});
 
 		let conversation = await Conversation.findOne({
 			participants: { $all: [senderId, receiverId] },
@@ -94,6 +103,8 @@ export const sendMessageOneToOne = async (req, res) => {
 		const newMessage = new Message({
 			senderId,
 			message,
+			profilePic: userForProfile.profilePic,
+			senderNickname: userForProfile.nickname
 		});
 
 		if (newMessage) {

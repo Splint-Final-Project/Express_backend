@@ -28,6 +28,14 @@ const messageSchema = new mongoose.Schema(
 		isTrack : {
 			type: Boolean,
 			default: false,
+		},
+
+		profilePic: {
+			type: String,
+		},
+
+		senderNickname: {
+			type: String,
 		}
 	},
 	{ timestamps: true }
