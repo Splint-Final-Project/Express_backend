@@ -9,14 +9,10 @@ dotenv.config();
 const app = express();
 
 const server = http.createServer(app);
-const io = new Server(httpsServer, {
-  cors: {
-    origin: "https://pickle-time-frontend.vercel.app",
-    methods: ["GET", "POST"],
-    credentials: true
-  },
-  path: '/socket.io',
-  transports: ['polling', 'websocket']  // 폴링과 웹소켓을 모두 지원
+const io = new Server(server, {
+	cors: {
+		origin: "*",
+	},
 });
 
 export const getReceiverSocketId = (receiverId) => {
