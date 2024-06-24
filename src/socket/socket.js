@@ -48,8 +48,9 @@ io.on("connection", (socket) => {
     console.error("Connection error:", err);
   });
 
-  socket.on("error", (err) => {
-    console.error("Socket error:", err);
+  socket.on('error', (err) => {
+    console.error('Socket encountered error: ', err.message, 'Closing socket');
+    socket.close();
   });
 });
 
