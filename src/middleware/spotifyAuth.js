@@ -17,7 +17,7 @@ export const spotifyAuth = async (req, res, next) => {
 
   const data = querystring.stringify({
     grant_type: 'client_credentials',
-    redirect_uri: "http://localhost:8080/callback",
+    redirect_uri: "https://pickle-time.net/callback",
   });
 
   try {
