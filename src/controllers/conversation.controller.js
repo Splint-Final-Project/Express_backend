@@ -6,16 +6,22 @@ import { conversationFormat } from "./dto/conversation.dto.js";
 import { findProceedingPickles } from "./services/pickle.service.js";
 
 export const getConversationList = async (req, res) => {
-	try {
-		const senderId = req.user._id;
+  console.log("getConversationList");
+  try {
+    const senderId = req.user._id;
     const { category } = req.query;
 
-    const { filteredPickles, todayPickles } = await findProceedingPickles(senderId);
-    const proceedingPickles = [ ...filteredPickles, ...todayPickles ];
+    const { filteredPickles, todayPickles } = await findProceedingPickles(
+      senderId
+    );
+    const proceedingPickles = [...filteredPickles, ...todayPickles];
     await createGroupConversation(proceedingPickles);
 
     // 필터링
-		const conversationList = await filterConversationsByQuery(category, senderId);
+    const conversationList = await filterConversationsByQuery(
+      category,
+      senderId
+    );
 
     // dto
     const updatedConversationList = [];
@@ -23,29 +29,33 @@ export const getConversationList = async (req, res) => {
     for await (const conversation of conversationList) {
       if (conversation.pickleId) {
         const pickle = await Pickle.findById(conversation.pickleId);
-        
-        const lastMessage = await Message.findById(conversation?.messages[conversation?.messages.length -1]);
+
+        const lastMessage = await Message.findById(
+          conversation?.messages[conversation?.messages.length - 1]
+        );
         const updatedConversation = {
-            ...conversation.toObject(),
-            imageUrl: pickle?.imgUrl,
-            title: pickle?.title,
-            lastMessage: lastMessage?.message,
-            lastUpdatedAt: conversation?.updatedAt,
-            lastMessageIsTrack: lastMessage?.isTrack
-        }
+          ...conversation.toObject(),
+          imageUrl: pickle?.imgUrl,
+          title: pickle?.title,
+          lastMessage: lastMessage?.message,
+          lastUpdatedAt: conversation?.updatedAt,
+          lastMessageIsTrack: lastMessage?.isTrack,
+        };
         updatedConversationList.push(updatedConversation);
       }
     }
-    const formattedConversationList = updatedConversationList.map(conversationFormat);
+    const formattedConversationList =
+      updatedConversationList.map(conversationFormat);
 
-		res.status(200).json({data: formattedConversationList});
-	} catch (error) {
+    res.status(200).json({ data: formattedConversationList });
+  } catch (error) {
     console.error(error);
-		res.status(500).json({ error: "Internal server error" });
-	}
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const filterConversationsByQuery = async (query, senderId) => {
+  console.log("filterConversationsByQuery");
   let result;
 
   switch (query) {
@@ -59,8 +69,8 @@ const filterConversationsByQuery = async (query, senderId) => {
 
     default:
       result = await Conversation.find({
-        participants: { $in: [senderId] }
-      }).populate('pickleId');
+        participants: { $in: [senderId] },
+      }).populate("pickleId");
   }
 
   return result;
@@ -70,25 +80,24 @@ const filterOneToOneChats = async (senderId) => {
   return await Conversation.find({
     participants: { $in: [senderId] },
     isGroup: false,
-  }).populate('pickleId');
+  }).populate("pickleId");
 };
 
 const filterOngoingConversations = async (senderId) => {
   return await Conversation.find({
     participants: { $in: [senderId] },
     isGroup: true,
-  }).populate('pickleId');
-}
+  }).populate("pickleId");
+};
 
- 
 const createGroupConversation = async (proceedingPickles) => {
   const totalConversations = [];
 
   for await (const proceedingPickle of proceedingPickles) {
     let conversation = await Conversation.findOne({
-			pickleId: proceedingPickle._id,
+      pickleId: proceedingPickle._id,
       isGroup: true,
-		}).populate('pickleId');
+    }).populate("pickleId");
 
     if (!conversation) {
       const participants = await Participation.find({
@@ -110,7 +119,7 @@ const createGroupConversation = async (proceedingPickles) => {
       const newMessage = await Message.create({
         senderId: leaderId,
         message: `"${proceedingPickle.title}" 피클 타임에 오신 여러분, 환영합니다.`,
-        pickleId: proceedingPickle._id
+        pickleId: proceedingPickle._id,
       });
 
       conversation = await Conversation.create({
@@ -124,4 +133,4 @@ const createGroupConversation = async (proceedingPickles) => {
 
     totalConversations.push(conversation);
   }
-}
+};
