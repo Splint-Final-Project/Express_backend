@@ -38,7 +38,7 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/pickle", pickleRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
 
-server.listen(PORT, async () => {
+server.listen(PORT, () => {
   connectToMongoDB();
   console.log(`server Running on ${PORT}`);
 });
