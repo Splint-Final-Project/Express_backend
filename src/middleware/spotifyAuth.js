@@ -32,6 +32,6 @@ export const spotifyAuth = async (req, res, next) => {
     }
   } catch (error) {
     console.error('Error getting access token:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error });
   }
 };
