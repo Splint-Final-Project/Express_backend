@@ -40,6 +40,7 @@ export const sendMessage = async (req, res) => {
     // // SOCKET IO FUNCTIONALITY WILL GO HERE
     const receiverSocketIds = getReceiverSocketIds(conversation.participants);
 
+    console.log(io);
     console.log(receiverSocketIds);
 
     for (const receiverSocketId of receiverSocketIds) {
