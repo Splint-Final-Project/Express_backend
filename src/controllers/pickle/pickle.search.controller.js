@@ -30,8 +30,8 @@ export const searchPickles = async (req, res) => {
       }
     }
 
-    //TODO: term(기간)에 따라 필터링 'any' | '1m' | '3m' | '6m'
-    //TODO: sort(정렬기준)에 따라 정렬 'popular' | 'recent' | 'lowPrice' | 'highPrice'
+    // TODO: sort(정렬기준)에 따라 정렬 'popular' | 'recent' | 'lowPrice' | 'highPrice'
+    // 리스폰스에 participantNumber field 추가하기
 
     res.json({ data: formattedPickles }); // 최대 10개
   } catch (error) {
