@@ -1,11 +1,13 @@
 import Pickle from "../../models/Pickle.model.js";
 import Participation from "../../models/participation.model.js";
+import User from "../../models/user.model.js";
+import { refund } from "../../utils/payments.js";
 import { PICKLE_FILTER } from "./constants/pickle.filter.js";
 import {
   filterRecruitingPickles,
   filterRecruitmentCompletedPickles,
   filterRecruitmentCompletedPicklesWithReview,
-  filterRecruitmentCompletedPicklesWithSome
+  filterRecruitmentCompletedPicklesWithSome,
 } from "./utils/index.js";
 import { likeRank } from "./utils/likeRank.js";
 
@@ -28,23 +30,23 @@ export const findPicklesByQueries = async (pickles, query) => {
         const newPickle = await likeRank(pickle);
 
         newPickles.push(newPickle);
-      };
+      }
       newPickles.sort((a, b) => b.likeRank - a.likeRank);
       return newPickles;
 
     case "가격 낮은 순":
       pickles.sort((a, b) => a.cost - b.cost);
-      return pickles
+      return pickles;
 
     case "가격 높은 순":
       pickles.sort((a, b) => b.cost - a.cost);
-      return pickles
+      return pickles;
 
     case "전체":
-      return pickles
+      return pickles;
 
     default:
-      return pickles
+      return pickles;
   }
 
   return pickles;
@@ -74,16 +76,14 @@ export const findPopularPickles = async () => {
   };
   const popularPickles = await Pickle.find(filterConditions);
 
-  const newPickles = await filterRecruitingPickles(
-    popularPickles
-  );
+  const newPickles = await filterRecruitingPickles(popularPickles);
 
   let popularAndRecruitingPickles = [];
   for await (const pickle of newPickles) {
     const newPickle = await likeRank(pickle);
 
     popularAndRecruitingPickles.push(newPickle);
-  };
+  }
   popularAndRecruitingPickles.sort((a, b) => b.likeRank - a.likeRank);
 
   return popularAndRecruitingPickles;
@@ -152,7 +152,10 @@ export const findProceedingPickles = async (user) => {
     const readyToStartPickle = await Pickle.find(filterConditions);
 
     if (readyToStartPickle[0]) {
-      const newFinishedPickle = { ...readyToStartPickle[0]._doc, attendance: myPickleId._doc.attendance };
+      const newFinishedPickle = {
+        ...readyToStartPickle[0]._doc,
+        attendance: myPickleId._doc.attendance,
+      };
 
       readyToStartPickles.push(newFinishedPickle);
     }
@@ -167,14 +170,12 @@ export const findProceedingPickles = async (user) => {
   let todayPickles = [];
 
   proceedingPickles.forEach((pickle) => {
-
     for (const time in pickle.when.times) {
       const savedTime = pickle.when.times[time];
 
       if (today.getTime() === savedTime.getTime()) {
         const pickleWithToday = { ...pickle, today };
         todayPickles.push(pickleWithToday);
-
       }
     }
 
@@ -192,7 +193,7 @@ export const findFinishedPickles = async (user) => {
 
   const reviewedMyPickleIds = await Participation.find({
     user: user,
-    review: { $ne: null }
+    review: { $ne: null },
   }).populate("user");
 
   let finishedPickles = [];
@@ -206,7 +207,7 @@ export const findFinishedPickles = async (user) => {
     const finishedPickle = await Pickle.find(finishedConditions);
 
     if (finishedPickle[0]) {
-      const newFinishedPickle = { ...finishedPickle[0]._doc, review: false};
+      const newFinishedPickle = { ...finishedPickle[0]._doc, review: false };
 
       finishedPickles.push(newFinishedPickle);
     }
@@ -220,7 +221,7 @@ export const findFinishedPickles = async (user) => {
 
     const finishedPickle = await Pickle.find(finishedConditions);
     if (finishedPickle[0]) {
-      const newFinishedPickle = { ...finishedPickle[0]._doc, review: true};
+      const newFinishedPickle = { ...finishedPickle[0]._doc, review: true };
 
       finishedPickles.push(newFinishedPickle);
     }

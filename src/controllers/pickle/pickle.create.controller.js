@@ -97,6 +97,7 @@ export const createPickle = async (req, res) => {
         pickle: newPickle._id,
         payment_uid: "points",
         amount: 0,
+        discount: discount,
         status: "points",
         isLeader: true,
       });
@@ -190,6 +191,7 @@ export const createPickle = async (req, res) => {
         pickle: newPickle._id,
         payment_uid: imp_uid,
         amount: payment.amount,
+        discount: pickleData.discount,
         status: "paid",
         isLeader: true,
       });

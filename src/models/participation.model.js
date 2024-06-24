@@ -24,6 +24,12 @@ const participationSchema = new mongoose.Schema(
       required: true,
     },
 
+    discount: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
     isLeader: {
       type: Boolean,
       required: true,
