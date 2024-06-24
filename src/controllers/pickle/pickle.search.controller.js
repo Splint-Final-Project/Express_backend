@@ -1,6 +1,7 @@
 import Pickle from "../../models/Pickle.model.js";
 import Participation from "../../models/participation.model.js";
 import { vectorSearchEngine } from "../../langchain/vectorSearch.js";
+import { findPicklesByQueries } from "../services/pickle.service.js";
 import { minimumFormatPickle } from "../dto/pickle.dto.js";
 
 export const searchPickles = async (req, res) => {
@@ -10,7 +11,7 @@ export const searchPickles = async (req, res) => {
 
     const searchedPickles = await vectorSearchEngine(text); // 리스트
 
-    const formattedPickles = [];
+    let formattedPickles = [];
 
     for await (const pickle of searchedPickles) {
       const foundPickle = await Pickle.find({
@@ -25,14 +26,13 @@ export const searchPickles = async (req, res) => {
       });
 
       if (participantNumber < foundPickle[0].capacity) {
-        const filteredPickles = minimumFormatPickle(foundPickle[0]);
+        const filteredPickles = minimumFormatPickle({...foundPickle[0]._doc, participantNumber});
         formattedPickles.push(filteredPickles);
       }
     }
 
-    //TODO: term(기간)에 따라 필터링 'any' | '1m' | '3m' | '6m'
-    //TODO: sort(정렬기준)에 따라 정렬 'popular' | 'recent' | 'lowPrice' | 'highPrice'
-
+    formattedPickles = await findPicklesByQueries(formattedPickles, sort);
+    console.log(formattedPickles);
     res.json({ data: formattedPickles }); // 최대 10개
   } catch (error) {
     console.error(error);

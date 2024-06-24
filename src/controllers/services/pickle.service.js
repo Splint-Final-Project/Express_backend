@@ -23,6 +23,7 @@ export const findRecruitingPickles = async (skip, limit) => {
 export const findPicklesByQueries = async (pickles, query) => {
   switch (query) {
     case "인기순":
+    case "popular": 
       let newPickles = [];
       for await (const pickle of pickles) {
         const newPickle = await likeRank(pickle);
@@ -33,11 +34,17 @@ export const findPicklesByQueries = async (pickles, query) => {
       return newPickles;
 
     case "가격 낮은 순":
+    case "lowPrice":
       pickles.sort((a, b) => a.cost - b.cost);
       return pickles
 
     case "가격 높은 순":
+    case "highPrice":
       pickles.sort((a, b) => b.cost - a.cost);
+      return pickles
+
+    case "recent":
+      pickles.sort((a, b) => b.createAt - a.createAt);
       return pickles
 
     case "전체":
@@ -46,8 +53,6 @@ export const findPicklesByQueries = async (pickles, query) => {
     default:
       return pickles
   }
-
-  return pickles;
 };
 
 export const findNearbyPickles = async (
