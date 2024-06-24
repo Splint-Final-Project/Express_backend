@@ -24,7 +24,7 @@ events.EventEmitter.defaultMaxListeners = 20;
 // 보안
 app.use(
   cors({
-    origin: "*",
+    origin: "https://pickle-time-frontend.vercel.app",
   })
 );
 app.use(express.json());
