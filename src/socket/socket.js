@@ -13,8 +13,6 @@ const io = new Server(server, {
 	cors: {
 		origin: "https://pickle-time-frontend.vercel.app",
 		methods: ["GET", "POST"],
-		allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true // 필요한 경우 자격 증명 허용
 	},
 	transports: ['websocket', 'polling'] // 폴링을 백업 전송 프로토콜로 사용
 });
