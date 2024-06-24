@@ -24,7 +24,6 @@ events.EventEmitter.defaultMaxListeners = 20;
 app.use(
   cors({
     origin: "http://localhost:4000",
-    credentials: true,
   })
 );
 app.use(express.json());
