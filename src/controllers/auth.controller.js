@@ -190,7 +190,7 @@ export const signup = async (req, res) => {
 
 export const signup2 = async (req, res) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization;
     if (!token) {
       return res
         .status(401)
@@ -269,7 +269,7 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization;
     if (!token) {
       return res
         .status(401)
