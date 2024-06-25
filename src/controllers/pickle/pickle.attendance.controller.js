@@ -34,7 +34,7 @@ export const pickleAttendance = async (req, res) => {
   const startTime = new Date();
   startTime.setHours(
     pickle.when.startTime.hour,
-    pickle.when.finishTime.minute,
+    pickle.when.startTime.minute,
     0,
     0
   );
