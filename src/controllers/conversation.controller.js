@@ -59,11 +59,11 @@ const filterConversationsByQuery = async (query, senderId) => {
   let result;
 
   switch (query) {
-    case "1:1 문의":
+    case "one-to-one":
       result = await filterOneToOneChats(senderId);
       break;
 
-    case "진행 중":
+    case "group":
       result = await filterOngoingConversations(senderId);
       break;
 
