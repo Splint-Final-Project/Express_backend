@@ -42,10 +42,11 @@ export const pickleAttendance = async (req, res) => {
   prev10.setMinutes(startTime.getMinutes() - 10);
   const after10 = new Date(startTime);
   after10.setMinutes(startTime.getMinutes() + 10);
+  console.log(prev10, after10, now);
   if (now < prev10 || now > after10) {
     return res
       .status(400)
-      .json({ message: "피클 시작 10분 전부터 출석이 가능합니다." });
+      .json({ message: "피클 시작 10분 전후로 출석이 가능합니다." });
   }
 
   if (
