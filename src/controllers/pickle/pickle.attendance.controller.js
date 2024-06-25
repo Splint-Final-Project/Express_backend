@@ -43,7 +43,7 @@ export const pickleAttendance = async (req, res) => {
   prev10.setMinutes(startTime.getMinutes() - 10);
   const after10 = new Date(startTime);
   after10.setMinutes(startTime.getMinutes() + 10);
-  console.log(prev10, after10, now);
+  // console.log(prev10, after10, now);
   if (now < prev10 || now > after10) {
     return res
       .status(400)
