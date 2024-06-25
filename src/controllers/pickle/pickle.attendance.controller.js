@@ -30,7 +30,8 @@ export const pickleAttendance = async (req, res) => {
   }
 
   // 피클 시작 시간 10분 전후인지 확인
-  const now = new Date();
+  const nowt = new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" });
+  const now = new Date(nowt);
   const startTime = new Date();
   startTime.setHours(
     pickle.when.startTime.hour,
