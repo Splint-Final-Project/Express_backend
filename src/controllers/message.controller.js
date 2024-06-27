@@ -185,7 +185,6 @@ export const getMessagesInOneToOne = async (req, res) => {
 export const getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
-    // const senderId = req.user._id; // do not use
 
     const conversation = await Conversation.findOne({
       _id: conversationId,
@@ -195,7 +194,15 @@ export const getMessages = async (req, res) => {
 
     const messages = conversation.messages;
 
-    res.status(200).json(messages);
+    let newMessages = [];
+    for await (const message of messages) {
+        const userForProfile = await User.findOne({_id: message.senderId});
+        const newMessageDto = messageDto(message, userForProfile);
+
+        newMessages.push(newMessageDto);
+    }
+
+    res.status(200).json(newMessages);
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
     res.status(500).json({ error: error });
