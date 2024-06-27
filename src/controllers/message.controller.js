@@ -185,21 +185,26 @@ export const getMessagesInOneToOne = async (req, res) => {
 export const getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
+    const { page = 1 } = req.query; 
+    const pageSize = 15;
 
-    const conversation = await Conversation.findOne({
-      _id: conversationId,
-    }).populate("messages");
+    const conversation = await Conversation.findById(conversationId).lean();
 
     if (!conversation) return res.status(200).json([]);
 
-    const messages = conversation.messages;
+    // 메시지 배열을 뒤집어 최신 메시지부터 정렬
+    const totalMessages = conversation.messages.length;
+    const startIndex = Math.max(totalMessages - page * pageSize, 0);
+    const endIndex = totalMessages - (page - 1) * pageSize;
+    const messages = conversation.messages.slice(startIndex, endIndex);
 
     let newMessages = [];
-    for await (const message of messages) {
-        const userForProfile = await User.findOne({_id: message.senderId});
-        const newMessageDto = messageDto(message, userForProfile);
+    for await (const messageId of messages) {
+      const message = await Message.findById(messageId).lean();
+      const userForProfile = await User.findOne({_id: message.senderId}).lean();
+      const newMessageDto = messageDto(message, userForProfile);
 
-        newMessages.push(newMessageDto);
+      newMessages.push(newMessageDto);
     }
 
     res.status(200).json(newMessages);
