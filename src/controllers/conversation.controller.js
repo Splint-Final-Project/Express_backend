@@ -6,7 +6,6 @@ import { conversationFormat } from "./dto/conversation.dto.js";
 import { findProceedingPickles } from "./services/pickle.service.js";
 
 export const getConversationList = async (req, res) => {
-  console.log("getConversationList");
   try {
     const senderId = req.user._id;
     const { category } = req.query;
@@ -51,6 +50,14 @@ export const getConversationList = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const countUnreadMessages = async (messages) => { // messages must be limit 300.
+  for await (const message of messages) {
+    const unreadMessage = await Message.countDocuments({
+
+    });
   }
 };
 

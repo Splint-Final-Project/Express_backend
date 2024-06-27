@@ -8,11 +8,18 @@ const messageSchema = new mongoose.Schema(
 			required: true,
 		},
 
-		// receiverId: {
-		// 	type: mongoose.Schema.Types.ObjectId,
-		// 	ref: "User",
-		// 	// required: true,
-		// },
+		receivers: [
+			{ 
+				receiverId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+				},
+				isRead: {
+					type: Boolean,
+					default: false,
+				}
+			},
+		],
 		
 		message: {
 			type: String,
@@ -29,14 +36,6 @@ const messageSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-
-		profilePic: {
-			type: String,
-		},
-
-		senderNickname: {
-			type: String,
-		}
 	},
 	{ timestamps: true }
 );

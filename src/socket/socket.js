@@ -1,4 +1,3 @@
-import User from "../models/user.model.js";
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
@@ -11,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
 	cors: {
-		origin: "https://pickle-time-frontend.vercel.app",
+		origin: process.env.FRONTEND_URL,
 		credentials: true,
 	},
 });
