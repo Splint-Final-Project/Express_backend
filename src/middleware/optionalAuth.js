@@ -19,7 +19,7 @@ const optionalAuth = async (req, res, next) => {
     next(); // 로그인되지 않았거나 인증 실패 시에도 요청을 계속 진행
   } catch (error) {
     console.log("Error in optionalAuth middleware: ", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

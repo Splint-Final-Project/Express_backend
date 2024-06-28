@@ -52,12 +52,12 @@ export const getPickles = async (req, res) => {
     const paginatedPickles = pickles.slice(skip, skip + limit);
     const formattedPickles = paginatedPickles.map(minimumFormatPickle);
 
-    res.status(200).json({
+    return res.status(200).json({
       data: formattedPickles,
       total: paginatedPickles.length,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "Server Error",
     });
@@ -109,9 +109,11 @@ export const getPopularPickles = async (req, res) => {
     const filteredPickles =
       popularAndRecruitingPickles.map(minimumFormatPickle);
 
-    res.status(200).json({ data: filteredPickles });
+    return res.status(200).json({ data: filteredPickles });
   } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
+    return res
+      .status(500)
+      .json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
 
@@ -158,9 +160,11 @@ export const getHotTimePickles = async (req, res) => {
     const filteredPickles =
       hotTimeAndRecruitingPickles.map(minimumFormatPickle);
 
-    res.status(200).json({ data: filteredPickles });
+    return res.status(200).json({ data: filteredPickles });
   } catch (error) {
-    res.status(500).json({ message: "서버 오류가 발생했습니다.", error });
+    return res
+      .status(500)
+      .json({ message: "서버 오류가 발생했습니다.", error });
   }
 };
 
@@ -194,7 +198,7 @@ export const getNearbyPickles = async (req, res) => {
     res.json({ data: formattedPickles });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -216,7 +220,7 @@ export const getProceedingPickles = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -245,7 +249,7 @@ export const getFinishedPickles = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -258,9 +262,9 @@ export const getPendingPickles = async (req, res) => {
     const formattedPendingPickles =
       pendingPickles?.map((pickle) => myPickleFormat(pickle, "pending")) || [];
 
-    res.status(201).json({ pendingPickles: formattedPendingPickles });
+    return res.status(201).json({ pendingPickles: formattedPendingPickles });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

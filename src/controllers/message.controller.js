@@ -59,10 +59,10 @@ export const sendMessage = async (req, res) => {
       req.access_token
     );
 
-    res.status(201).json(newMessage);
+    return res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -147,10 +147,10 @@ export const sendMessageOneToOne = async (req, res) => {
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
 
-    res.status(201).json(newMessage);
+    return res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -169,10 +169,10 @@ export const getMessagesInOneToOne = async (req, res) => {
 
     const messages = conversation.messages;
 
-    res.status(200).json(messages);
+    return res.status(200).json(messages);
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -189,9 +189,9 @@ export const getMessages = async (req, res) => {
 
     const messages = conversation.messages;
 
-    res.status(200).json(messages);
+    return res.status(200).json(messages);
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };

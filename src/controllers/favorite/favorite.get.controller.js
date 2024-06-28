@@ -26,24 +26,24 @@ export const getFavorites = async (req, res) => {
 
       const participantNumber = await Participation.countDocuments({
         pickle: favorite.pickleId,
-      }).populate('pickle');
+      }).populate("pickle");
 
-      const format = { ...foundPickle[0]._doc, participantNumber}
-      
+      const format = { ...foundPickle[0]._doc, participantNumber };
+
       const filteredPickles = minimumFormatPickle(format);
       favoritePickles.push(filteredPickles);
     }
 
     const totalFavorites = await Favorite.countDocuments({ userId: user });
     const totalPages = Math.ceil(totalFavorites / limit);
-    res.status(201).json({
+    return res.status(201).json({
       currentPage: page,
       totalPages: totalPages,
       totalFavorites: totalFavorites,
       data: favoritePickles,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "찜 목록 조회에 실패했습니다.",
     });
@@ -64,9 +64,9 @@ export const getFavoriteIds = async (req, res) => {
       favoriteIds.push(favorite.pickleId);
     }
 
-    res.status(200).json({ data: favoriteIds });
+    return res.status(200).json({ data: favoriteIds });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "찜 목록 조회에 실패했습니다.",
     });
@@ -85,9 +85,9 @@ export const getFavorite = async (req, res) => {
       .populate("pickleId")
       .populate("userId");
 
-    res.status(200).json({ data: favoritePickle });
+    return res.status(200).json({ data: favoritePickle });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

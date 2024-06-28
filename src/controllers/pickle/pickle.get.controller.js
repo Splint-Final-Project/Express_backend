@@ -70,7 +70,7 @@ export const getPickleDetails = async (req, res) => {
     res.json({ data: addLikeAndParticipants }); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -95,6 +95,6 @@ export const getFavoriteCount = async (req, res) => {
 
     res.json({ likeCount: likeCount, isClicked: isClicked }); // status 필드가 JSON 응답에 포함됩니다.
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

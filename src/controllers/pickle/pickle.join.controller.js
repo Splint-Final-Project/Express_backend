@@ -76,10 +76,12 @@ export const JoinPickle = async (req, res) => {
 
       await newParticipation.save();
 
-      res.status(200).json({ message: "신청성공" });
+      return res.status(200).json({ message: "신청성공" });
     } catch (error) {
       console.log(error);
-      res.status(400).json({ message: "신청에 실패했습니다.", error: error });
+      return res
+        .status(400)
+        .json({ message: "신청에 실패했습니다.", error: error });
     }
   } else {
     try {
@@ -153,7 +155,7 @@ export const JoinPickle = async (req, res) => {
         payment.status !== "paid"
       ) {
         const refundResult = await refund(imp_uid);
-        res.status(400).json({
+        return res.status(400).json({
           message: "결제에 실패했습니다. 금액 위변조가 의심됩니다.",
           refundResult,
         });
@@ -190,7 +192,7 @@ export const JoinPickle = async (req, res) => {
 
       await newParticipation.save();
 
-      res.status(200).json({ message: "신청성공" });
+      return res.status(200).json({ message: "신청성공" });
     } catch (error) {
       const refundResult = await refund(imp_uid);
       console.log(error);
@@ -222,6 +224,6 @@ export const WithdrawFromPickle = async (req, res) => {
   await participation.save();
 
   const refundResult = await refund(participation.imp_uid);
-  res.status(200).json({ message: "참여 취소 성공", refundResult });
-  // res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
+  return res.status(200).json({ message: "참여 취소 성공", refundResult });
+  // return res.status(400).json({ message: "참여 취소에 실패했습니다.", refundResult });
 };

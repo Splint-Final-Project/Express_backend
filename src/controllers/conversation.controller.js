@@ -47,10 +47,10 @@ export const getConversationList = async (req, res) => {
     const formattedConversationList =
       updatedConversationList.map(conversationFormat);
 
-    res.status(200).json({ data: formattedConversationList });
+    return res.status(200).json({ data: formattedConversationList });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

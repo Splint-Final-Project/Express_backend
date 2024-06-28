@@ -18,10 +18,10 @@ export const getReviews = async (req, res) => {
         content: participation.review.content,
       };
     });
-    res.status(200).json({ data: reviews });
+    return res.status(200).json({ data: reviews });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -66,10 +66,12 @@ export const postReview = async (req, res) => {
       remaining: user.points.current,
     });
     await user.save();
-    res.status(200).json({ message: "리뷰 작성 완료! 500P가 지급됐습니다." });
+    return res
+      .status(200)
+      .json({ message: "리뷰 작성 완료! 500P가 지급됐습니다." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -90,9 +92,9 @@ export const postReview = async (req, res) => {
 //     }
 //     participation.review = null;
 //     await participation.save();
-//     res.status(200).json({ message: "Review deleted successfully" });
+//     return res.status(200).json({ message: "Review deleted successfully" });
 //   } catch (error) {
 //     console.error(error);
-//     res.status(500).json({ error: "Internal server error" });
+//     return res.status(500).json({ error: "Internal server error" });
 //   }
 // };
