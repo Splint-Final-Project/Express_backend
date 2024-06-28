@@ -22,7 +22,7 @@ export const sendMessage = async (req, res) => {
     }).populate("messages");
 
     const receivers = conversation.participants
-      .filter(id => id.toString() !== senderId)
+      .filter(id => id.toString() !== senderId.toString())
       .map(id => ({
         receiverId: id,
         isRead: false
@@ -131,11 +131,17 @@ export const sendMessageOneToOne = async (req, res) => {
       });
     }
 
+    const receivers = conversation.participants
+      .filter(id => id.toString() !== senderId.toString())
+      .map(id => ({
+        receiverId: id,
+        isRead: false
+      }));
+
     const newMessage = new Message({
       senderId,
       message,
-      profilePic: userForProfile.profilePic,
-      senderNickname: userForProfile.nickname,
+      receivers: receivers
     });
 
     if (newMessage) {
@@ -145,15 +151,17 @@ export const sendMessageOneToOne = async (req, res) => {
     // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
 
+    const newMessageDto = messageDto(newMessage, userForProfile);
+
     // SOCKET IO FUNCTIONALITY WILL GO HERE
-    const receiverSocketId = getReceiverSocketId(receiverId);
+    const receiverSocketIds = getReceiverSocketIds(conversation.participants);
 
-    if (receiverSocketId) {
-      // io.to(<socket_id>).emit() used to send events to specific client
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    for (const receiverSocketId of receiverSocketIds) {
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("newMessage", newMessageDto);
+      }
     }
-
-    res.status(201).json(newMessage);
+    res.status(201).json(newMessageDto);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
     res.status(500).json({ error: error });
@@ -164,6 +172,8 @@ export const getMessagesInOneToOne = async (req, res) => {
   try {
     const { id: userToChatId, pickleId } = req.params;
     const senderId = req.user._id;
+    const { page = 1 } = req.query; 
+    const pageSize = 15;
 
     const conversation = await Conversation.findOne({
       participants: { $all: [senderId, userToChatId] },
@@ -171,11 +181,26 @@ export const getMessagesInOneToOne = async (req, res) => {
       isGroup: false,
     }).populate("messages"); // NOT REFERENCE BUT ACTUAL MESSAGES
 
-    if (!conversation) return res.status(200).json([]);
+    if (!conversation) return res.status(200).json({ messages: [], totalPages: 1, currentPage: Number(page) });
 
-    const messages = conversation.messages;
+    const totalMessages = conversation.messages.length;
+    const startIndex = Math.max(totalMessages - page * pageSize, 0);
+    const endIndex = totalMessages - (page - 1) * pageSize;
+    const messages = conversation.messages.slice(startIndex, endIndex);
 
-    res.status(200).json(messages);
+    let newMessages = [];
+    for await (const messageId of messages) {
+      const message = await Message.findById(messageId).lean();
+      const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+
+      const userForProfile = await User.findOne({_id: message.senderId}).lean();
+      const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+
+      newMessages.push(newMessageDto);
+    }
+
+    const totalPages = Math.ceil(totalMessages / pageSize);
+    res.status(200).json({ messages: newMessages, totalPages, currentPage: Number(page) });
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
     res.status(500).json({ error: error });
@@ -190,9 +215,9 @@ export const getMessages = async (req, res) => {
 
     const conversation = await Conversation.findById(conversationId).lean();
 
-    if (!conversation) return res.status(200).json([]);
+    if (!conversation) return res.status(200).json({ messages: [], totalPages: 1, currentPage: Number(page) });
 
-    // 메시지 배열을 뒤집어 최신 메시지부터 정렬
+    // 메시지 배열을 최신 메시지부터
     const totalMessages = conversation.messages.length;
     const startIndex = Math.max(totalMessages - page * pageSize, 0);
     const endIndex = totalMessages - (page - 1) * pageSize;
@@ -201,13 +226,17 @@ export const getMessages = async (req, res) => {
     let newMessages = [];
     for await (const messageId of messages) {
       const message = await Message.findById(messageId).lean();
+      const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+
       const userForProfile = await User.findOne({_id: message.senderId}).lean();
-      const newMessageDto = messageDto(message, userForProfile);
+      const newMessageDto = messageDto(message, userForProfile, unReadNumber);
 
       newMessages.push(newMessageDto);
     }
 
-    res.status(200).json(newMessages);
+    const totalPages = Math.ceil(totalMessages / pageSize);
+
+    res.status(200).json({ messages: newMessages, totalPages, currentPage: Number(page) });
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
     res.status(500).json({ error: error });

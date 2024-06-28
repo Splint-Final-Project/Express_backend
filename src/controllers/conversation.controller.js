@@ -62,15 +62,15 @@ const countUnreadMessages = async (messages) => { // messages must be limit 300.
 };
 
 const filterConversationsByQuery = async (query, senderId) => {
-  console.log("filterConversationsByQuery");
+  console.log(query)
   let result;
 
   switch (query) {
-    case "1:1 문의":
+    case "one-to-one":
       result = await filterOneToOneChats(senderId);
       break;
 
-    case "진행 중":
+    case "group":
       result = await filterOngoingConversations(senderId);
       break;
 
