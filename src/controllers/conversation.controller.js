@@ -32,6 +32,8 @@ export const getConversationList = async (req, res) => {
         const lastMessage = await Message.findById(
           conversation?.messages[conversation?.messages.length - 1]
         );
+        const result = await countUnreadMessages(conversation?.messages, senderId);
+
         const updatedConversation = {
           ...conversation.toObject(),
           imageUrl: pickle?.imgUrl,
@@ -39,6 +41,8 @@ export const getConversationList = async (req, res) => {
           lastMessage: lastMessage?.message,
           lastUpdatedAt: conversation?.updatedAt,
           lastMessageIsTrack: lastMessage?.isTrack,
+          unReadNumber: result.unReadNumber,
+          isOver: result.isOver
         };
         updatedConversationList.push(updatedConversation);
       }
@@ -53,12 +57,22 @@ export const getConversationList = async (req, res) => {
   }
 };
 
-const countUnreadMessages = async (messages) => { // messages must be limit 300.
+const countUnreadMessages = async (messages, senderId) => { // messages must be limit 300.
+  let unReadNumber = 0;
   for await (const message of messages) {
-    const unreadMessage = await Message.countDocuments({
-
+    const unReadMessage = await Message.countDocuments({
+      _id: message._id,
+      receivers: {
+        $elemMatch: { isRead: false, receiverId: senderId }
+      }
     });
+
+    unReadNumber = unReadNumber + unReadMessage;
+    if (unReadNumber > 300) {
+      return { unReadNumber: unReadNumber, isOver: true };
+    }
   }
+  return { unReadNumber: unReadNumber, isOver: false };
 };
 
 const filterConversationsByQuery = async (query, senderId) => {
@@ -122,11 +136,18 @@ const createGroupConversation = async (proceedingPickles) => {
         }
       }
 
+      const receivers = participantsList
+      .map(id => ({
+        receiverId: id,
+        isRead: false
+      }));
+
       // 첫 메시지: 리더가 생성
       const newMessage = await Message.create({
         senderId: leaderId,
         message: `"${proceedingPickle.title}" 피클 타임에 오신 여러분, 환영합니다.`,
         pickleId: proceedingPickle._id,
+        receivers: receivers
       });
 
       conversation = await Conversation.create({

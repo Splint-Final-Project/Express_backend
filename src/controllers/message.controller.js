@@ -3,7 +3,7 @@ import Message from "../models/message.model.js";
 
 import User from "../models/user.model.js";
 import {
-  getReceiverSocketId,
+  socketIdMaps,
   io,
   getReceiverSocketIds,
 } from "../socket/socket.js";
@@ -223,15 +223,50 @@ export const getMessages = async (req, res) => {
     const endIndex = totalMessages - (page - 1) * pageSize;
     const messages = conversation.messages.slice(startIndex, endIndex);
 
+    // let newMessages = [];
+    // for await (const messageId of messages) {
+    //   const message = await Message.findById(messageId).lean();
+    //   const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+
+    //   const userForProfile = await User.findOne({_id: message.senderId}).lean();
+    //   const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+
+    //   newMessages.push(newMessageDto);
+    // }
+
+    // // SOCKET IO FUNCTIONALITY WILL GO HERE
+    const receiverSocketIds = socketIdMaps(conversation.participants);
+
     let newMessages = [];
-    for await (const messageId of messages) {
-      const message = await Message.findById(messageId).lean();
-      const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        for await (const messageId of messages) {
+          const message = await Message.findById(messageId).lean();
+          const unReadReceivers = message.receivers.filter(receiver => receiver.receiverId.toString() === receiverIdInSocket.toString() && !receiver.isRead);
+      
+          unReadReceivers.forEach(receiver => receiver.isRead = true);
+      
+          const updatedReceivers = message.receivers.map(receiver => {
+            if (!receiver.isRead && receiver.receiverId.toString() === receiverIdInSocket.toString()) {
+                return { ...receiver, isRead: true };
+            }
+            return receiver;
+          });
+        
+          // 메시지의 receivers 필드를 업데이트
+          await Message.updateOne({ _id: messageId }, { $set: { receivers: updatedReceivers } });
 
-      const userForProfile = await User.findOne({_id: message.senderId}).lean();
-      const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+          const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+          const userForProfile = await User.findOne({_id: message.senderId}).lean();
+          const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+    
+          newMessages.push(newMessageDto);
+        }
 
-      newMessages.push(newMessageDto);
+        const totalPages = Math.ceil(totalMessages / pageSize);
+
+        io.to(receiverSocketIds[receiverIdInSocket]).emit("newMessage", { messages: newMessages, totalPages, currentPage: Number(page) });
+      }
     }
 
     const totalPages = Math.ceil(totalMessages / pageSize);

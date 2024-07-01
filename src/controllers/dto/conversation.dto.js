@@ -7,6 +7,8 @@ export const conversationFormat = (conversation) => {
     lastMessage: conversation.lastMessage,
     participants: conversation.participants,
     pickleId: conversation.pickleId,
-    lastMessageIsTrack: conversation.lastMessageIsTrack
+    lastMessageIsTrack: conversation.lastMessageIsTrack,
+    unReadNumber: conversation.unReadNumber,
+    isOver: conversation.isOver,
   }
 }
