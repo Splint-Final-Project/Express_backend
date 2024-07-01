@@ -111,7 +111,7 @@ export const createPickle = async (req, res) => {
         .json({ message: "Pickle created successfully", pickle: newPickle });
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: "Server Error",
       });
@@ -205,7 +205,7 @@ export const createPickle = async (req, res) => {
         .json({ message: "Pickle created successfully", pickle: newPickle });
     } catch (error) {
       const refundResult = refund(imp_uid);
-      res.status(500).json({
+      return res.status(500).json({
         message: error,
         refundResult,
       });
@@ -244,7 +244,7 @@ export const createImgUrl = async (req, res) => {
     res.json({ url: objectUrl });
   } catch (error) {
     console.error("Error generating presigned URL:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -273,6 +273,6 @@ export const createUrlImgForGeneratedImage = async (req, res) => {
 
     res.json({ url: objectUrl });
   } catch (error) {
-    res.status(500).json({ message: "Image download failed", error });
+    return res.status(500).json({ message: "Image download failed", error });
   }
 };

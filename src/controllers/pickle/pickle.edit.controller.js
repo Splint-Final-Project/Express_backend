@@ -48,7 +48,7 @@ export const editPickle = async (req, res) => {
     res.json(pickleEditFormat(updatedPickle));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -63,8 +63,8 @@ export const pickleViewCountUp = async (req, res) => {
     Object.assign(pickle, { viewCount: pickle.viewCount + 1 });
     await pickle.save();
 
-    res.status(201).json({message: "successfully viewCount updated" });
+    return res.status(201).json({ message: "successfully viewCount updated" });
   } catch (error) {
-    res.status(500).json({ error: "해당하는 피클을 찾을 수 없어요" });
+    return res.status(500).json({ error: "해당하는 피클을 찾을 수 없어요" });
   }
-}
+};

@@ -30,11 +30,12 @@ export const pickleAttendance = async (req, res) => {
   }
 
   // 피클 시작 시간 10분 전후인지 확인
-  const now = new Date();
+  const nowt = new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" });
+  const now = new Date(nowt);
   const startTime = new Date();
   startTime.setHours(
     pickle.when.startTime.hour,
-    pickle.when.finishTime.minute,
+    pickle.when.startTime.minute,
     0,
     0
   );
@@ -42,10 +43,11 @@ export const pickleAttendance = async (req, res) => {
   prev10.setMinutes(startTime.getMinutes() - 10);
   const after10 = new Date(startTime);
   after10.setMinutes(startTime.getMinutes() + 10);
+  // console.log(prev10, after10, now);
   if (now < prev10 || now > after10) {
     return res
       .status(400)
-      .json({ message: "피클 시작 10분 전부터 출석이 가능합니다." });
+      .json({ message: "피클 시작 10분 전후로 출석이 가능합니다." });
   }
 
   if (

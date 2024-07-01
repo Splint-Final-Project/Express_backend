@@ -75,7 +75,7 @@ export const sendMessage = async (req, res) => {
     res.status(201).json(newMessageDto);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -201,7 +201,7 @@ export const sendMessageOneToOne = async (req, res) => {
     res.status(201).json(newMessageDto);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -240,7 +240,7 @@ export const getMessagesInOneToOne = async (req, res) => {
     res.status(200).json({ messages: newMessages, totalPages, currentPage: Number(page) });
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };
 
@@ -287,6 +287,6 @@ export const getMessages = async (req, res) => {
     res.status(200).json({ messages: newMessages, totalPages, currentPage: Number(page) });
   } catch (error) {
     console.log("Error in getMessages controller: ", error.message);
-    res.status(500).json({ error: error });
+    return res.status(500).json({ error: error });
   }
 };

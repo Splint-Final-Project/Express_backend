@@ -79,7 +79,7 @@ export const oauth = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    // res.status(500).json(error);
+    // return res.status(500).json(error);
   }
 };
 
@@ -122,12 +122,12 @@ export const emailVerify = async (req, res) => {
       html: `<h1>이메일 인증 코드: ${verificationCode}<h1>`, // html body
     });
     console.log("Message sent: %s", info.messageId);
-    res.status(200).json({
+    return res.status(200).json({
       message: "Email is available",
     });
   } catch (error) {
     console.log("Error in emailVerify controller", error.message);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Internal Server Error",
     });
   }
@@ -168,7 +168,7 @@ export const signup = async (req, res) => {
       await newUser.save();
 
       const token = generateToken(newUser._id, res);
-      res.status(201).json({
+      return res.status(201).json({
         message: "회원가입 성공, 추가정보 입력 페이지로 리다이렉트합니다.",
         token: token,
         user: {
@@ -179,10 +179,10 @@ export const signup = async (req, res) => {
         },
       });
     } else {
-      res.status(400).json({ error: "Invalid user data" });
+      return res.status(400).json({ error: "Invalid user data" });
     }
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
     console.log("Error in signup controller", err.message);
   }
 };
@@ -218,7 +218,7 @@ export const signup2 = async (req, res) => {
 
     const updated = await User.findById(user._id).select("-password");
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "필수 회원 정보가 입력되어 회원가입이 완료됐습니다.",
       user: {
         _id: updated._id,
@@ -230,7 +230,7 @@ export const signup2 = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
     console.log("Error in signup2 controller", err.message);
   }
 };
@@ -248,7 +248,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
     const token = generateToken(user._id, res);
-    res.status(200).json({
+    return res.status(200).json({
       message: "로그인 성공",
       token: token,
       user: {
@@ -262,7 +262,7 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -282,7 +282,7 @@ export const getMe = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).json({
+    return res.status(200).json({
       message: "유저 정보를 성공적으로 가져왔습니다.",
       user: {
         _id: user._id,
@@ -295,16 +295,16 @@ export const getMe = async (req, res) => {
     });
   } catch (error) {
     console.log("Error in getMe controller", error.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 export const logout = (req, res) => {
   try {
     res.clearCookie("jwt");
-    res.status(200).json({ message: "Logged out successfully" });
+    return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout controller", error.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };

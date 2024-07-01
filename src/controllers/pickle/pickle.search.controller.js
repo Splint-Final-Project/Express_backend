@@ -38,6 +38,6 @@ export const searchPickles = async (req, res) => {
     res.json({ data: formattedPickles }); // 최대 10개
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
