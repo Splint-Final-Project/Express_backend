@@ -21,12 +21,26 @@ export const sendMessage = async (req, res) => {
       _id: conversationId,
     }).populate("messages");
 
-    const receivers = conversation.participants
+    let receivers = conversation.participants
       .filter(id => id.toString() !== senderId.toString())
       .map(id => ({
         receiverId: id,
         isRead: false
       }));
+    
+
+    const receiverSocketIds = socketIdMaps(conversation.participants);
+
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        receivers = receivers.map(receiver => {
+          if (!receiver.isRead && receiver.receiverId.toString() === receiverIdInSocket.toString()) {
+              return { ...receiver, isRead: true };
+          }
+          return receiver;
+        });
+      }
+    }
 
     const newMessage = new Message({
       senderId,
@@ -41,14 +55,13 @@ export const sendMessage = async (req, res) => {
     // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
 
-    const newMessageDto = messageDto(newMessage, userForProfile);
+    const unReadNumber = newMessage.receivers.filter(receiver => !receiver.isRead).length;
+    const newMessageDto = messageDto(newMessage, userForProfile, unReadNumber);
 
     // // SOCKET IO FUNCTIONALITY WILL GO HERE
-    const receiverSocketIds = getReceiverSocketIds(conversation.participants);
-
-    for (const receiverSocketId of receiverSocketIds) {
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessageDto);
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        io.to(receiverSocketIds[receiverIdInSocket]).emit("newMessage", newMessageDto);
       }
     }
 
@@ -80,11 +93,22 @@ const chatBotMessage = async (
       _id: "6676a2dd02763d733afa8892",
     });
 
-    const receivers = conversation.participants
+    let receivers = conversation.participants
       .map(id => ({
         receiverId: id,
         isRead: false
       }));
+
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        receivers = receivers.map(receiver => {
+          if (!receiver.isRead && receiver.receiverId.toString() === receiverIdInSocket.toString()) {
+              return { ...receiver, isRead: true };
+          }
+          return receiver;
+        });
+      }
+    }
 
     const newMessage = new Message({
       senderId: "6676a2dd02763d733afa8892",
@@ -99,11 +123,12 @@ const chatBotMessage = async (
 
     await Promise.all([conversation.save(), newMessage.save()]);
 
-    const newMessageDto = messageDto(newMessage, userForProfile);
+    const unReadNumber = newMessage.receivers.filter(receiver => !receiver.isRead).length;
+    const newMessageDto = messageDto(newMessage, userForProfile, unReadNumber);
 
-    for (const receiverSocketId of receiverSocketIds) {
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("chatBotMessage", newMessageDto);
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        io.to(receiverSocketIds[receiverIdInSocket]).emit("chatBotMessage", newMessageDto);
       }
     }
   }
@@ -131,12 +156,26 @@ export const sendMessageOneToOne = async (req, res) => {
       });
     }
 
-    const receivers = conversation.participants
+    let receivers = conversation.participants
       .filter(id => id.toString() !== senderId.toString())
       .map(id => ({
         receiverId: id,
         isRead: false
       }));
+
+    const receiverSocketIds = socketIdMaps(conversation.participants);
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        receivers = receivers.map(receiver => {
+          if (!receiver.isRead && receiver.receiverId.toString() === receiverIdInSocket.toString()) {
+              return { ...receiver, isRead: true };
+          }
+          return receiver;
+        });
+        // io.to(receiverSocketIds[receiverIdInSocket]).emit("newMessage", newMessageDto);
+      }
+    }
+    console.log(receivers);
 
     const newMessage = new Message({
       senderId,
@@ -151,14 +190,13 @@ export const sendMessageOneToOne = async (req, res) => {
     // this will run in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
 
-    const newMessageDto = messageDto(newMessage, userForProfile);
+    const unReadNumber = newMessage.receivers.filter(receiver => !receiver.isRead).length;
+    const newMessageDto = messageDto(newMessage, userForProfile, unReadNumber);
 
     // SOCKET IO FUNCTIONALITY WILL GO HERE
-    const receiverSocketIds = getReceiverSocketIds(conversation.participants);
-
-    for (const receiverSocketId of receiverSocketIds) {
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newMessage", newMessageDto);
+    for (const receiverIdInSocket in receiverSocketIds) {
+      if (receiverIdInSocket) {
+        io.to(receiverSocketIds[receiverIdInSocket]).emit("newMessage", newMessageDto);
       }
     }
     res.status(201).json(newMessageDto);
@@ -223,28 +261,27 @@ export const getMessages = async (req, res) => {
     const endIndex = totalMessages - (page - 1) * pageSize;
     const messages = conversation.messages.slice(startIndex, endIndex);
 
-    // let newMessages = [];
-    // for await (const messageId of messages) {
-    //   const message = await Message.findById(messageId).lean();
-    //   const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
+    let newMessages = [];
+    for await (const messageId of messages) {
+      const message = await Message.findById(messageId).lean();
+      const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
 
-    //   const userForProfile = await User.findOne({_id: message.senderId}).lean();
-    //   const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+      const userForProfile = await User.findOne({_id: message.senderId}).lean();
+      const newMessageDto = messageDto(message, userForProfile, unReadNumber);
 
-    //   newMessages.push(newMessageDto);
-    // }
+      newMessages.push(newMessageDto);
+    }
 
-    // // SOCKET IO FUNCTIONALITY WILL GO HERE
+    // // // SOCKET IO FUNCTIONALITY WILL GO HERE
     const receiverSocketIds = socketIdMaps(conversation.participants);
 
-    let newMessages = [];
     for (const receiverIdInSocket in receiverSocketIds) {
       if (receiverIdInSocket) {
         for await (const messageId of messages) {
           const message = await Message.findById(messageId).lean();
-          const unReadReceivers = message.receivers.filter(receiver => receiver.receiverId.toString() === receiverIdInSocket.toString() && !receiver.isRead);
+          // const unReadReceivers = message.receivers.filter(receiver => receiver.receiverId.toString() === receiverIdInSocket.toString() && !receiver.isRead);
       
-          unReadReceivers.forEach(receiver => receiver.isRead = true);
+          // unReadReceivers.forEach(receiver => receiver.isRead = true);
       
           const updatedReceivers = message.receivers.map(receiver => {
             if (!receiver.isRead && receiver.receiverId.toString() === receiverIdInSocket.toString()) {
@@ -256,16 +293,14 @@ export const getMessages = async (req, res) => {
           // 메시지의 receivers 필드를 업데이트
           await Message.updateOne({ _id: messageId }, { $set: { receivers: updatedReceivers } });
 
-          const unReadNumber = message.receivers.filter(receiver => !receiver.isRead).length;
-          const userForProfile = await User.findOne({_id: message.senderId}).lean();
-          const newMessageDto = messageDto(message, userForProfile, unReadNumber);
+          const unReadNumber = updatedReceivers.filter(receiver => !receiver.isRead).length;
+          // const userForProfile = await User.findOne({_id: message.senderId}).lean();
+          // const newMessageDto = messageDto(message, userForProfile, unReadNumber);
     
-          newMessages.push(newMessageDto);
+          // newMessages.push(newMessageDto);
+          io.to(receiverSocketIds[receiverIdInSocket]).emit("unReadMessage", unReadNumber);
         }
-
-        const totalPages = Math.ceil(totalMessages / pageSize);
-
-        io.to(receiverSocketIds[receiverIdInSocket]).emit("newMessage", { messages: newMessages, totalPages, currentPage: Number(page) });
+        // io.to(receiverSocketIds[receiverIdInSocket]).emit("unReadMessage", unReadNumber);
       }
     }
 
