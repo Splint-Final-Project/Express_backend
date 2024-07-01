@@ -137,6 +137,7 @@ const createGroupConversation = async (proceedingPickles) => {
       }
 
       const receivers = participantsList
+      .filter(id => id.toString() !== leaderId.toString())
       .map(id => ({
         receiverId: id,
         isRead: false
