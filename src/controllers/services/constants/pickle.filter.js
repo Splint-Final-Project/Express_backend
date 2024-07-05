@@ -12,10 +12,6 @@ export const PICKLE_FILTER = {
   },
 
   READY_TO_START: (today) => {
-    // $and: [
-    //   { $expr: { $gte: [new Date(), { $arrayElemAt: ["$when.times", 0] }] } }, // 첫 번째 요소보다 크거나 같은
-    //   { $expr: { $lte: [new Date(), { $arrayElemAt: ["$when.times", -1] }] } } // 마지막 요소보다 작거나 같은
-    // ],
     return { $expr: { $lte: [today, { $arrayElemAt: ["$when.times", -1] }] } }; // 마지막 요소보다 작거나 같은
   },
 

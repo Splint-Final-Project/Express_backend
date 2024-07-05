@@ -15,12 +15,13 @@ import {
   myPickleFormat,
   finishedPickleFormat,
 } from "../dto/pickle.dto.js";
+import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFilter } from "../services/pickle.filter.js";
 
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
-
-    let pickles = await findRecruitingPickles();
+    let pickles = await filterRecruitingPickles(now);
+    // let pickles = await findRecruitingPickles();
     const total = pickles.length;
 
     if (req.user) {
@@ -66,16 +67,9 @@ export const getPickles = async (req, res) => {
 
 export const getPopularPickles = async (req, res) => {
   try {
-    const startOfDayUTC = new Date();
-    startOfDayUTC.setUTCHours(0, 0, 0, 0);
-    console.log(startOfDayUTC);
-
-    const endOfDayUTC = new Date();
-    endOfDayUTC.setUTCHours(23, 59, 59, 999);
-    console.log(endOfDayUTC);
+    const now = new Date();
+    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter(now);
     
-    let popularAndRecruitingPickles = await findPopularPickles();
-
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
       const filteredPickles = [];
@@ -122,10 +116,8 @@ export const getPopularPickles = async (req, res) => {
 export const getHotTimePickles = async (req, res) => {
   try {
     const now = new Date();
-    const oneDayLater = new Date(now);
-    oneDayLater.setDate(now.getDate() + 1); // 현재 날짜에서 1일 후의 날짜를 설정
 
-    let hotTimeAndRecruitingPickles = await findHotTimePickles(oneDayLater);
+    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter(now);
 
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
