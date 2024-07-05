@@ -48,9 +48,6 @@ router.get("/", optionalAuth, getPickles);
 router.get("/popular", optionalAuth, getPopularPickles);
 router.get("/hotTime", optionalAuth, getHotTimePickles);
 router.get("/search", optionalAuth, searchPickles);
-router.get("/detail/popular", optionalAuth);
-router.get("/detail/lowCount", optionalAuth);
-router.get("/detail/highCount", optionalAuth);
 
 // 로그인 필수
 router.get("/proceeding", protectRoute, getProceedingPickles);

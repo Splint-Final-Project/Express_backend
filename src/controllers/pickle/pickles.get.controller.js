@@ -68,10 +68,12 @@ export const getPopularPickles = async (req, res) => {
   try {
     const startOfDayUTC = new Date();
     startOfDayUTC.setUTCHours(0, 0, 0, 0);
+    console.log(startOfDayUTC);
 
     const endOfDayUTC = new Date();
     endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
+    console.log(endOfDayUTC);
+    
     let popularAndRecruitingPickles = await findPopularPickles();
 
     if (req.user) {
