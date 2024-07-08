@@ -1,5 +1,7 @@
 import Pickle from "../../models/Pickle.model.js";
-import { likeRank } from "./utils/likeRank.js";
+
+const LIKE_RANK = 3;
+const PARTICIPANT_RANK = 7;
 
 const pickleDto = {
   $project: {
@@ -41,37 +43,26 @@ export const filterRecruitingPickles = async (now) => {
 export const realtimeTrendingPickleFilter = async (now) => {
   const basePipeline = [
     deadlineFilter(now),
+    realtimeTrendingFilter(now),
     ...participationCountFilter('greater'),
+    ...likeLankFilter(),
     pickleDto,
   ];
 
-  return await applyFilters(basePipeline, [realtimeTrendingFilter(now)]);
+  return await applyFilters(basePipeline, []);
 }
 
 // 마감 임박
 export const hotTimePicklesFilter = async (now) => {
   const basePipeline = [
     deadlineFilter(now), // 동적으로 현재 시간 기준으로 필터 생성
+    hotTimeFilter(now),
     ...participationCountFilter('greater'),
+    ...likeLankFilter(),
     pickleDto,
-    {
-      $sort: {
-        deadLine: 1 // deadLine 기준으로 오름차순 정렬
-      }
-    }
   ];
 
-  const results = await applyFilters(basePipeline, [hotTimeFilter(now)]);
-
-  let popularAndRecruitingPickles = [];
-  for await (const pickle of results) {
-    const newPickle = await likeRank(pickle);
-
-    popularAndRecruitingPickles.push(newPickle);
-  }
-  popularAndRecruitingPickles.sort((a, b) => b.likeRank - a.likeRank);
-
-  return popularAndRecruitingPickles;
+  return await applyFilters(basePipeline, []);
 };
 
 // 참가 인원 관련
@@ -167,6 +158,40 @@ const hotTimeFilter = (now) => {
     }
   };
 };
+
+const likeLankFilter = () => {
+  return [
+    {
+      $lookup: {
+        from: "favorites", // 조인할 컬렉션 이름
+        localField: "_id", // 조인할 필드 (pickle의 _id)
+        foreignField: "pickleId", // 조인될 필드 (favorite의 pickleId)
+        as: "likes" // 조인 결과를 저장할 필드 이름
+      }
+    },
+    {
+      $addFields: {
+        likeCount: { $size: "$likes" } // 조인된 결과 배열의 크기를 계산하여 likeCount 필드를 추가
+      }
+    },
+    {
+      $addFields: {
+        likeRank: {
+          $add: [
+            "$viewCount",
+            { $multiply: ["$likeCount", LIKE_RANK] },
+            { $multiply: ["$participantNumber", PARTICIPANT_RANK] }
+          ]
+        }
+      }
+    },
+    {
+      $sort: {
+        likeRank: -1 // likeRank 기준으로 내림차순 정렬
+      }
+    },
+  ]
+}
 
 export const applyFilters = async (basePipeline, additionalFilters) => {
   const pipeline = [...basePipeline, ...additionalFilters];

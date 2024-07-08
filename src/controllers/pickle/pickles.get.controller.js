@@ -69,7 +69,7 @@ export const getPopularPickles = async (req, res) => {
   try {
     const now = new Date();
     let popularAndRecruitingPickles = await realtimeTrendingPickleFilter(now);
-    
+
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;
       const filteredPickles = [];
