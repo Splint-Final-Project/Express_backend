@@ -20,7 +20,7 @@ import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFi
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
-    let pickles = await filterRecruitingPickles(now);
+    let pickles = await filterRecruitingPickles(now, 1);
     // let pickles = await findRecruitingPickles();
     const total = pickles.length;
 
@@ -68,7 +68,9 @@ export const getPickles = async (req, res) => {
 export const getPopularPickles = async (req, res) => {
   try {
     const now = new Date();
+
     let popularAndRecruitingPickles = await realtimeTrendingPickleFilter(now);
+    // let popularAndRecruitingPickles = await findPopularPickles();
 
     if (req.user) {
       const userAreaCodes = req.user.areaCodes;

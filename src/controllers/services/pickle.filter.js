@@ -2,67 +2,95 @@ import Pickle from "../../models/Pickle.model.js";
 
 const LIKE_RANK = 3;
 const PARTICIPANT_RANK = 7;
+const PAGINATION_LIMIT = 10;
 
-const pickleDto = {
-  $project: {
-    _id: 1,
-    title: 1,
-    imgUrl: 1,
-    capacity: 1,
-    deadLine: 1,
-    place: 1,
-    when: 1,
-    cost: 1,
-    latitude: 1,
-    longitude: 1,
-    category: 1,
-    participantNumber: "$participationCount", // 참가자 수 필드 추가
-    detailedAddress: 1, // 필요한 다른 필드도 포함
-    today: 1,
-    attendance: 1,
-    review: 1,
-    goals: 1,
-    explanation: 1,
-    areaCode: 1,
-    createdAt: 1,
-    viewCount: 1,
+const pickleDto = [
+  {
+    $facet: {
+      data: [
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            imgUrl: 1,
+            capacity: 1,
+            deadLine: 1,
+            place: 1,
+            when: 1,
+            cost: 1,
+            latitude: 1,
+            longitude: 1,
+            category: 1,
+            participantNumber: "$participationCount", // 참가자 수 필드 추가
+            detailedAddress: 1, // 필요한 다른 필드도 포함
+            today: 1,
+            attendance: 1,
+            review: 1,
+            goals: 1,
+            explanation: 1,
+            areaCode: 1,
+            createdAt: 1,
+            viewCount: 1,
+            likeRank: "$likeRank",
+            likeCount: "$likeCount",
+          }
+        }
+      ],
+      totalCount: [
+        {
+          $count: "totalCount"
+        }
+      ]
+    }
+  },
+  {
+    $unwind: "$data"
+  },
+  {
+    $addFields: {
+      totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }
+    }
+  },
+  {
+    $replaceRoot: { newRoot: { $mergeObjects: ["$data", { totalCount: "$totalCount" }] } }
   }
-};
+];
 
 // 현재 모집 중인 피클: 참가자 비교 + 아직 데드 라인 지나지 않음
-export const filterRecruitingPickles = async (now) => {
+export const filterRecruitingPickles = async (now, page) => {
   const basePipeline = [
     deadlineFilter(now),
     ...participationCountFilter('greater'),
-    pickleDto,
+    ...pickleDto,
   ];
-  return await applyFilters(basePipeline, []);
+  return await applyFilters(basePipeline, [...paginationFilter(page)]);
 };
 
 // 인기 급상승
-export const realtimeTrendingPickleFilter = async (now) => {
+export const realtimeTrendingPickleFilter = async (now, page) => {
   const basePipeline = [
     deadlineFilter(now),
     realtimeTrendingFilter(now),
     ...participationCountFilter('greater'),
     ...likeLankFilter(),
-    pickleDto,
+    ...pickleDto,
   ];
 
-  return await applyFilters(basePipeline, []);
+  const result =  await applyFilters(basePipeline, [...paginationFilter(page)]);
+  return result;
 }
 
 // 마감 임박
-export const hotTimePicklesFilter = async (now) => {
+export const hotTimePicklesFilter = async (now, page) => {
   const basePipeline = [
     deadlineFilter(now), // 동적으로 현재 시간 기준으로 필터 생성
     hotTimeFilter(now),
     ...participationCountFilter('greater'),
     ...likeLankFilter(),
-    pickleDto,
+    ...pickleDto,
   ];
 
-  return await applyFilters(basePipeline, []);
+  return await applyFilters(basePipeline, [...paginationFilter(page)]);
 };
 
 // 참가 인원 관련
@@ -178,9 +206,9 @@ const likeLankFilter = () => {
       $addFields: {
         likeRank: {
           $add: [
-            "$viewCount",
-            { $multiply: ["$likeCount", LIKE_RANK] },
-            { $multiply: ["$participantNumber", PARTICIPANT_RANK] }
+            { $ifNull: ["$viewCount", 0] },
+            { $multiply: [{ $ifNull: ["$likeCount", 0] }, LIKE_RANK] },
+            { $multiply: [{ $ifNull: ["$participationCount", 0] }, PARTICIPANT_RANK] }
           ]
         }
       }
@@ -190,6 +218,14 @@ const likeLankFilter = () => {
         likeRank: -1 // likeRank 기준으로 내림차순 정렬
       }
     },
+  ]
+}
+
+const paginationFilter = (page = 1) => {
+  const skip = (page - 1) * PAGINATION_LIMIT;
+  return [
+    { $skip: skip },
+    { $limit: PAGINATION_LIMIT }
   ]
 }
 
