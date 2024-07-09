@@ -20,30 +20,11 @@ import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFi
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
-    let pickles = await filterRecruitingPickles(now, 1);
+    const query = req.query.sortBy;
+    let pickles = await filterRecruitingPickles({now, page: 1, user: req.user});
     // let pickles = await findRecruitingPickles();
     const total = pickles.length;
 
-    if (req.user) {
-      const userAreaCodes = req.user.areaCodes;
-      const filteredPickles = [];
-
-      for (const userAreaCode of userAreaCodes) {
-        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
-
-        for (const pickle of pickles) {
-          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
-
-          if (userAreaCodePrefix === pickleAreaCodePrefix) {
-            filteredPickles.push(pickle);
-          }
-        }
-      }
-
-      pickles = filteredPickles;
-    }
-
-    const query = req.query.sortBy;
     pickles = await findPicklesByQueries(pickles, query);
 
     const page = parseInt(req.query.page) || 1;
@@ -69,27 +50,8 @@ export const getPopularPickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter(now);
+    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({now, user: req.user});
     // let popularAndRecruitingPickles = await findPopularPickles();
-
-    if (req.user) {
-      const userAreaCodes = req.user.areaCodes;
-      const filteredPickles = [];
-
-      for (const userAreaCode of userAreaCodes) {
-        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
-
-        for (const pickle of popularAndRecruitingPickles) {
-          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
-
-          if (userAreaCodePrefix === pickleAreaCodePrefix) {
-            filteredPickles.push(pickle);
-          }
-        }
-      }
-
-      popularAndRecruitingPickles = filteredPickles;
-    }
 
     if (req.query.category) {
       const query = req.query.category;
@@ -119,35 +81,16 @@ export const getHotTimePickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter(now);
-
-    if (req.user) {
-      const userAreaCodes = req.user.areaCodes;
+    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter({now, user: req.user});
+    
+    if (req.query.category) {
+      const query = req.query.category;
       const filteredPickles = [];
 
-      for (const userAreaCode of userAreaCodes) {
-        const userAreaCodePrefix = Math.floor(userAreaCode / 100000);
-
-        for (const pickle of hotTimeAndRecruitingPickles) {
-          const pickleAreaCodePrefix = Math.floor(pickle.areaCode / 100000);
-
-          if (userAreaCodePrefix === pickleAreaCodePrefix) {
-            filteredPickles.push(pickle);
-          }
+      for (const pickle of hotTimeAndRecruitingPickles) {
+        if (query === pickle.category) {
+          filteredPickles.push(pickle);
         }
-      }
-
-      if (req.query.category) {
-        const query = req.query.category;
-        const filteredPickles = [];
-
-        for (const pickle of hotTimeAndRecruitingPickles) {
-          if (query === pickle.category) {
-            filteredPickles.push(pickle);
-          }
-        }
-
-        hotTimeAndRecruitingPickles = filteredPickles;
       }
 
       hotTimeAndRecruitingPickles = filteredPickles;

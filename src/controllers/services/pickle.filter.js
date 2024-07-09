@@ -57,21 +57,24 @@ const pickleDto = [
 ];
 
 // 현재 모집 중인 피클: 참가자 비교 + 아직 데드 라인 지나지 않음
-export const filterRecruitingPickles = async (now, page) => {
+export const filterRecruitingPickles = async ({now, page, user}) => {
   const basePipeline = [
     deadlineFilter(now),
     ...participationCountFilter('greater'),
+    areaCodeFilter(user),
     ...pickleDto,
   ];
   return await applyFilters(basePipeline, [...paginationFilter(page)]);
 };
 
 // 인기 급상승
-export const realtimeTrendingPickleFilter = async (now, page) => {
+export const realtimeTrendingPickleFilter = async ({now, page, category, user}) => {
   const basePipeline = [
     deadlineFilter(now),
     realtimeTrendingFilter(now),
     ...participationCountFilter('greater'),
+    categoryFilter(category),
+    areaCodeFilter(user),
     ...likeLankFilter(),
     ...pickleDto,
   ];
@@ -81,11 +84,13 @@ export const realtimeTrendingPickleFilter = async (now, page) => {
 }
 
 // 마감 임박
-export const hotTimePicklesFilter = async (now, page) => {
+export const hotTimePicklesFilter = async ({now, page, category, user}) => {
   const basePipeline = [
     deadlineFilter(now), // 동적으로 현재 시간 기준으로 필터 생성
     hotTimeFilter(now),
     ...participationCountFilter('greater'),
+    categoryFilter(category),
+    areaCodeFilter(user),
     ...likeLankFilter(),
     ...pickleDto,
   ];
@@ -141,7 +146,7 @@ const deadlineFilter = (now) => {
   };
 };
 
-export const categoryFilter = (category) => {
+const categoryFilter = (category) => {
   if (!category || category === "all") {
     return { $match: {} }; // 빈 조건으로 모든 문서를 포함
   }
@@ -150,6 +155,26 @@ export const categoryFilter = (category) => {
       category: category
     }
   };
+};
+
+const areaCodeFilter = (user) => {
+  if (!user) return { $match: {} };
+
+  const userAreaCodes = user.areaCodes;
+  if (!userAreaCodes || userAreaCodes.length === 0) return { $match: {} }; // 사용자 지역 코드가 없으면 빈 매치를 반환
+
+  const userAreaCodePrefixes = userAreaCodes.map((code) => Math.floor(code / 100000));
+  return {
+    $match: {
+      $expr: {
+        $in: [{ $toInt: { $divide: ["$areaCode", 100000] } }, userAreaCodePrefixes],
+      },
+    },
+  };
+};
+
+const queryFilter = (query) => {
+
 };
 
 const realtimeTrendingFilter = (now) => {
