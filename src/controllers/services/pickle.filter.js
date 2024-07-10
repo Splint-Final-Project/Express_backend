@@ -174,22 +174,20 @@ const areaCodeFilter = (user) => {
 };
 
 const queryFilter = (query) => {
+  return {
+    $match: {
 
+    }
+  }
 };
 
 const realtimeTrendingFilter = (now) => {
-  const startOfDayUTC = new Date(now);
-  startOfDayUTC.setUTCHours(0, 0, 0, 0);
-
-  const endOfDayUTC = new Date(now);
-  endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
   return {
     $match: {
       $expr: {
-        $and: [
-          { $gte: ["$createdAt", startOfDayUTC] },
-          { $lte: ["$createdAt", endOfDayUTC] }
+        $gt: [
+          { $add: ["$createdAt", 24 * 60 * 60 * 1000] }, // createdAt + 24시간
+          now
         ]
       }
     }

@@ -50,7 +50,7 @@ export const getPopularPickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({now, user: req.user});
+    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({now, category: req.query.category, user: req.user});
     // let popularAndRecruitingPickles = await findPopularPickles();
 
     if (req.query.category) {
