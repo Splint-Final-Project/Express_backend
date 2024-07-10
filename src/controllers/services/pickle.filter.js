@@ -57,11 +57,12 @@ const pickleDto = [
 ];
 
 // 현재 모집 중인 피클: 참가자 비교 + 아직 데드 라인 지나지 않음
-export const filterRecruitingPickles = async ({now, page, user}) => {
+export const filterRecruitingPickles = async ({now, page, user, query}) => {
   const basePipeline = [
     deadlineFilter(now),
     ...participationCountFilter('greater'),
     areaCodeFilter(user),
+    ...queryFilter(query),
     ...pickleDto,
   ];
   return await applyFilters(basePipeline, [...paginationFilter(page)]);
@@ -174,12 +175,52 @@ const areaCodeFilter = (user) => {
 };
 
 const queryFilter = (query) => {
-  return {
-    $match: {
+  switch (query) {
+    case "인기순":
+    case "popular":
+      return likeLankFilter();
 
-    }
+    case "가격 낮은 순":
+    case "lowPrice":
+      return costFilter("lowPrice");
+
+    case "가격 높은 순":
+    case "highPrice":
+      return costFilter("highPrice");
+
+    case "recent":
+      // pickles.sort((a, b) => b.createAt - a.createAt);
+      // return pickles;
+
+    case "전체":
+      return [];
+
+    default:
+      return [];
   }
 };
+
+const costFilter = (condition) => {
+  switch (condition) {
+    case "highPrice":
+      return [
+        {
+          $sort: {
+            cost: -1
+          }
+        }
+      ]
+
+    case "lowPrice":
+      return [
+        {
+          $sort: {
+            cost: 1
+          }
+        }
+      ]
+  }
+}
 
 const realtimeTrendingFilter = (now) => {
   return {

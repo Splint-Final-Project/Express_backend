@@ -21,11 +21,9 @@ export const getPickles = async (req, res) => {
   try {
     const now = new Date();
     const query = req.query.sortBy;
-    let pickles = await filterRecruitingPickles({now, page: 1, user: req.user});
+    let pickles = await filterRecruitingPickles({now, page: 1, user: req.user, query});
     // let pickles = await findRecruitingPickles();
     const total = pickles.length;
-
-    pickles = await findPicklesByQueries(pickles, query);
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 100;
@@ -53,19 +51,6 @@ export const getPopularPickles = async (req, res) => {
     let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({now, category: req.query.category, user: req.user});
     // let popularAndRecruitingPickles = await findPopularPickles();
 
-    if (req.query.category) {
-      const query = req.query.category;
-      const filteredPickles = [];
-
-      for (const pickle of popularAndRecruitingPickles) {
-        if (query === pickle.category) {
-          filteredPickles.push(pickle);
-        }
-      }
-
-      popularAndRecruitingPickles = filteredPickles;
-    }
-
     const filteredPickles =
       popularAndRecruitingPickles.map(minimumFormatPickle);
 
@@ -81,21 +66,8 @@ export const getHotTimePickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter({now, user: req.user});
+    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter({now, category: req.query.category, user: req.user});
     
-    if (req.query.category) {
-      const query = req.query.category;
-      const filteredPickles = [];
-
-      for (const pickle of hotTimeAndRecruitingPickles) {
-        if (query === pickle.category) {
-          filteredPickles.push(pickle);
-        }
-      }
-
-      hotTimeAndRecruitingPickles = filteredPickles;
-    }
-
     const filteredPickles =
       hotTimeAndRecruitingPickles.map(minimumFormatPickle);
 
