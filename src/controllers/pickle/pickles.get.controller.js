@@ -1,12 +1,12 @@
 // 다양한 종류 피클에 대한 컨트롤러
 import {
-  findRecruitingPickles,
+  // findRecruitingPickles,
   findProceedingPickles,
   findFinishedPickles,
   findNearbyPickles,
-  findPopularPickles,
-  findHotTimePickles,
-  findPicklesByQueries,
+  // findPopularPickles,
+  // findHotTimePickles,
+  // findPicklesByQueries,
   findPendingPickles,
   findCancelledPickles,
 } from "../services/pickle.service.js";
@@ -15,7 +15,7 @@ import {
   myPickleFormat,
   finishedPickleFormat,
 } from "../dto/pickle.dto.js";
-import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFilter } from "../services/pickle.filter.js";
+import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFilter, nearbyPicklesFilter } from "../services/pickle.filter.js";
 
 export const getPickles = async (req, res) => {
   try {
@@ -97,11 +97,13 @@ export const getNearbyPickles = async (req, res) => {
   const radiusInDegrees = radiansToDegrees(maxDistance / earthRadius);
 
   try {
-    const nearbyAndRecruitingPickles = await findNearbyPickles(
+    const nearbyAndRecruitingPickles = await nearbyPicklesFilter({
+      now,
+      category: req.query.category,
       parsedLatitude,
       parsedLongitude,
-      radiusInDegrees
-    );
+      radiusInDegrees,
+    });
 
     const formattedPickles =
       nearbyAndRecruitingPickles.map(minimumFormatPickle);

@@ -99,6 +99,30 @@ export const hotTimePicklesFilter = async ({now, page, category, user}) => {
   return await applyFilters(basePipeline, [...paginationFilter(page)]);
 };
 
+// 현재 위치 기반
+export const nearbyPicklesFilter = async ({now, category, parsedLatitude, parsedLongitude, radiusInDegrees}) => {
+  const basePipeline = [
+    deadlineFilter(now),
+    ...participationCountFilter('greater'),
+    categoryFilter(category),
+    {
+      $match: {
+        latitude: {
+          $gte: parsedLatitude - radiusInDegrees,
+          $lte: parsedLatitude + radiusInDegrees,
+        },
+        longitude: {
+          $gte: parsedLongitude - radiusInDegrees,
+          $lte: parsedLongitude + radiusInDegrees,
+        },
+      },
+    },
+    ...pickleDto,
+  ]
+
+  return await applyFilters(basePipeline, []); // do not use pagination
+}
+
 // 참가 인원 관련
 const participationCountFilter = (condition) => {
   let matchCondition;
