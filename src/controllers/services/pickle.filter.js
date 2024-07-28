@@ -1,4 +1,5 @@
 import Pickle from "../../models/Pickle.model.js";
+import { myPickleDto } from "./pickle.dto.js";
 
 const LIKE_RANK = 3;
 const PARTICIPANT_RANK = 7;
@@ -123,6 +124,27 @@ export const nearbyPicklesFilter = async ({now, category, parsedLatitude, parsed
   return await applyFilters(basePipeline, []); // do not use pagination
 }
 
+// 진행중
+export const proceedingPicklesFilter = async ({user, today, page}) => {
+  const basePipeline = [
+    ...myPicklesFilter(user, today),
+    ...participationCountFilter('equal'),
+    ...myPickleDto,
+  ]
+
+  return await applyFilters(basePipeline, [...paginationFilter(page)]); 
+}
+
+export const todayPicklesFilter = async ({user, today}) => {
+  const basePipeline = [
+    ...myPicklesFilter(user, today),
+    ...participationCountFilter('equal'),
+    ...myPickleDto,
+  ]
+
+  return await applyFilters(basePipeline, []); 
+}
+
 // 참가 인원 관련
 const participationCountFilter = (condition) => {
   let matchCondition;
@@ -162,6 +184,30 @@ const participationCountFilter = (condition) => {
     }
   ];
 };
+
+// 내 피클 관련
+const myPicklesFilter = (user, today) => {
+  return [
+    {
+      $lookup: {
+        from: 'participations',
+        localField: '_id',
+        foreignField: 'pickle',
+        as: 'participations',
+      },
+    },
+    {
+      $unwind: '$participations',
+    },
+    {
+      $match: {
+        'participations.user': user,
+        'participations.status': 'paid',
+        $expr: { $lte: [today, { $arrayElemAt: ["$when.times", -1] }] }
+      },
+    },
+  ]
+}
 
 const deadlineFilter = (now) => {
   return {

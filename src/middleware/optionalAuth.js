@@ -5,7 +5,7 @@ const optionalAuth = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
 
-    if (token) {
+    try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       if (decoded) {
@@ -13,6 +13,11 @@ const optionalAuth = async (req, res, next) => {
         if (user) {
           req.user = user;
         }
+      }
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        console.log("JWT expired in optionalAuth middleware");
+        return res.status(401).json({ error: "JWT expired", shouldLogOut: true });
       }
     }
 

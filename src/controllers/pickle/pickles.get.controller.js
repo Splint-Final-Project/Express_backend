@@ -3,7 +3,7 @@ import {
   // findRecruitingPickles,
   findProceedingPickles,
   findFinishedPickles,
-  findNearbyPickles,
+  // findNearbyPickles,
   // findPopularPickles,
   // findHotTimePickles,
   // findPicklesByQueries,
@@ -15,13 +15,24 @@ import {
   myPickleFormat,
   finishedPickleFormat,
 } from "../dto/pickle.dto.js";
-import { filterRecruitingPickles, hotTimePicklesFilter, realtimeTrendingPickleFilter, nearbyPicklesFilter } from "../services/pickle.filter.js";
+import {
+  filterRecruitingPickles,
+  hotTimePicklesFilter,
+  realtimeTrendingPickleFilter,
+  nearbyPicklesFilter,
+  proceedingPicklesFilter,
+} from "../services/pickle.filter.js";
 
 export const getPickles = async (req, res) => {
   try {
     const now = new Date();
     const query = req.query.sortBy;
-    let pickles = await filterRecruitingPickles({now, page: 1, user: req.user, query});
+    let pickles = await filterRecruitingPickles({
+      now,
+      page: 1,
+      user: req.user,
+      query,
+    });
     // let pickles = await findRecruitingPickles();
     const total = pickles.length;
 
@@ -48,7 +59,11 @@ export const getPopularPickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({now, category: req.query.category, user: req.user});
+    let popularAndRecruitingPickles = await realtimeTrendingPickleFilter({
+      now,
+      category: req.query.category,
+      user: req.user,
+    });
     // let popularAndRecruitingPickles = await findPopularPickles();
 
     const filteredPickles =
@@ -66,8 +81,12 @@ export const getHotTimePickles = async (req, res) => {
   try {
     const now = new Date();
 
-    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter({now, category: req.query.category, user: req.user});
-    
+    let hotTimeAndRecruitingPickles = await hotTimePicklesFilter({
+      now,
+      category: req.query.category,
+      user: req.user,
+    });
+
     const filteredPickles =
       hotTimeAndRecruitingPickles.map(minimumFormatPickle);
 
@@ -117,9 +136,16 @@ export const getNearbyPickles = async (req, res) => {
 
 // 로그인 필수
 export const getProceedingPickles = async (req, res) => {
+  const now = new Date();
+  const today = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+  );
+
   const user = req.user._id;
+
   try {
     const { filteredPickles, todayPickles } = await findProceedingPickles(user);
+    const result = await proceedingPicklesFilter({user, today});
 
     const formattedFilteredPickles =
       filteredPickles?.map((pickle) => myPickleFormat(pickle, "progress")) ||
